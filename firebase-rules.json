@@ -1,0 +1,77 @@
+{
+  "rules": {
+    "users": {
+      "$userId": {
+        "read": "auth != null && (auth.uid == $userId || auth.uid == 'super_admin_uid')",
+        "create": "auth != null && auth.uid == $userId",
+        "update": "auth != null && (auth.uid == $userId || auth.uid == 'super_admin_uid')",
+        "delete": "auth != null && auth.uid == 'super_admin_uid'"
+      }
+    },
+    
+    "buildings": {
+      ".read": "auth != null && auth.uid == 'super_admin_uid'",
+      ".write": "auth != null && auth.uid == 'super_admin_uid'"
+    },
+    
+    "floors": {
+      ".read": "auth != null && auth.uid == 'super_admin_uid'",
+      ".write": "auth != null && auth.uid == 'super_admin_uid'"
+    },
+    
+    "units": {
+      ".read": "auth != null && auth.uid == 'super_admin_uid'",
+      ".write": "auth != null && auth.uid == 'super_admin_uid'"
+    },
+    
+    "leases": {
+      ".read": "auth != null && auth.uid == 'super_admin_uid'",
+      ".write": "auth != null && auth.uid == 'super_admin_uid'"
+    },
+    
+    "invoices": {
+      ".read": "auth != null && auth.uid == 'super_admin_uid'",
+      ".write": "auth != null && auth.uid == 'super_admin_uid'"
+    },
+    
+    "payments": {
+      ".read": "auth != null && auth.uid == 'super_admin_uid'",
+      ".write": "auth != null && auth.uid == 'super_admin_uid'"
+    },
+    
+    "expenses": {
+      ".read": "auth != null && auth.uid == 'super_admin_uid'",
+      ".write": "auth != null && auth.uid == 'super_admin_uid'"
+    },
+    
+    "maintenanceTickets": {
+      ".read": "auth != null && auth.uid == 'super_admin_uid'",
+      ".write": "auth != null && auth.uid == 'super_admin_uid'"
+    },
+    
+    "staff": {
+      ".read": "auth != null && auth.uid == 'super_admin_uid'",
+      ".write": "auth != null && auth.uid == 'super_admin_uid'"
+    },
+    
+    "visitors": {
+      ".read": "auth != null && auth.uid == 'super_admin_uid'",
+      ".write": "auth != null && auth.uid == 'super_admin_uid'"
+    },
+    
+    "complaints": {
+      ".read": "auth != null && auth.uid == 'super_admin_uid'",
+      ".write": "auth != null && auth.uid == 'super_admin_uid'"
+    },
+    
+    "parking": {
+      ".read": "auth != null && auth.uid == 'super_admin_uid'",
+      ".write": "auth != null && auth.uid == 'super_admin_uid'"
+    },
+    
+    "notices": {
+      ".read": "auth != null",
+      ".write": "auth != null && auth.uid == 'super_admin_uid'"
+    }
+  }
+}

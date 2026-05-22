@@ -1,0 +1,385 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  SUPER_ADMIN
+  MANAGER
+  OFFICE_ASSISTANT
+  RESIDENT
+  TENANT
+  RENTAL_OWNER
+  GENERAL_STAFF
+  PLUMBER
+  CLEANER
+  SECURITY_GUARD
+}
+
+enum UnitStatus {
+  VACANT
+  OCCUPIED
+  RESERVED
+  UNDER_MAINTENANCE
+}
+
+enum UnitType {
+  APARTMENT
+  STUDIO
+  PENTHOUSE
+  COMMERCIAL
+}
+
+enum LeaseStatus {
+  ACTIVE
+  EXPIRED
+  TERMINATED
+  PENDING_RENEWAL
+}
+
+enum InvoiceStatus {
+  PENDING
+  PAID
+  OVERDUE
+  CANCELLED
+  PARTIAL
+}
+
+enum PaymentStatus {
+  PENDING
+  COMPLETED
+  FAILED
+  REFUNDED
+}
+
+enum PaymentMethod {
+  CASH
+  BANK_TRANSFER
+  ESEWA
+  KHALTI
+  FONEPAY
+  MOBILE_BANKING
+  CREDIT_CARD
+  DEBIT_CARD
+}
+
+enum TicketStatus {
+  OPEN
+  ASSIGNED
+  IN_PROGRESS
+  PENDING_PARTS
+  COMPLETED
+  CLOSED
+}
+
+enum TicketPriority {
+  LOW
+  MEDIUM
+  HIGH
+  URGENT
+}
+
+enum TicketCategory {
+  PLUMBING
+  ELECTRICAL
+  CLEANING
+  ELEVATOR
+  SECURITY
+  WATER_LEAKAGE
+  AIR_CONDITIONING
+  PEST_CONTROL
+  INTERNET
+  OTHER
+}
+
+enum VisitorStatus {
+  ENTERED
+  EXITED
+  WAITING
+}
+
+model User {
+  id            String    @id @default(cuid())
+  email         String    @unique
+  password      String
+  name          String
+  phone         String?
+  role          UserRole  @default(RESIDENT)
+  image         String?
+  nationalId    String?
+  emergencyContact String?
+  emergencyPhone String?
+  isActive      Boolean   @default(true)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  ownedUnit     Unit?     @relation("OwnerRelation")
+  rentedUnit    Unit?     @relation("TenantRelation")
+  lease         Lease?
+  invoices      Invoice[]
+  payments      Payment[]
+  complaints    Complaint[]
+  maintenanceTicketsAssigned MaintenanceTicket[] @relation("AssignedStaff")
+  attendance    StaffAttendance[]
+  createdNotices Notice[] @relation("NoticeCreator")
+}
+
+model Building {
+  id          String   @id @default(cuid())
+  name        String
+  address     String
+  totalFloors Int
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  floors      Floor[]
+  units       Unit[]
+}
+
+model Floor {
+  id          String   @id @default(cuid())
+  buildingId  String
+  floorNumber Int
+  description String?
+
+  building    Building @relation(fields: [buildingId], references: [id], onDelete: Cascade)
+  units       Unit[]
+
+  @@unique([buildingId, floorNumber])
+}
+
+model Unit {
+  id              String      @id @default(cuid())
+  buildingId      String
+  floorId         String
+  unitNumber      String
+  type            UnitType    @default(APARTMENT)
+  area            Float
+  bedrooms        Int
+  bathrooms       Int
+  status          UnitStatus  @default(VACANT)
+  rent            Float       @default(0)
+  ownerId         String?     @unique
+  tenantId        String?     @unique
+
+  building        Building    @relation(fields: [buildingId], references: [id], onDelete: Cascade)
+  floor           Floor       @relation(fields: [floorId], references: [id], onDelete: Cascade)
+  owner           User?       @relation("OwnerRelation", fields: [ownerId], references: [id])
+  tenant          User?       @relation("TenantRelation", fields: [tenantId], references: [id])
+
+  leases          Lease[]
+  invoices        Invoice[]
+  complaints      Complaint[]
+  maintenanceTickets MaintenanceTicket[]
+  visitors        Visitor[]
+  parkingSlot     ParkingSlot?
+  utilityReadings UtilityReading[]
+
+  @@unique([buildingId, unitNumber])
+}
+
+model Lease {
+  id              String      @id @default(cuid())
+  unitId          String
+  tenantId        String      @unique
+  startDate       DateTime
+  endDate         DateTime
+  monthlyRent     Float
+  deposit         Float
+  status          LeaseStatus @default(ACTIVE)
+  documentUrl     String?
+  rentIncrement   Float       @default(0)
+  notes           String?
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+
+  unit            Unit        @relation(fields: [unitId], references: [id], onDelete: Cascade)
+  tenant          User        @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+}
+
+model Invoice {
+  id            String        @id @default(cuid())
+  invoiceNumber String        @unique
+  unitId        String
+  tenantId      String
+  month         Int
+  year          Int
+  dueDate       DateTime
+  totalAmount   Float
+  status        InvoiceStatus @default(PENDING)
+  notes         String?
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+
+  unit          Unit          @relation(fields: [unitId], references: [id], onDelete: Cascade)
+  tenant        User          @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  items         InvoiceItem[]
+  payments      Payment[]
+}
+
+model InvoiceItem {
+  id          String   @id @default(cuid())
+  invoiceId   String
+  description String
+  amount      Float
+
+  invoice     Invoice  @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+}
+
+model Payment {
+  id          String        @id @default(cuid())
+  invoiceId   String
+  tenantId    String
+  amount      Float
+  method      PaymentMethod
+  date        DateTime
+  reference   String?
+  status      PaymentStatus @default(PENDING)
+  notes       String?
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  invoice     Invoice      @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+  tenant      User         @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+}
+
+model Expense {
+  id          String   @id @default(cuid())
+  category    String
+  description String
+  amount      Float
+  date        DateTime
+  approvedBy  String?
+  receiptUrl  String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model MaintenanceTicket {
+  id          String          @id @default(cuid())
+  ticketNumber String          @unique
+  unitId      String
+  category    TicketCategory
+  priority    TicketPriority
+  description String
+  images      String[]
+  status      TicketStatus    @default(OPEN)
+  assignedToId String?
+  estimatedCost Float?
+  actualCost   Float?
+  scheduledDate DateTime?
+  completedDate DateTime?
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+
+  unit        Unit            @relation(fields: [unitId], references: [id], onDelete: Cascade)
+  assignedTo  User?           @relation("AssignedStaff", fields: [assignedToId], references: [id])
+  logs        MaintenanceLog[]
+}
+
+model MaintenanceLog {
+  id        String   @id @default(cuid())
+  ticketId  String
+  action    String
+  notes     String?
+  createdAt DateTime @default(now())
+
+  ticket    MaintenanceTicket @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+}
+
+model Complaint {
+  id          String   @id @default(cuid())
+  unitId      String
+  creatorId   String
+  category    String
+  description String
+  status      String   @default("OPEN")
+  priority    String   @default("MEDIUM")
+  resolvedAt  DateTime?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  unit        Unit     @relation(fields: [unitId], references: [id], onDelete: Cascade)
+  creator     User     @relation(fields: [creatorId], references: [id])
+}
+
+model Notice {
+  id          String   @id @default(cuid())
+  title       String
+  content     String
+  type        String   @default("GENERAL")
+  targetRoles String[]
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  creator     User     @relation("NoticeCreator", fields: [creatorId], references: [id])
+  creatorId   String
+}
+
+model Visitor {
+  id          String        @id @default(cuid())
+  unitId      String
+  name        String
+  phone       String?
+  vehicle     String?
+  purpose     String?
+  entryTime   DateTime      @default(now())
+  exitTime    DateTime?
+  status      VisitorStatus @default(WAITING)
+  badgeNumber String?
+
+  unit        Unit          @relation(fields: [unitId], references: [id], onDelete: Cascade)
+}
+
+model ParkingSlot {
+  id          String   @id @default(cuid())
+  unitId      String   @unique
+  slotNumber  String
+  vehicleNumber String?
+  vehicleModel String?
+  status      String   @default("AVAILABLE")
+  monthlyFee  Float    @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  unit        Unit     @relation(fields: [unitId], references: [id], onDelete: Cascade)
+}
+
+model StaffAttendance {
+  id        String   @id @default(cuid())
+  staffId   String
+  date      DateTime @default(now())
+  checkIn   DateTime?
+  checkOut  DateTime?
+  status    String   @default("PRESENT")
+  notes     String?
+
+  staff     User     @relation(fields: [staffId], references: [id], onDelete: Cascade)
+
+  @@unique([staffId, date])
+}
+
+model UtilityReading {
+  id          String   @id @default(cuid())
+  unitId      String
+  type        String
+  reading     Float
+  date        DateTime
+  createdAt   DateTime @default(now())
+
+  unit        Unit     @relation(fields: [unitId], references: [id], onDelete: Cascade)
+}
+
+model Settings {
+  id          String   @id @default(cuid())
+  key         String   @unique
+  value       String
+  description String?
+  updatedAt   DateTime @updatedAt
+}

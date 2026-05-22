@@ -1,0 +1,169 @@
+'use client'
+
+import { useState, useEffect } from 'react'
+import { SeedButton } from './SeedButton'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
+import { Building2, Home, Users, CreditCard, Wrench, TrendingUp, TrendingDown, DollarSign } from 'lucide-react'
+import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, Legend } from 'recharts'
+import { db } from '@/config/firebase'
+import { collection, onSnapshot } from 'firebase/firestore'
+import { Building, Unit, Invoice, MaintenanceTicket } from '@/types/models'
+
+export function AdminView({ profile }: { profile: any }) {
+  const [buildings, setBuildings] = useState<Building[]>([])
+  const [units, setUnits] = useState<Unit[]>([])
+  const [invoices, setInvoices] = useState<Invoice[]>([])
+  const [tickets, setTickets] = useState<MaintenanceTicket[]>([])
+
+  useEffect(() => {
+    const unsubBuildings = onSnapshot(collection(db, 'buildings'), (snap) => setBuildings(snap.docs.map(d => d.data() as Building)))
+    const unsubUnits = onSnapshot(collection(db, 'units'), (snap) => setUnits(snap.docs.map(d => d.data() as Unit)))
+    const unsubInvoices = onSnapshot(collection(db, 'invoices'), (snap) => setInvoices(snap.docs.map(d => d.data() as Invoice)))
+    const unsubTickets = onSnapshot(collection(db, 'maintenance'), (snap) => setTickets(snap.docs.map(d => d.data() as MaintenanceTicket)))
+
+    return () => {
+      unsubBuildings()
+      unsubUnits()
+      unsubInvoices()
+      unsubTickets()
+    }
+  }, [])
+
+  // Calculate KPIs
+  const occupiedUnits = units.filter(u => u.status === 'occupied').length
+  const occupancyRate = units.length > 0 ? Math.round((occupiedUnits / units.length) * 100) : 0
+  
+  const monthlyRevenue = invoices.filter(i => i.status === 'paid').reduce((acc, i) => acc + i.amount, 0)
+  const pendingPayments = invoices.filter(i => i.status === 'pending' || i.status === 'overdue').reduce((acc, i) => acc + i.amount, 0)
+  const openTickets = tickets.filter(t => t.status === 'open' || t.status === 'in_progress').length
+
+  const kpis = [
+    { title: 'Total Buildings', value: buildings.length.toString(), change: '', trend: 'up', icon: Building2, color: 'bg-blue-500' },
+    { title: 'Total Units', value: units.length.toString(), change: '', trend: 'up', icon: Home, color: 'bg-green-500' },
+    { title: 'Occupied Units', value: occupiedUnits.toString(), change: `${occupancyRate}%`, trend: 'up', icon: Users, color: 'bg-purple-500' },
+    { title: 'Monthly Revenue', value: `₨ ${monthlyRevenue.toLocaleString()}`, change: '', trend: 'up', icon: DollarSign, color: 'bg-yellow-500' },
+    { title: 'Pending Payments', value: `₨ ${pendingPayments.toLocaleString()}`, change: '', trend: 'down', icon: CreditCard, color: 'bg-red-500' },
+    { title: 'Open Tickets', value: openTickets.toString(), change: '', trend: 'up', icon: Wrench, color: 'bg-orange-500' },
+  ]
+
+  // Temporary mock data for charts since we don't have historical data yet
+  const revenueData = [
+    { month: 'Jan', revenue: 125000, expenses: 45000 },
+    { month: 'Feb', revenue: 132000, expenses: 48000 },
+    { month: 'Mar', revenue: 145000, expenses: 52000 },
+    { month: 'Apr', revenue: 138000, expenses: 49000 },
+    { month: 'May', revenue: 152000, expenses: 55000 },
+    { month: 'Jun', revenue: monthlyRevenue || 168000, expenses: 58000 },
+  ]
+
+  const vacantUnits = units.filter(u => u.status === 'vacant').length
+  const maintenanceUnits = units.filter(u => u.status === 'maintenance').length
+  const reservedUnits = units.filter(u => u.status === 'reserved').length
+
+  const occupancyData = units.length > 0 ? [
+    { name: 'Occupied', value: occupiedUnits, color: '#95DBAE' },
+    { name: 'Vacant', value: vacantUnits, color: '#F59E0B' },
+    { name: 'Reserved', value: reservedUnits, color: '#3B82F6' },
+    { name: 'Maintenance', value: maintenanceUnits, color: '#EF4444' },
+  ].filter(d => d.value > 0) : [
+    { name: 'No Data', value: 1, color: '#e2e8f0' }
+  ]
+
+  return (
+    <div className="space-y-6">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+        <div>
+          <h2 className="text-3xl font-bold tracking-tight">
+            Welcome back, {profile?.fullName?.split(' ')[0] || 'Admin'}!
+            <Badge variant="secondary" className="ml-2 align-middle bg-green-100 text-green-800 hover:bg-green-100">
+              {profile?.role}
+            </Badge>
+          </h2>
+          <p className="text-muted-foreground mt-1">
+            Here's the current overview of Sunrise Apartment.
+          </p>
+        </div>
+        <div className="flex gap-3">
+          <SeedButton />
+          <Button variant="outline">Export Report</Button>
+          <Button className="bg-emerald-400 hover:bg-emerald-500 text-black">Generate Invoice</Button>
+        </div>
+      </div>
+
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
+        {kpis.map((kpi, index) => (
+          <Card key={index}>
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm text-muted-foreground">{kpi.title}</p>
+                  <p className="text-2xl font-bold mt-1">{kpi.value}</p>
+                  <div className="flex items-center gap-1 mt-2">
+                    {kpi.change && (
+                      <>
+                        {kpi.trend === 'up' ? (
+                          <TrendingUp className="h-4 w-4 text-green-500" />
+                        ) : (
+                          <TrendingDown className="h-4 w-4 text-red-500" />
+                        )}
+                        <span className={`text-xs ${kpi.trend === 'up' ? 'text-green-500' : 'text-red-500'}`}>
+                          {kpi.change}
+                        </span>
+                      </>
+                    )}
+                  </div>
+                </div>
+                <div className={`p-3 rounded-lg ${kpi.color}`}>
+                  <kpi.icon className="h-6 w-6 text-white" />
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
+        <Card className="col-span-4">
+          <CardHeader><CardTitle>Revenue & Expenses</CardTitle></CardHeader>
+          <CardContent>
+            <ResponsiveContainer width="100%" height={350}>
+              <AreaChart data={revenueData}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
+                <XAxis dataKey="month" stroke="#64748b" />
+                <YAxis stroke="#64748b" tickFormatter={(value) => `₨${value / 1000}K`} />
+                <Tooltip formatter={(value: number) => [`₨${value.toLocaleString()}`, '']} />
+                <Area type="monotone" dataKey="revenue" stroke="#95DBAE" fill="#95DBAE" fillOpacity={0.3} name="Revenue" />
+                <Area type="monotone" dataKey="expenses" stroke="#F59E0B" fill="#F59E0B" fillOpacity={0.3} name="Expenses" />
+                <Legend />
+              </AreaChart>
+            </ResponsiveContainer>
+          </CardContent>
+        </Card>
+
+        <Card className="col-span-3">
+          <CardHeader><CardTitle>Occupancy Status</CardTitle></CardHeader>
+          <CardContent>
+            <ResponsiveContainer width="100%" height={350}>
+              <PieChart>
+                <Pie data={occupancyData} cx="50%" cy="50%" innerRadius={60} outerRadius={100} paddingAngle={5} dataKey="value" label={({ name, value }) => `${name}: ${value}`}>
+                  {occupancyData.map((entry, index) => (<Cell key={`cell-${index}`} fill={entry.color} />))}
+                </Pie>
+                <Tooltip />
+              </PieChart>
+            </ResponsiveContainer>
+            <div className="flex flex-wrap gap-4 justify-center mt-4">
+              {occupancyData.map((item) => (
+                <div key={item.name} className="flex items-center gap-2">
+                  <div className="w-3 h-3 rounded-full" style={{ backgroundColor: item.color }} />
+                  <span className="text-sm">{item.name}</span>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    </div>
+  )
+}
