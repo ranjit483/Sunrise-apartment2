@@ -4,7 +4,7 @@ import { Sidebar } from './Sidebar'
 import { Navbar } from './Navbar'
 import { useAuth } from '@/context/AuthContext'
 import { Loader2 } from 'lucide-react'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 
 import { signOut } from 'firebase/auth'
