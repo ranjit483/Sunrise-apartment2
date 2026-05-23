@@ -37,9 +37,10 @@ export default function ProfilePage() {
   }, [profile])
 
   const getInitials = (name: string) => {
+    if (!name || typeof name !== 'string') return 'U'
     return name
       .split(' ')
-      .map((n) => n[0])
+      .map((n) => n[0] || '')
       .join('')
       .toUpperCase()
       .substring(0, 2)
@@ -111,7 +112,7 @@ export default function ProfilePage() {
                 Role
               </div>
               <Badge variant="secondary" className="font-medium">
-                {profile.role.replace('_', ' ')}
+                {profile.role ? profile.role.replace('_', ' ') : 'UNKNOWN'}
               </Badge>
             </div>
             <div className="flex items-center justify-between">
