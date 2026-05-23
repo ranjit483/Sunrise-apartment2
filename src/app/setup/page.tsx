@@ -38,7 +38,7 @@ export default function SetupPage() {
       const q = await getDocs(usersCollection)
       
       let hasSuperAdmin = false
-      q.forEach((doc) => {
+      q.forEach((doc: any) => {
         if (doc.data().role === 'SUPER_ADMIN' && doc.data().status === 'approved') {
           hasSuperAdmin = true
         }

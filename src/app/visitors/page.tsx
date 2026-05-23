@@ -17,7 +17,7 @@ export default function VisitorsPage() {
     const q = query(collection(db, 'visitors'), orderBy('createdAt', 'desc'))
     const unsubscribe = onSnapshot(q, (snapshot) => {
       const vData: Visitor[] = []
-      snapshot.forEach((doc) => {
+      snapshot.forEach((doc: any) => {
         vData.push(doc.data() as Visitor)
       })
       setVisitors(vData)

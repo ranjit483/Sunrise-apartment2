@@ -17,7 +17,7 @@ export default function ParkingPage() {
     const q = query(collection(db, 'parking'), orderBy('slotNumber', 'asc'))
     const unsubscribe = onSnapshot(q, (snapshot) => {
       const pData: ParkingSlot[] = []
-      snapshot.forEach((doc) => {
+      snapshot.forEach((doc: any) => {
         pData.push({ id: doc.id, ...doc.data() } as ParkingSlot)
       })
       setParkingSlots(pData)

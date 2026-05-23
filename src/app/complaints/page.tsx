@@ -21,7 +21,7 @@ export default function ComplaintsPage() {
     const q = query(collection(db, 'complaints'), orderBy('createdAt', 'desc'))
     const unsubscribe = onSnapshot(q, (snapshot) => {
       const cData: Complaint[] = []
-      snapshot.forEach((doc) => {
+      snapshot.forEach((doc: any) => {
         const data = doc.data() as Complaint;
         // Filter for GUARD role
         if (profile.role === 'GUARD') {

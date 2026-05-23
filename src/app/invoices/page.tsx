@@ -52,7 +52,7 @@ export default function InvoicesPage() {
     const q = query(collection(db, 'invoices'), orderBy('createdAt', 'desc'))
     const unsubscribe = onSnapshot(q, (snapshot) => {
       const bData: Invoice[] = []
-      snapshot.forEach((doc) => {
+      snapshot.forEach((doc: any) => {
         bData.push(doc.data() as Invoice)
       })
       setInvoices(bData)
@@ -77,7 +77,7 @@ export default function InvoicesPage() {
       const usersSnapshot = await getDocs(usersQuery)
       
       const targetUsers: any[] = []
-      usersSnapshot.forEach(doc => {
+      usersSnapshot.forEach((doc: any) => {
         const u = doc.data()
         if (['TENANT', 'RESIDENT', 'OWNER'].includes(u.role)) {
           targetUsers.push(u)
@@ -92,7 +92,7 @@ export default function InvoicesPage() {
 
       const unitsSnapshot = await getDocs(collection(db, 'units'))
       const unitsByNumber: Record<string, Unit> = {}
-      unitsSnapshot.forEach(doc => {
+      unitsSnapshot.forEach((doc: any) => {
         const u = doc.data() as Unit
         if (u.unitNumber) {
           unitsByNumber[u.unitNumber.toLowerCase().trim()] = u
@@ -175,7 +175,7 @@ export default function InvoicesPage() {
 
       const batch = writeBatch(db)
       let count = 0
-      snapshot.forEach(doc => {
+      snapshot.forEach((doc: any) => {
         batch.delete(doc.ref)
         count++
         // Note: Firestore batches have a 500 operation limit. Assuming < 500 invoices for now.

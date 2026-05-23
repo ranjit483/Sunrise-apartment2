@@ -16,7 +16,7 @@ export function GuardView({ profile }: { profile: any }) {
     const unsubscribe = onSnapshot(q, (snapshot) => {
       let count = 0;
       const allowedCategories = ['Parking', 'Security', 'Emergency']
-      snapshot.forEach(doc => {
+      snapshot.forEach((doc: any) => {
         const data = doc.data()
         if (data.category && allowedCategories.includes(data.category)) {
           count++

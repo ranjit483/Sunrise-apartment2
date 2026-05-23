@@ -39,7 +39,7 @@ export default function AdminApprovePage() {
         const q = query(collection(db, 'users'), where('status', '==', 'pending_approval'))
         const snapshot = await getDocs(q)
         const pendingUsers: any[] = []
-        snapshot.forEach(doc => {
+        snapshot.forEach((doc: any) => {
           pendingUsers.push({ id: doc.id, ...doc.data() })
         })
         setUsers(pendingUsers)

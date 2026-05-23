@@ -32,7 +32,7 @@ export default function StaffPage() {
     const q = query(collection(db, 'users'), orderBy('createdAt', 'desc'))
     const unsubscribe = onSnapshot(q, (snapshot) => {
       const sData: StaffUser[] = []
-      snapshot.forEach((doc) => {
+      snapshot.forEach((doc: any) => {
         const data = doc.data() as StaffUser
         // Filter out non-staff roles
         if (!['SUPER_ADMIN', 'RESIDENT', 'TENANT'].includes(data.role)) {

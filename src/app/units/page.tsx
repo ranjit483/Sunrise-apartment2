@@ -48,7 +48,7 @@ export default function UnitsPage() {
   useEffect(() => {
     const unsubUnits = onSnapshot(query(collection(db, 'units'), orderBy('unitNumber')), (snapshot) => {
       const uData: Unit[] = []
-      snapshot.forEach((doc) => {
+      snapshot.forEach((doc: any) => {
         uData.push(doc.data() as Unit)
       })
       setUnits(uData)
@@ -60,7 +60,7 @@ export default function UnitsPage() {
 
     const unsubBuildings = onSnapshot(query(collection(db, 'buildings'), orderBy('name')), (snapshot) => {
       const bData: Building[] = []
-      snapshot.forEach((doc) => {
+      snapshot.forEach((doc: any) => {
         bData.push(doc.data() as Building)
       })
       setBuildings(bData)

@@ -17,7 +17,7 @@ export default function LeasesPage() {
     const q = query(collection(db, 'leases'), orderBy('startDate', 'desc'))
     const unsubscribe = onSnapshot(q, (snapshot) => {
       const lData: Lease[] = []
-      snapshot.forEach((doc) => {
+      snapshot.forEach((doc: any) => {
         lData.push(doc.data() as Lease)
       })
       setLeases(lData)

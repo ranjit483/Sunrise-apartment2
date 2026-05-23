@@ -20,7 +20,7 @@ export default function MaintenancePage() {
     const q = query(collection(db, 'maintenance'), orderBy('createdAt', 'desc'))
     const unsubscribe = onSnapshot(q, (snapshot) => {
       const tData: MaintenanceTicket[] = []
-      snapshot.forEach((doc) => {
+      snapshot.forEach((doc: any) => {
         tData.push(doc.data() as MaintenanceTicket)
       })
       setTickets(tData)

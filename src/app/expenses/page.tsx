@@ -16,7 +16,7 @@ export default function ExpensesPage() {
     const q = query(collection(db, 'expenses'), orderBy('date', 'desc'))
     const unsubscribe = onSnapshot(q, (snapshot) => {
       const eData: Expense[] = []
-      snapshot.forEach((doc) => {
+      snapshot.forEach((doc: any) => {
         eData.push(doc.data() as Expense)
       })
       setExpenses(eData)

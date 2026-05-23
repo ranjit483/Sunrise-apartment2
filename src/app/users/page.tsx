@@ -119,7 +119,7 @@ export default function UsersPage() {
         const q = query(collection(db, 'users'))
         const querySnapshot = await getDocs(q)
         const fetchedUsers: UserData[] = []
-        querySnapshot.forEach((doc) => {
+        querySnapshot.forEach((doc: any) => {
           const data = doc.data()
           fetchedUsers.push({
             id: doc.id,

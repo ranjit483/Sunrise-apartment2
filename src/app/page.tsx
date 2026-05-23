@@ -51,7 +51,7 @@ function LandingContent() {
           const usersCollection = collection(db, 'users')
           const snapshot = await getDocs(usersCollection)
           let hasSuperAdmin = false
-          snapshot.forEach((doc) => {
+          snapshot.forEach((doc: any) => {
             if (doc.data().role === 'SUPER_ADMIN' && doc.data().status === 'approved') {
               hasSuperAdmin = true
             }

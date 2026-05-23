@@ -56,7 +56,7 @@ export default function ApproveUsersPage() {
       const snapshot = await getDocs(usersCollection)
       
       const users: UserItem[] = []
-      snapshot.forEach((doc) => {
+      snapshot.forEach((doc: any) => {
         users.push(doc.data() as UserItem)
       })
       

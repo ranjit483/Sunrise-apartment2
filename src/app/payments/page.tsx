@@ -17,7 +17,7 @@ export default function PaymentsPage() {
     const q = query(collection(db, 'payments'), orderBy('createdAt', 'desc'))
     const unsubscribe = onSnapshot(q, (snapshot) => {
       const pData: Payment[] = []
-      snapshot.forEach((doc) => {
+      snapshot.forEach((doc: any) => {
         pData.push(doc.data() as Payment)
       })
       setPayments(pData)
