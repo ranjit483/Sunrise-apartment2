@@ -29,12 +29,26 @@ export function GuardView({ profile }: { profile: any }) {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h2 className="text-3xl font-bold flex items-center gap-2">
-          <ShieldCheck className="h-8 w-8 text-primary" />
-          Guard Dashboard
-        </h2>
-        <p className="text-muted-foreground mt-1">Welcome back, {profile.fullName}. Here is your security overview.</p>
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div>
+          <h2 className="text-3xl font-bold flex items-center gap-2">
+            <ShieldCheck className="h-8 w-8 text-primary" />
+            Guard Dashboard
+          </h2>
+          <p className="text-muted-foreground mt-1">Welcome back, {profile.fullName}. Here is your security overview.</p>
+        </div>
+        <div className="flex gap-2">
+          <Link href="/visitors">
+            <button className="px-4 py-2 bg-green-400 hover:bg-green-500 text-green-950 font-medium rounded-md shadow-sm transition-colors">
+              Register Visitor
+            </button>
+          </Link>
+          <Link href="/visitors">
+            <button className="px-4 py-2 bg-white border border-gray-200 hover:bg-gray-50 text-blue-900 font-medium rounded-md shadow-sm transition-colors">
+              Log Delivery
+            </button>
+          </Link>
+        </div>
       </div>
 
       <div className="grid gap-4 md:grid-cols-3">
