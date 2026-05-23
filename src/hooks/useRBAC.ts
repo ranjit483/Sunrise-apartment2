@@ -1,5 +1,5 @@
-import { useAuth } from '@/context/AuthContext'
-import { canPerformAction, hasClearance, PermissionAction, UserRole } from '@/lib/rbac'
+import { useAuth, UserRole } from '@/context/AuthContext'
+import { canPerformAction, hasClearance, PermissionAction } from '@/lib/rbac'
 
 export function useRBAC() {
   const { profile } = useAuth()
