@@ -57,6 +57,7 @@ export default function DashboardPage() {
     switch (profile.role) {
       case 'SUPER_ADMIN':
       case 'MANAGER':
+      case 'ACCOUNTANT':
         return <AdminView profile={profile} />
       case 'OFFICE_ASSISTANT':
       case 'GENERAL_STAFF':
