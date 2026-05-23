@@ -36,7 +36,7 @@ export interface UserProfile {
 }
 
 interface AuthContextType {
-  user: User | null
+  user: any | null
   profile: UserProfile | null
   loading: boolean
   signOut: () => Promise<void>
@@ -114,10 +114,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, async (firebaseUser: any) => {
-      setUser(firebaseUser)
-      if (firebaseUser) {
-        await fetchProfile(firebaseUser.uid)
+    const unsubscribe = onAuthStateChanged(auth, async (currentUser: any) => {
+      setUser(currentUser as any)
+      
+      if (currentUser) {
+        await fetchProfile(currentUser.uid)
       } else {
         setProfile(null)
       }

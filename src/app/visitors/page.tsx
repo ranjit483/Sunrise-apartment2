@@ -15,14 +15,14 @@ export default function VisitorsPage() {
 
   useEffect(() => {
     const q = query(collection(db, 'visitors'), orderBy('createdAt', 'desc'))
-    const unsubscribe = onSnapshot(q, (snapshot) => {
+    const unsubscribe = onSnapshot(q, (snapshot: any) => {
       const vData: Visitor[] = []
       snapshot.forEach((doc: any) => {
         vData.push(doc.data() as Visitor)
       })
       setVisitors(vData)
       setLoading(false)
-    }, (error) => {
+    }, (error: any) => {
       console.error('Error fetching visitors:', error)
       setLoading(false)
     })

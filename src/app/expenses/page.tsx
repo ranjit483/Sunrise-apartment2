@@ -14,14 +14,14 @@ export default function ExpensesPage() {
 
   useEffect(() => {
     const q = query(collection(db, 'expenses'), orderBy('date', 'desc'))
-    const unsubscribe = onSnapshot(q, (snapshot) => {
+    const unsubscribe = onSnapshot(q, (snapshot: any) => {
       const eData: Expense[] = []
       snapshot.forEach((doc: any) => {
         eData.push(doc.data() as Expense)
       })
       setExpenses(eData)
       setLoading(false)
-    }, (error) => {
+    }, (error: any) => {
       console.error('Error fetching expenses:', error)
       setLoading(false)
     })

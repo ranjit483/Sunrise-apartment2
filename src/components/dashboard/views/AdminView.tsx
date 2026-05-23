@@ -18,10 +18,10 @@ export function AdminView({ profile }: { profile: any }) {
   const [tickets, setTickets] = useState<MaintenanceTicket[]>([])
 
   useEffect(() => {
-    const unsubBuildings = onSnapshot(collection(db, 'buildings'), (snap) => setBuildings(snap.docs.map(d => d.data() as Building)))
-    const unsubUnits = onSnapshot(collection(db, 'units'), (snap) => setUnits(snap.docs.map(d => d.data() as Unit)))
-    const unsubInvoices = onSnapshot(collection(db, 'invoices'), (snap) => setInvoices(snap.docs.map(d => d.data() as Invoice)))
-    const unsubTickets = onSnapshot(collection(db, 'maintenance'), (snap) => setTickets(snap.docs.map(d => d.data() as MaintenanceTicket)))
+    const unsubBuildings = onSnapshot(collection(db, 'buildings'), (snap: any) => setBuildings(snap.docs.map((d: any) => d.data() as Building)))
+    const unsubUnits = onSnapshot(collection(db, 'units'), (snap: any) => setUnits(snap.docs.map((d: any) => d.data() as Unit)))
+    const unsubInvoices = onSnapshot(collection(db, 'invoices'), (snap: any) => setInvoices(snap.docs.map((d: any) => d.data() as Invoice)))
+    const unsubTickets = onSnapshot(collection(db, 'maintenance'), (snap: any) => setTickets(snap.docs.map((d: any) => d.data() as MaintenanceTicket)))
 
     return () => {
       unsubBuildings()
@@ -67,7 +67,7 @@ export function AdminView({ profile }: { profile: any }) {
     { name: 'Vacant', value: vacantUnits, color: '#F59E0B' },
     { name: 'Reserved', value: reservedUnits, color: '#3B82F6' },
     { name: 'Maintenance', value: maintenanceUnits, color: '#EF4444' },
-  ].filter(d => d.value > 0) : [
+  ].filter((d: any) => d.value > 0) : [
     { name: 'No Data', value: 1, color: '#e2e8f0' }
   ]
 

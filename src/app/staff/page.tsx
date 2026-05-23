@@ -30,7 +30,7 @@ export default function StaffPage() {
 
   useEffect(() => {
     const q = query(collection(db, 'users'), orderBy('createdAt', 'desc'))
-    const unsubscribe = onSnapshot(q, (snapshot) => {
+    const unsubscribe = onSnapshot(q, (snapshot: any) => {
       const sData: StaffUser[] = []
       snapshot.forEach((doc: any) => {
         const data = doc.data() as StaffUser
@@ -41,7 +41,7 @@ export default function StaffPage() {
       })
       setStaff(sData)
       setLoading(false)
-    }, (error) => {
+    }, (error: any) => {
       console.error('Error fetching staff:', error)
       setLoading(false)
     })

@@ -46,25 +46,25 @@ export default function UnitsPage() {
   const [editingUnit, setEditingUnit] = useState<Unit | null>(null)
 
   useEffect(() => {
-    const unsubUnits = onSnapshot(query(collection(db, 'units'), orderBy('unitNumber')), (snapshot) => {
+    const unsubUnits = onSnapshot(query(collection(db, 'units'), orderBy('unitNumber')), (snapshot: any) => {
       const uData: Unit[] = []
       snapshot.forEach((doc: any) => {
         uData.push(doc.data() as Unit)
       })
       setUnits(uData)
       setLoading(false)
-    }, (error) => {
+    }, (error: any) => {
       console.error('Error fetching units:', error)
       setLoading(false)
     })
 
-    const unsubBuildings = onSnapshot(query(collection(db, 'buildings'), orderBy('name')), (snapshot) => {
+    const unsubBuildings = onSnapshot(query(collection(db, 'buildings'), orderBy('name')), (snapshot: any) => {
       const bData: Building[] = []
       snapshot.forEach((doc: any) => {
         bData.push(doc.data() as Building)
       })
       setBuildings(bData)
-    }, (error) => {
+    }, (error: any) => {
       console.error('Error fetching buildings:', error)
     })
 
@@ -320,7 +320,7 @@ export default function UnitsPage() {
                 </thead>
                 <tbody>
                   {units.map((u) => {
-                    const b = buildings.find(bld => bld.id === u.buildingId)
+                    const b = buildings.find((bld: any) => bld.id === u.buildingId)
                     return (
                       <tr key={u.id} className="border-b">
                         <td className="py-3 font-medium">{u.unitNumber}</td>

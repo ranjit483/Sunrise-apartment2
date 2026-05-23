@@ -34,12 +34,12 @@ export default function SettingsPage() {
 
   useEffect(() => {
     const docRef = doc(db, 'settings', 'general')
-    const unsubscribe = onSnapshot(docRef, (docSnap) => {
+    const unsubscribe = onSnapshot(docRef, (docSnap: any) => {
       if (docSnap.exists()) {
         setSettings(docSnap.data() as SystemSettings)
       }
       setLoading(false)
-    }, (error) => {
+    }, (error: any) => {
       console.error('Error fetching settings:', error)
       setLoading(false)
     })

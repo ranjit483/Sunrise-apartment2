@@ -14,11 +14,11 @@ export function StaffView({ profile }: { profile: any }) {
   const [complaints, setComplaints] = useState<Complaint[]>([])
 
   useEffect(() => {
-    const unsubVis = onSnapshot(query(collection(db, 'visitors'), orderBy('createdAt', 'desc')), (snap) => {
-      setVisitors(snap.docs.map(d => ({ id: d.id, ...d.data() } as Visitor)))
+    const unsubVis = onSnapshot(query(collection(db, 'visitors'), orderBy('createdAt', 'desc')), (snap: any) => {
+      setVisitors(snap.docs.map((d: any) => ({ id: d.id, ...d.data() } as Visitor)))
     })
-    const unsubComp = onSnapshot(query(collection(db, 'complaints'), orderBy('createdAt', 'desc')), (snap) => {
-      setComplaints(snap.docs.map(d => ({ id: d.id, ...d.data() } as Complaint)))
+    const unsubComp = onSnapshot(query(collection(db, 'complaints'), orderBy('createdAt', 'desc')), (snap: any) => {
+      setComplaints(snap.docs.map((d: any) => ({ id: d.id, ...d.data() } as Complaint)))
     })
 
     return () => {

@@ -34,25 +34,25 @@ export default function BuildingsPage() {
   })
 
   useEffect(() => {
-    const unsubBuildings = onSnapshot(query(collection(db, 'buildings'), orderBy('name')), (snapshot) => {
+    const unsubBuildings = onSnapshot(query(collection(db, 'buildings'), orderBy('name')), (snapshot: any) => {
       const bData: Building[] = []
       snapshot.forEach((doc: any) => {
         bData.push(doc.data() as Building)
       })
       setBuildings(bData)
       setLoading(false)
-    }, (error) => {
+    }, (error: any) => {
       console.error('Error fetching buildings:', error)
       setLoading(false)
     })
 
-    const unsubUnits = onSnapshot(collection(db, 'units'), (snapshot) => {
+    const unsubUnits = onSnapshot(collection(db, 'units'), (snapshot: any) => {
       const uData: any[] = []
       snapshot.forEach((doc: any) => {
         uData.push(doc.data())
       })
       setUnits(uData)
-    }, (error) => {
+    }, (error: any) => {
       console.error('Error fetching units:', error)
     })
 

@@ -18,14 +18,14 @@ export default function MaintenancePage() {
 
   useEffect(() => {
     const q = query(collection(db, 'maintenance'), orderBy('createdAt', 'desc'))
-    const unsubscribe = onSnapshot(q, (snapshot) => {
+    const unsubscribe = onSnapshot(q, (snapshot: any) => {
       const tData: MaintenanceTicket[] = []
       snapshot.forEach((doc: any) => {
         tData.push(doc.data() as MaintenanceTicket)
       })
       setTickets(tData)
       setLoading(false)
-    }, (error) => {
+    }, (error: any) => {
       console.error('Error fetching maintenance tickets:', error)
       setLoading(false)
     })

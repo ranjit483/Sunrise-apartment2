@@ -15,14 +15,14 @@ export default function PaymentsPage() {
 
   useEffect(() => {
     const q = query(collection(db, 'payments'), orderBy('createdAt', 'desc'))
-    const unsubscribe = onSnapshot(q, (snapshot) => {
+    const unsubscribe = onSnapshot(q, (snapshot: any) => {
       const pData: Payment[] = []
       snapshot.forEach((doc: any) => {
         pData.push(doc.data() as Payment)
       })
       setPayments(pData)
       setLoading(false)
-    }, (error) => {
+    }, (error: any) => {
       console.error('Error fetching payments:', error)
       setLoading(false)
     })

@@ -15,14 +15,14 @@ export default function ParkingPage() {
 
   useEffect(() => {
     const q = query(collection(db, 'parking'), orderBy('slotNumber', 'asc'))
-    const unsubscribe = onSnapshot(q, (snapshot) => {
+    const unsubscribe = onSnapshot(q, (snapshot: any) => {
       const pData: ParkingSlot[] = []
       snapshot.forEach((doc: any) => {
         pData.push({ id: doc.id, ...doc.data() } as ParkingSlot)
       })
       setParkingSlots(pData)
       setLoading(false)
-    }, (error) => {
+    }, (error: any) => {
       console.error('Error fetching parking slots:', error)
       setLoading(false)
     })

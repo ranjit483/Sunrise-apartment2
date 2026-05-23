@@ -15,14 +15,14 @@ export default function LeasesPage() {
 
   useEffect(() => {
     const q = query(collection(db, 'leases'), orderBy('startDate', 'desc'))
-    const unsubscribe = onSnapshot(q, (snapshot) => {
+    const unsubscribe = onSnapshot(q, (snapshot: any) => {
       const lData: Lease[] = []
       snapshot.forEach((doc: any) => {
         lData.push(doc.data() as Lease)
       })
       setLeases(lData)
       setLoading(false)
-    }, (error) => {
+    }, (error: any) => {
       console.error('Error fetching leases:', error)
       setLoading(false)
     })

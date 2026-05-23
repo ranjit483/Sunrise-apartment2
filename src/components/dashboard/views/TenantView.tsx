@@ -17,16 +17,16 @@ export function TenantView({ profile }: { profile: any }) {
   useEffect(() => {
     if (!profile?.uid) return;
 
-    const unsubInvoices = onSnapshot(query(collection(db, 'invoices'), where('tenantId', '==', profile.uid)), (snap) => {
-      setInvoices(snap.docs.map(d => ({ id: d.id, ...d.data() } as Invoice)))
+    const unsubInvoices = onSnapshot(query(collection(db, 'invoices'), where('tenantId', '==', profile.uid)), (snap: any) => {
+      setInvoices(snap.docs.map((d: any) => ({ id: d.id, ...d.data() } as Invoice)))
     })
     
-    const unsubTickets = onSnapshot(query(collection(db, 'maintenance'), where('reportedBy', '==', profile.uid)), (snap) => {
-      setTickets(snap.docs.map(d => ({ id: d.id, ...d.data() } as MaintenanceTicket)))
+    const unsubTickets = onSnapshot(query(collection(db, 'maintenance'), where('reportedBy', '==', profile.uid)), (snap: any) => {
+      setTickets(snap.docs.map((d: any) => ({ id: d.id, ...d.data() } as MaintenanceTicket)))
     })
 
-    const unsubLeases = onSnapshot(query(collection(db, 'leases'), where('tenantId', '==', profile.uid)), (snap) => {
-      setLeases(snap.docs.map(d => ({ id: d.id, ...d.data() } as Lease)))
+    const unsubLeases = onSnapshot(query(collection(db, 'leases'), where('tenantId', '==', profile.uid)), (snap: any) => {
+      setLeases(snap.docs.map((d: any) => ({ id: d.id, ...d.data() } as Lease)))
     })
 
     return () => {

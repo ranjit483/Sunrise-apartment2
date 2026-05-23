@@ -13,7 +13,7 @@ export function GuardView({ profile }: { profile: any }) {
     // However, since we don't have category-based filtering in firestore right now
     // due to missing composite indexes, we'll fetch all open complaints and filter in memory.
     const q = query(collection(db, 'complaints'), where('status', 'in', ['open', 'in_progress']))
-    const unsubscribe = onSnapshot(q, (snapshot) => {
+    const unsubscribe = onSnapshot(q, (snapshot: any) => {
       let count = 0;
       const allowedCategories = ['Parking', 'Security', 'Emergency']
       snapshot.forEach((doc: any) => {

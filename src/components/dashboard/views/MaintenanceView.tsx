@@ -13,15 +13,15 @@ export function MaintenanceView({ profile }: { profile: any }) {
   const [tickets, setTickets] = useState<MaintenanceTicket[]>([])
 
   useEffect(() => {
-    const unsub = onSnapshot(query(collection(db, 'maintenance'), orderBy('createdAt', 'desc')), (snap) => {
-      setTickets(snap.docs.map(d => ({ id: d.id, ...d.data() } as MaintenanceTicket)))
+    const unsub = onSnapshot(query(collection(db, 'maintenance'), orderBy('createdAt', 'desc')), (snap: any) => {
+      setTickets(snap.docs.map((d: any) => ({ id: d.id, ...d.data() } as MaintenanceTicket)))
     })
 
     return () => unsub()
   }, [])
 
   const pendingTasks = tickets.filter(t => t.status === 'open' || t.status === 'in_progress').length
-  const urgentIssues = tickets.filter(t => t.priority === 'urgent' || t.priority === 'high').length
+  const urgentIssues = tickets.filter(t => t.priority === 'critical' || t.priority === 'high').length
   const completedToday = tickets.filter(t => t.status === 'resolved').length // Ideally check if resolvedAt is today, keeping it simple for now
 
   return (
@@ -93,7 +93,7 @@ export function MaintenanceView({ profile }: { profile: any }) {
                     <div>
                       <div className="flex items-center gap-2">
                         <p className="font-bold text-lg">{ticket.title}</p>
-                        <Badge variant={ticket.priority === 'urgent' ? 'destructive' : ticket.priority === 'high' ? 'warning' : 'secondary'}>
+                        <Badge variant={ticket.priority === 'critical' ? 'destructive' : ticket.priority === 'high' ? 'warning' : 'secondary'}>
                           {ticket.priority.toUpperCase()}
                         </Badge>
                       </div>

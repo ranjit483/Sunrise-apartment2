@@ -50,14 +50,14 @@ export default function InvoicesPage() {
 
   useEffect(() => {
     const q = query(collection(db, 'invoices'), orderBy('createdAt', 'desc'))
-    const unsubscribe = onSnapshot(q, (snapshot) => {
+    const unsubscribe = onSnapshot(q, (snapshot: any) => {
       const bData: Invoice[] = []
       snapshot.forEach((doc: any) => {
         bData.push(doc.data() as Invoice)
       })
       setInvoices(bData)
       setLoading(false)
-    }, (error) => {
+    }, (error: any) => {
       console.error('Error fetching invoices:', error)
       setLoading(false)
     })

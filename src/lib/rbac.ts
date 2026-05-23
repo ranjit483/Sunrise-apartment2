@@ -1,4 +1,4 @@
-import { UserRole } from '@/context/AuthContext'
+import type { UserRole } from '@/context/AuthContext'
 
 export const RoleHierarchy: Record<UserRole, number> = {
   SUPER_ADMIN: 1,

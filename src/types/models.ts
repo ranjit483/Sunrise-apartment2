@@ -1,4 +1,4 @@
-import { UserRole } from '@/context/AuthContext'
+import type { UserRole } from '@/context/AuthContext'
 
 export type BuildingStatus = 'active' | 'maintenance' | 'inactive'
 export type UnitStatus = 'vacant' | 'occupied' | 'maintenance' | 'reserved'

@@ -19,7 +19,7 @@ export default function ComplaintsPage() {
     if (!profile) return;
     
     const q = query(collection(db, 'complaints'), orderBy('createdAt', 'desc'))
-    const unsubscribe = onSnapshot(q, (snapshot) => {
+    const unsubscribe = onSnapshot(q, (snapshot: any) => {
       const cData: Complaint[] = []
       snapshot.forEach((doc: any) => {
         const data = doc.data() as Complaint;
@@ -27,15 +27,15 @@ export default function ComplaintsPage() {
         if (profile.role === 'GUARD') {
           const allowedCategories = ['Parking', 'Security', 'Emergency']
           if (data.category && allowedCategories.includes(data.category)) {
-            cData.push({ id: doc.id, ...data })
+            cData.push(data)
           }
         } else {
-          cData.push({ id: doc.id, ...data })
+          cData.push(data)
         }
       })
       setComplaints(cData)
       setLoading(false)
-    }, (error) => {
+    }, (error: any) => {
       console.error('Error fetching complaints:', error)
       setLoading(false)
     })
