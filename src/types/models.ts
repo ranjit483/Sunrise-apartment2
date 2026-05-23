@@ -151,6 +151,9 @@ export interface SystemSettings {
   lateFeePercent: number
   autoGenerateInvoices: boolean
   sendEmailReminders: boolean
+}
+
+export interface UserSettings {
   emailNotifications: boolean
   smsNotifications: boolean
   pushNotifications: boolean
