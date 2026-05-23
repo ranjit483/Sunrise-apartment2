@@ -107,7 +107,7 @@ export default function AdminAddPage() {
     try {
       const snapshot = await getDocs(collection(db, 'users'))
       const userList: any[] = []
-      snapshot.forEach((doc) => {
+      snapshot.forEach((doc: any) => {
         userList.push(doc.data())
       })
       setUsers(userList)

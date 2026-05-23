@@ -94,6 +94,7 @@ export interface Complaint {
   tenantId: string
   title: string
   description: string
+  category?: string
   status: TicketStatus
   createdAt: string
   updatedAt: string

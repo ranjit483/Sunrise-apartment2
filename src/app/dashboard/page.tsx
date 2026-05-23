@@ -10,6 +10,7 @@ import { AdminView } from '@/components/dashboard/views/AdminView'
 import { TenantView } from '@/components/dashboard/views/TenantView'
 import { StaffView } from '@/components/dashboard/views/StaffView'
 import { MaintenanceView } from '@/components/dashboard/views/MaintenanceView'
+import { GuardView } from '@/components/dashboard/views/GuardView'
 
 export default function DashboardPage() {
   const router = useRouter()
@@ -67,6 +68,8 @@ export default function DashboardPage() {
       case 'ELECTRICIAN':
       case 'CLEANER':
         return <MaintenanceView profile={profile} />
+      case 'GUARD':
+        return <GuardView profile={profile} />
       default:
         return (
           <div className="text-center py-10">

@@ -30,6 +30,8 @@ interface NavItem {
   href: string
   icon: React.ElementType
   roles?: string[]
+  excludeRoles?: string[]
+  includeRoles?: string[]
   minClearance?: number
 }
 
@@ -43,11 +45,11 @@ const navItems: NavItem[] = [
   { title: 'Invoices', href: '/invoices', icon: FileText, minClearance: 4 },
   { title: 'Payments', href: '/payments', icon: CreditCard, minClearance: 4 },
   { title: 'Expenses', href: '/expenses', icon: CreditCard, minClearance: 2 },
-  { title: 'Maintenance', href: '/maintenance', icon: Wrench },
+  { title: 'Maintenance', href: '/maintenance', icon: Wrench, excludeRoles: ['GUARD'] },
   { title: 'Staff', href: '/staff', icon: UserCheck, minClearance: 3 },
-  { title: 'Visitors', href: '/visitors', icon: UsersRound, minClearance: 5 },
+  { title: 'Visitors', href: '/visitors', icon: UsersRound, minClearance: 5, includeRoles: ['GUARD'] },
   { title: 'Complaints', href: '/complaints', icon: Bell },
-  { title: 'Parking', href: '/parking', icon: Car, minClearance: 5 },
+  { title: 'Parking', href: '/parking', icon: Car, minClearance: 5, includeRoles: ['GUARD'] },
   { title: 'Reports', href: '/reports', icon: BarChart3, minClearance: 2 },
   { title: 'Settings', href: '/settings', icon: Settings },
 ]
@@ -62,7 +64,14 @@ export function Sidebar() {
 
   const filteredNavItems = navItems.filter(item => {
     if (item.roles && !item.roles.includes(userRole)) return false;
-    if (item.minClearance && userClearance > item.minClearance) return false;
+    if (item.excludeRoles && item.excludeRoles.includes(userRole)) return false;
+    
+    if (item.minClearance && userClearance > item.minClearance) {
+      if (item.includeRoles && item.includeRoles.includes(userRole)) {
+        return true;
+      }
+      return false;
+    }
     return true;
   })
 

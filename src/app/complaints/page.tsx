@@ -8,17 +8,30 @@ import { db } from '@/config/firebase'
 import { collection, onSnapshot, query, orderBy } from 'firebase/firestore'
 import { Complaint } from '@/types/models'
 import { Loader2 } from 'lucide-react'
+import { useAuth } from '@/context/AuthContext'
 
 export default function ComplaintsPage() {
+  const { profile } = useAuth()
   const [complaints, setComplaints] = useState<Complaint[]>([])
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
+    if (!profile) return;
+    
     const q = query(collection(db, 'complaints'), orderBy('createdAt', 'desc'))
     const unsubscribe = onSnapshot(q, (snapshot) => {
       const cData: Complaint[] = []
       snapshot.forEach((doc) => {
-        cData.push(doc.data() as Complaint)
+        const data = doc.data() as Complaint;
+        // Filter for GUARD role
+        if (profile.role === 'GUARD') {
+          const allowedCategories = ['Parking', 'Security', 'Emergency']
+          if (data.category && allowedCategories.includes(data.category)) {
+            cData.push({ id: doc.id, ...data })
+          }
+        } else {
+          cData.push({ id: doc.id, ...data })
+        }
       })
       setComplaints(cData)
       setLoading(false)
@@ -28,7 +41,7 @@ export default function ComplaintsPage() {
     })
 
     return () => unsubscribe()
-  }, [])
+  }, [profile])
 
   const openCount = complaints.filter(c => c.status === 'open').length
   const inProgressCount = complaints.filter(c => c.status === 'in_progress').length
@@ -55,13 +68,14 @@ export default function ComplaintsPage() {
               <div className="text-center py-8 text-muted-foreground">No complaints found.</div>
             ) : (
               <table className="w-full">
-                <thead><tr className="border-b"><th className="pb-3 text-left">ID</th><th className="pb-3 text-left">Tenant ID</th><th className="pb-3 text-left">Title</th><th className="pb-3 text-left">Description</th><th className="pb-3 text-left">Status</th></tr></thead>
+                <thead><tr className="border-b"><th className="pb-3 text-left">ID</th><th className="pb-3 text-left">Tenant ID</th><th className="pb-3 text-left">Title</th><th className="pb-3 text-left">Category</th><th className="pb-3 text-left">Description</th><th className="pb-3 text-left">Status</th></tr></thead>
                 <tbody>
                   {complaints.map((c) => (
                     <tr key={c.id} className="border-b">
                       <td className="py-3 font-medium">{c.id.substring(0,8)}...</td>
                       <td className="py-3">{c.tenantId}</td>
                       <td className="py-3">{c.title}</td>
+                      <td className="py-3"><Badge variant="outline">{c.category || 'General'}</Badge></td>
                       <td className="py-3">{c.description}</td>
                       <td className="py-3"><Badge variant={c.status === 'resolved' || c.status === 'closed' ? 'success' : c.status === 'in_progress' ? 'warning' : 'info'}>{c.status.toUpperCase()}</Badge></td>
                     </tr>
