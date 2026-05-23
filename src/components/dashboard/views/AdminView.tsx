@@ -85,10 +85,10 @@ export function AdminView({ profile }: { profile: any }) {
             Here's the current overview of Sunrise Apartment.
           </p>
         </div>
-        <div className="flex gap-3">
+        <div className="flex flex-wrap gap-2 w-full md:w-auto mt-2 md:mt-0">
           <SeedButton />
-          <Button variant="outline">Export Report</Button>
-          <Button className="bg-emerald-400 hover:bg-emerald-500 text-black">Generate Invoice</Button>
+          <Button variant="outline" className="flex-1 md:flex-none">Export Report</Button>
+          <Button className="flex-1 md:flex-none bg-emerald-400 hover:bg-emerald-500 text-black">Generate Invoice</Button>
         </div>
       </div>
 

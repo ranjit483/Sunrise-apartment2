@@ -18,6 +18,8 @@ interface DashboardLayoutProps {
 export function DashboardLayout({ children, title }: DashboardLayoutProps) {
   const { user, profile, loading } = useAuth()
   const router = useRouter()
+  const [collapsed, setCollapsed] = useState(false)
+  const [mobileOpen, setMobileOpen] = useState(false)
 
   useEffect(() => {
     if (!loading && !user) {
@@ -57,10 +59,15 @@ export function DashboardLayout({ children, title }: DashboardLayoutProps) {
 
   return (
     <div className="min-h-screen bg-background">
-      <Sidebar />
-      <div className="main-content">
-        <Navbar title={title} />
-        <main className="p-6">{children}</main>
+      <Sidebar 
+        collapsed={collapsed} 
+        setCollapsed={setCollapsed} 
+        mobileOpen={mobileOpen} 
+        setMobileOpen={setMobileOpen} 
+      />
+      <div className={`main-content transition-all duration-300 ${collapsed ? 'lg:ml-20' : 'lg:ml-64'}`}>
+        <Navbar title={title} setMobileOpen={setMobileOpen} />
+        <main className="p-4 md:p-6 overflow-x-hidden">{children}</main>
       </div>
     </div>
   )

@@ -15,20 +15,29 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { Badge } from '@/components/ui/badge'
 import { getInitials } from '@/lib/utils'
-import { Bell, Moon, Sun, LogOut, User, Settings } from 'lucide-react'
+import { Bell, Moon, Sun, LogOut, User, Settings, Menu } from 'lucide-react'
 
 interface NavbarProps {
   title?: string
+  setMobileOpen?: (open: boolean) => void
 }
 
-export function Navbar({ title }: NavbarProps) {
+export function Navbar({ title, setMobileOpen }: NavbarProps) {
   const { user, profile, signOut } = useAuth()
   const [darkMode, setDarkMode] = useState(false)
 
   return (
-    <header className="sticky top-0 z-30 flex h-16 items-center justify-between border-b bg-background px-6">
-      <div className="flex items-center gap-4">
-        {title && <h1 className="text-xl font-semibold">{title}</h1>}
+    <header className="sticky top-0 z-30 flex h-16 items-center justify-between border-b bg-background px-4 md:px-6">
+      <div className="flex items-center gap-3">
+        <Button
+          variant="ghost"
+          size="icon"
+          className="lg:hidden"
+          onClick={() => setMobileOpen?.(true)}
+        >
+          <Menu className="h-6 w-6" />
+        </Button>
+        {title && <h1 className="text-xl font-semibold truncate max-w-[150px] sm:max-w-none">{title}</h1>}
       </div>
 
       <div className="flex items-center gap-4">

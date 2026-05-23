@@ -64,18 +64,3 @@
     text-wrap: balance;
   }
 }
-
-.sidebar-collapsed .main-content {
-  margin-left: 80px;
-}
-
-.main-content {
-  margin-left: 256px;
-  transition: margin-left 300ms;
-}
-
-@media (max-width: 1024px) {
-  .main-content {
-    margin-left: 0;
-  }
-}
