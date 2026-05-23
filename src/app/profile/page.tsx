@@ -83,15 +83,7 @@ export default function ProfilePage() {
   return (
     <div className="container mx-auto p-4 max-w-4xl space-y-6">
       <div className="flex flex-col gap-2">
-        <div className="flex items-center gap-4">
-          <Button variant="outline" size="sm" asChild>
-            <Link href="/dashboard">
-              <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
-              Back to Dashboard
-            </Link>
-          </Button>
-          <h1 className="text-3xl font-bold tracking-tight">My Profile</h1>
-        </div>
+        <h1 className="text-3xl font-bold tracking-tight">My Profile</h1>
         <p className="text-muted-foreground">
           View and manage your personal information
         </p>
@@ -238,6 +230,15 @@ export default function ProfilePage() {
             </CardFooter>
           </form>
         </Card>
+      </div>
+
+      <div className="flex justify-end pt-4">
+        <Button asChild style={{ backgroundColor: '#95DBAE', color: '#1a3622' }} className="hover:opacity-90 transition-opacity">
+          <Link href="/dashboard">
+            <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+            Back to Dashboard
+          </Link>
+        </Button>
       </div>
     </div>
   )
