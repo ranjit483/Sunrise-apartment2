@@ -134,6 +134,10 @@ function LandingContent() {
             <a href="#features" className="block text-gray-600" onClick={() => setMobileMenuOpen(false)}>Features</a>
             <a href="#about" className="block text-gray-600" onClick={() => setMobileMenuOpen(false)}>About</a>
             <a href="#testimonials" className="block text-gray-600" onClick={() => setMobileMenuOpen(false)}>Testimonials</a>
+            <div className="pt-4 border-t flex flex-col gap-3">
+              <Button variant="outline" className="w-full justify-center" onClick={() => { setMobileMenuOpen(false); setAuthModalOpen(true); }}>Sign In</Button>
+              <Button className="w-full justify-center" onClick={() => { setMobileMenuOpen(false); setAuthModalOpen(true); }}>Get Started</Button>
+            </div>
           </div>
         )}
       </header>
