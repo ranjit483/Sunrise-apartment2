@@ -141,7 +141,33 @@ export default function VisitorsPage() {
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <Label>Host Unit *</Label>
-                    <Input required value={unitId} onChange={e => setUnitId(e.target.value)} placeholder="e.g. A-101" />
+                    <Select required value={unitId} onValueChange={setUnitId}>
+                      <SelectTrigger><SelectValue placeholder="Select unit..." /></SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="Tower A / A-0">Tower A / A-0</SelectItem>
+                        <SelectItem value="Tower A / A-1">Tower A / A-1</SelectItem>
+                        <SelectItem value="Tower A / A-2">Tower A / A-2</SelectItem>
+                        <SelectItem value="Tower A / A-3">Tower A / A-3</SelectItem>
+                        <SelectItem value="Tower A / B-0">Tower A / B-0</SelectItem>
+                        <SelectItem value="Tower A / B-1">Tower A / B-1</SelectItem>
+                        <SelectItem value="Tower A / B-2">Tower A / B-2</SelectItem>
+                        <SelectItem value="Tower A / B-3">Tower A / B-3</SelectItem>
+                        <SelectItem value="Tower A / C-1">Tower A / C-1</SelectItem>
+                        <SelectItem value="Tower A / C-2">Tower A / C-2</SelectItem>
+                        <SelectItem value="Tower A / C-3">Tower A / C-3</SelectItem>
+                        <SelectItem value="Tower A / D-1">Tower A / D-1</SelectItem>
+                        <SelectItem value="Tower A / D-2">Tower A / D-2</SelectItem>
+                        <SelectItem value="Tower A / D-3">Tower A / D-3</SelectItem>
+                        <SelectItem value="Tower B I / G-1">Tower B I / G-1</SelectItem>
+                        <SelectItem value="Tower B I / G-2">Tower B I / G-2</SelectItem>
+                        <SelectItem value="Tower B I / G-3">Tower B I / G-3</SelectItem>
+                        <SelectItem value="Tower B II / G-1">Tower B II / G-1</SelectItem>
+                        <SelectItem value="Tower B II / G-2">Tower B II / G-2</SelectItem>
+                        <SelectItem value="Tower B II / G-3">Tower B II / G-3</SelectItem>
+                        <SelectItem value="Office">Office</SelectItem>
+                        <SelectItem value="Others">Others</SelectItem>
+                      </SelectContent>
+                    </Select>
                   </div>
                   <div className="space-y-2">
                     <Label>Phone *</Label>
@@ -151,7 +177,17 @@ export default function VisitorsPage() {
 
                 <div className="space-y-2">
                   <Label>Purpose of Visit *</Label>
-                  <Input required value={purpose} onChange={e => setPurpose(e.target.value)} placeholder="e.g. Delivery, Guest" />
+                  <Select required value={purpose} onValueChange={setPurpose}>
+                    <SelectTrigger><SelectValue placeholder="Select purpose..." /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="Guest">Guest</SelectItem>
+                      <SelectItem value="Delivery">Delivery</SelectItem>
+                      <SelectItem value="Maintenance">Maintenance</SelectItem>
+                      <SelectItem value="Meade">Meade</SelectItem>
+                      <SelectItem value="Driver">Driver</SelectItem>
+                      <SelectItem value="Other">Other</SelectItem>
+                    </SelectContent>
+                  </Select>
                 </div>
 
                 <div className="space-y-2 pt-2 border-t">
