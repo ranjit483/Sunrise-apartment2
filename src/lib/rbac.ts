@@ -22,11 +22,12 @@ export type PermissionAction =
   | 'view_financial_reports'
   | 'manage_visitors'
   | 'view_audit_logs'
+  | 'delete_records'
 
 const RolePermissions: Record<UserRole, PermissionAction[]> = {
   SUPER_ADMIN: [
     'manage_users', 'assign_roles', 'manage_apartments', 
-    'approve_residents', 'view_financial_reports', 'manage_visitors', 'view_audit_logs'
+    'approve_residents', 'view_financial_reports', 'manage_visitors', 'view_audit_logs', 'delete_records'
   ],
   MANAGER: [
     'manage_users', 'manage_apartments', 'approve_residents', 

@@ -214,9 +214,11 @@ export default function BuildingsPage() {
                           {deleting === b.id ? (
                             <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
                           ) : (
-                            <Button variant="ghost" size="sm" onClick={() => handleDeleteBuilding(b.id)}>
-                              <Trash2 className="h-4 w-4 text-red-500" />
-                            </Button>
+                            isAuthorized('delete_records') && (
+                              <Button variant="ghost" size="sm" onClick={() => handleDeleteBuilding(b.id)}>
+                                <Trash2 className="h-4 w-4 text-red-500" />
+                              </Button>
+                            )
                           )}
                         </td>
                       )}
