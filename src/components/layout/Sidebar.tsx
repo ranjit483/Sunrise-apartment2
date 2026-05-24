@@ -42,7 +42,7 @@ const navItems: NavItem[] = [
   { title: 'Units', href: '/units', icon: Home, minClearance: 4, excludeRoles: ['RESIDENT', 'TENANT'] },
   { title: 'Leases', href: '/leases', icon: FileText, minClearance: 4, excludeRoles: ['RESIDENT', 'TENANT'] },
   { title: 'Users', href: '/users', icon: Users, minClearance: 3 },
-  { title: 'Invoices', href: '/invoices', icon: FileText, minClearance: 4 },
+  { title: 'Invoices', href: '/invoices', icon: FileText, minClearance: 4, excludeRoles: ['RESIDENT', 'TENANT'] },
   { title: 'Payments', href: '/payments', icon: CreditCard, minClearance: 4 },
   { title: 'Expenses', href: '/expenses', icon: CreditCard, minClearance: 2 },
   { title: 'Maintenance', href: '/maintenance', icon: Wrench, excludeRoles: ['GUARD'] },
