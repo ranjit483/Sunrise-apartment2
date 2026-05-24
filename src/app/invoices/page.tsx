@@ -111,6 +111,8 @@ export default function InvoicesPage() {
           id: invoiceRef.id,
           unitId: matchingUnit ? matchingUnit.id : 'N/A',
           tenantId: user.uid || user.id,
+          unitNumber: matchingUnit ? matchingUnit.unitNumber : (user.unitNumber || 'N/A'),
+          tenantName: user.name || user.email || 'Unknown',
           month: invoiceMonth,
           amount: matchingUnit ? (matchingUnit.rent || 0) : 0,
           electricityReading: 0,
@@ -312,6 +314,7 @@ export default function InvoicesPage() {
                   <tr className="border-b">
                     <th className="pb-3 text-left">Invoice ID</th>
                     <th className="pb-3 text-left">Unit</th>
+                    <th className="pb-3 text-left">Tenant</th>
                     <th className="pb-3 text-left">Month</th>
                     <th className="pb-3 text-left">Due Date</th>
                     <th className="pb-3 text-left">Rent</th>
@@ -327,7 +330,8 @@ export default function InvoicesPage() {
                     return (
                       <tr key={inv.id} className="border-b">
                         <td className="py-3 font-medium">{inv.id.substring(0, 8)}...</td>
-                        <td className="py-3">{inv.unitId.substring(0,8)}...</td>
+                        <td className="py-3">{inv.unitNumber || (inv.unitId !== 'N/A' ? inv.unitId.substring(0,8) + '...' : 'N/A')}</td>
+                        <td className="py-3">{inv.tenantName || 'Unknown'}</td>
                         <td className="py-3">{inv.month}</td>
                         <td className="py-3">{inv.dueDate}</td>
                         <td className="py-3">₨ {inv.amount.toLocaleString()}</td>
@@ -361,6 +365,10 @@ export default function InvoicesPage() {
           </DialogHeader>
           {editingInvoice && (
             <div className="space-y-4 pt-4">
+              <div className="bg-gray-50 p-3 rounded-md text-sm mb-2 border">
+                <p><strong>Unit:</strong> {editingInvoice.unitNumber || editingInvoice.unitId}</p>
+                <p><strong>Tenant:</strong> {editingInvoice.tenantName || editingInvoice.tenantId}</p>
+              </div>
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label>Rent Amount (₨)</Label>

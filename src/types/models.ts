@@ -51,6 +51,8 @@ export interface Invoice {
   id: string
   unitId: string
   tenantId: string
+  unitNumber?: string
+  tenantName?: string
   month: string
   amount: number
   electricityReading?: number
