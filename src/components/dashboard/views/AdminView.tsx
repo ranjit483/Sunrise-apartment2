@@ -86,7 +86,7 @@ export function AdminView({ profile }: { profile: any }) {
           </p>
         </div>
         <div className="flex flex-wrap gap-2 w-full md:w-auto mt-2 md:mt-0">
-          <SeedButton />
+          {profile?.role === 'SUPER_ADMIN' && <SeedButton />}
           <Button variant="outline" className="flex-1 md:flex-none">Export Report</Button>
           <Button className="flex-1 md:flex-none bg-emerald-400 hover:bg-emerald-500 text-black">Generate Invoice</Button>
         </div>
