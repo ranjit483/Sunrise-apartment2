@@ -124,6 +124,10 @@ export interface Visitor {
   unitId: string
   phone: string
   purpose: string
+  vehicleType?: 'pedestrian' | '2-wheeler' | '4-wheeler'
+  licensePlate?: string
+  vehicleBrand?: string
+  parkingSlot?: string
   entryTime: string
   exitTime?: string
   status: 'entered' | 'exited' | 'waiting'
