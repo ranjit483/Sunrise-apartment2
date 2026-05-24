@@ -67,7 +67,7 @@ export default function ComplaintsPage() {
             ) : complaints.length === 0 ? (
               <div className="text-center py-8 text-muted-foreground">No complaints found.</div>
             ) : (
-              <table className="w-full">
+              <div className="overflow-x-auto overflow-y-hidden"><table className="w-full min-w-[800px]">
                 <thead><tr className="border-b"><th className="pb-3 text-left">ID</th><th className="pb-3 text-left">Tenant ID</th><th className="pb-3 text-left">Title</th><th className="pb-3 text-left">Category</th><th className="pb-3 text-left">Description</th><th className="pb-3 text-left">Status</th></tr></thead>
                 <tbody>
                   {complaints.map((c) => (
@@ -81,7 +81,7 @@ export default function ComplaintsPage() {
                     </tr>
                   ))}
                 </tbody>
-              </table>
+              </table></div>
             )}
           </CardContent>
         </Card>

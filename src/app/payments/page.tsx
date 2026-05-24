@@ -56,7 +56,7 @@ export default function PaymentsPage() {
             ) : payments.length === 0 ? (
               <div className="text-center py-8 text-muted-foreground">No payments found. Please seed the database.</div>
             ) : (
-              <table className="w-full">
+              <div className="overflow-x-auto overflow-y-hidden"><table className="w-full min-w-[800px]">
                 <thead>
                   <tr className="border-b">
                     <th className="pb-3 text-left">Invoice ID</th>
@@ -79,7 +79,7 @@ export default function PaymentsPage() {
                     </tr>
                   ))}
                 </tbody>
-              </table>
+              </table></div>
             )}
           </CardContent>
         </Card>

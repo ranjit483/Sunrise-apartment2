@@ -211,7 +211,7 @@ export default function UsersPage() {
         <Card>
           <CardHeader><CardTitle>All Users</CardTitle></CardHeader>
           <CardContent>
-            <table className="w-full">
+            <div className="overflow-x-auto overflow-y-hidden"><table className="w-full min-w-[800px]">
               <thead>
                 <tr className="border-b">
                   <th className="pb-3 text-left">User</th>
@@ -259,7 +259,7 @@ export default function UsersPage() {
                   </tr>
                 ))}
               </tbody>
-            </table>
+            </table></div>
           </CardContent>
         </Card>
       </div>

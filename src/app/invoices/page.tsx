@@ -307,7 +307,7 @@ export default function InvoicesPage() {
             ) : invoices.length === 0 ? (
               <div className="text-center py-8 text-muted-foreground">No invoices found. Generate invoices to get started.</div>
             ) : (
-              <table className="w-full">
+              <div className="overflow-x-auto overflow-y-hidden"><table className="w-full min-w-[800px]">
                 <thead>
                   <tr className="border-b">
                     <th className="pb-3 text-left">Invoice ID</th>
@@ -347,7 +347,7 @@ export default function InvoicesPage() {
                     )
                   })}
                 </tbody>
-              </table>
+              </table></div>
             )}
           </CardContent>
         </Card>

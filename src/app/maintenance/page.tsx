@@ -57,7 +57,7 @@ export default function MaintenancePage() {
             ) : tickets.length === 0 ? (
               <div className="text-center py-8 text-muted-foreground">No maintenance tickets found.</div>
             ) : (
-              <table className="w-full">
+              <div className="overflow-x-auto overflow-y-hidden"><table className="w-full min-w-[800px]">
                 <thead><tr className="border-b"><th className="pb-3 text-left">ID</th><th className="pb-3 text-left">Unit ID</th><th className="pb-3 text-left">Issue</th><th className="pb-3 text-left">Priority</th><th className="pb-3 text-left">Status</th><th className="pb-3 text-left">Assigned</th></tr></thead>
                 <tbody>
                   {tickets.map((t) => (
@@ -71,7 +71,7 @@ export default function MaintenancePage() {
                     </tr>
                   ))}
                 </tbody>
-              </table>
+              </table></div>
             )}
           </CardContent>
         </Card>

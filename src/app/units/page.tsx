@@ -306,7 +306,7 @@ export default function UnitsPage() {
             ) : units.length === 0 ? (
               <div className="text-center py-8 text-muted-foreground">No units found. Click "Add Unit" to create one.</div>
             ) : (
-              <table className="w-full">
+              <div className="overflow-x-auto overflow-y-hidden"><table className="w-full min-w-[800px]">
                 <thead>
                   <tr className="border-b">
                     <th className="pb-3 text-left">Unit</th>
@@ -349,7 +349,7 @@ export default function UnitsPage() {
                     )
                   })}
                 </tbody>
-              </table>
+              </table></div>
             )}
           </CardContent>
         </Card>

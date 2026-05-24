@@ -53,7 +53,7 @@ export default function VisitorsPage() {
             ) : visitors.length === 0 ? (
               <div className="text-center py-8 text-muted-foreground">No visitors found. Please seed the database.</div>
             ) : (
-              <table className="w-full">
+              <div className="overflow-x-auto overflow-y-hidden"><table className="w-full min-w-[800px]">
                 <thead><tr className="border-b"><th className="pb-3 text-left">Name</th><th className="pb-3 text-left">Unit ID</th><th className="pb-3 text-left">Phone</th><th className="pb-3 text-left">Purpose</th><th className="pb-3 text-left">Entry Time</th><th className="pb-3 text-left">Status</th></tr></thead>
                 <tbody>
                   {visitors.map((v) => (
@@ -67,7 +67,7 @@ export default function VisitorsPage() {
                     </tr>
                   ))}
                 </tbody>
-              </table>
+              </table></div>
             )}
           </CardContent>
         </Card>

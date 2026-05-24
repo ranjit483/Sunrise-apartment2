@@ -54,7 +54,7 @@ export default function ParkingPage() {
             ) : parkingSlots.length === 0 ? (
               <div className="text-center py-8 text-muted-foreground">No parking slots found. Please seed the database.</div>
             ) : (
-              <table className="w-full">
+              <div className="overflow-x-auto overflow-y-hidden"><table className="w-full min-w-[800px]">
                 <thead><tr className="border-b"><th className="pb-3 text-left">Slot</th><th className="pb-3 text-left">Unit</th><th className="pb-3 text-left">Vehicle</th><th className="pb-3 text-left">Model</th><th className="pb-3 text-left">Fee</th><th className="pb-3 text-left">Status</th></tr></thead>
                 <tbody>
                   {parkingSlots.map((p) => (
@@ -68,7 +68,7 @@ export default function ParkingPage() {
                     </tr>
                   ))}
                 </tbody>
-              </table>
+              </table></div>
             )}
           </CardContent>
         </Card>

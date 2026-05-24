@@ -230,7 +230,7 @@ export default function ApproveUsersPage() {
               </div>
             ) : (
               <div className="overflow-x-auto">
-                <table className="w-full">
+                <div className="overflow-x-auto overflow-y-hidden"><table className="w-full min-w-[800px]">
                   <thead>
                     <tr className="border-b">
                       <th className="pb-3 text-left">Name</th>
@@ -267,7 +267,7 @@ export default function ApproveUsersPage() {
                       </tr>
                     ))}
                   </tbody>
-                </table>
+                </table></div>
               </div>
             )}
           </CardContent>

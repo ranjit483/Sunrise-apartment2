@@ -56,7 +56,7 @@ export default function ExpensesPage() {
             ) : expenses.length === 0 ? (
               <div className="text-center py-8 text-muted-foreground">No expenses found. Please seed the database.</div>
             ) : (
-              <table className="w-full">
+              <div className="overflow-x-auto overflow-y-hidden"><table className="w-full min-w-[800px]">
                 <thead>
                   <tr className="border-b">
                     <th className="pb-3 text-left">Category</th>
@@ -75,7 +75,7 @@ export default function ExpensesPage() {
                     </tr>
                   ))}
                 </tbody>
-              </table>
+              </table></div>
             )}
           </CardContent>
         </Card>

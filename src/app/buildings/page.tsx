@@ -186,7 +186,7 @@ export default function BuildingsPage() {
             ) : buildings.length === 0 ? (
               <div className="text-center py-8 text-muted-foreground">No buildings found. Click "Add Building" to create one.</div>
             ) : (
-              <table className="w-full">
+              <div className="overflow-x-auto overflow-y-hidden"><table className="w-full min-w-[800px]">
                 <thead>
                   <tr className="border-b">
                     <th className="pb-3 text-left">Building</th>
@@ -223,7 +223,7 @@ export default function BuildingsPage() {
                     </tr>
                   ))}
                 </tbody>
-              </table>
+              </table></div>
             )}
           </CardContent>
         </Card>
