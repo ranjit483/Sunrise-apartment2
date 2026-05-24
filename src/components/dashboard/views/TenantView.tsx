@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Home, CreditCard, Wrench, FileText, Download } from 'lucide-react'
+import Link from 'next/link'
 import { db } from '@/config/firebase'
 import { collection, onSnapshot, query, where, orderBy } from 'firebase/firestore'
 import { Invoice, MaintenanceTicket, Lease } from '@/types/models'
@@ -53,7 +54,11 @@ export function TenantView({ profile }: { profile: any }) {
           <p className="text-muted-foreground mt-1">Here is the summary for your unit: {profile?.unitNumber || 'N/A'}</p>
         </div>
         <div className="flex gap-2">
-          {totalBalance > 0 && <Button>Pay Due Balance</Button>}
+          {totalBalance > 0 && (
+            <Link href="/payments">
+              <Button>Pay Due Balance</Button>
+            </Link>
+          )}
         </div>
       </div>
 
@@ -122,7 +127,9 @@ export function TenantView({ profile }: { profile: any }) {
                         <p className="font-medium">₨{(invoice.amount + (invoice.electricityAmount || 0) + (invoice.utilityAmount || 0) + (invoice.waterAmount || 0) + (invoice.otherAmount || 0)).toLocaleString()}</p>
                         <Badge variant={invoice.status === 'paid' ? 'success' : invoice.status === 'pending' ? 'warning' : 'destructive'}>{invoice.status.toUpperCase()}</Badge>
                       </div>
-                      <Button variant="ghost" size="icon"><Download className="h-4 w-4" /></Button>
+                      <Link href="/payments">
+                        <Button variant="ghost" size="icon" title="View & Pay in Payments"><Download className="h-4 w-4" /></Button>
+                      </Link>
                     </div>
                   </div>
                 ))}
@@ -152,7 +159,9 @@ export function TenantView({ profile }: { profile: any }) {
                 ))}
               </div>
             )}
-            <Button variant="outline" className="w-full mt-4">Raise New Request</Button>
+            <Link href="/maintenance">
+              <Button variant="outline" className="w-full mt-4">Raise New Request</Button>
+            </Link>
           </CardContent>
         </Card>
       </div>
