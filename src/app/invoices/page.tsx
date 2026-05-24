@@ -117,6 +117,9 @@ export default function InvoicesPage() {
           amount: matchingUnit ? (matchingUnit.rent || 0) : 0,
           electricityReading: 0,
           electricityAmount: 0,
+          utilityAmount: 0,
+          waterAmount: 0,
+          otherAmount: 0,
           dueDate: invoiceDueDate,
           status: 'draft', // Generated as DRAFT initially
           createdAt: new Date().toISOString(),
@@ -199,6 +202,9 @@ export default function InvoicesPage() {
         amount: Number(editingInvoice.amount),
         electricityReading: Number(editingInvoice.electricityReading || 0),
         electricityAmount: Number(editingInvoice.electricityAmount || 0),
+        utilityAmount: Number(editingInvoice.utilityAmount || 0),
+        waterAmount: Number(editingInvoice.waterAmount || 0),
+        otherAmount: Number(editingInvoice.otherAmount || 0),
         dueDate: editingInvoice.dueDate,
         updatedAt: new Date().toISOString()
       })
@@ -220,8 +226,8 @@ export default function InvoicesPage() {
   const draftCount = invoices.filter(i => i.status === 'draft').length
   const pendingCount = invoices.filter(i => i.status === 'pending').length
   const overdueCount = invoices.filter(i => i.status === 'overdue').length
-  const collectedAmount = invoices.filter(i => i.status === 'paid').reduce((acc, i) => acc + i.amount + (i.electricityAmount || 0), 0)
-  const outstandingAmount = invoices.filter(i => i.status === 'pending' || i.status === 'overdue').reduce((acc, i) => acc + i.amount + (i.electricityAmount || 0), 0)
+  const collectedAmount = invoices.filter(i => i.status === 'paid').reduce((acc, i) => acc + i.amount + (i.electricityAmount || 0) + (i.utilityAmount || 0) + (i.waterAmount || 0) + (i.otherAmount || 0), 0)
+  const outstandingAmount = invoices.filter(i => i.status === 'pending' || i.status === 'overdue').reduce((acc, i) => acc + i.amount + (i.electricityAmount || 0) + (i.utilityAmount || 0) + (i.waterAmount || 0) + (i.otherAmount || 0), 0)
 
   return (
     <DashboardLayout title="Invoices & Billing">
@@ -319,6 +325,9 @@ export default function InvoicesPage() {
                     <th className="pb-3 text-left">Due Date</th>
                     <th className="pb-3 text-left">Rent</th>
                     <th className="pb-3 text-left">Electricity</th>
+                    <th className="pb-3 text-left">Utility</th>
+                    <th className="pb-3 text-left">Water</th>
+                    <th className="pb-3 text-left">Other</th>
                     <th className="pb-3 text-left">Total</th>
                     <th className="pb-3 text-left">Status</th>
                     {canManageInvoices && <th className="pb-3 text-left">Actions</th>}
@@ -326,7 +335,7 @@ export default function InvoicesPage() {
                 </thead>
                 <tbody>
                   {invoices.map((inv) => {
-                    const total = inv.amount + (inv.electricityAmount || 0)
+                    const total = inv.amount + (inv.electricityAmount || 0) + (inv.utilityAmount || 0) + (inv.waterAmount || 0) + (inv.otherAmount || 0)
                     return (
                       <tr key={inv.id} className="border-b">
                         <td className="py-3 font-medium">{inv.id.substring(0, 8)}...</td>
@@ -336,6 +345,9 @@ export default function InvoicesPage() {
                         <td className="py-3">{inv.dueDate}</td>
                         <td className="py-3">₨ {inv.amount.toLocaleString()}</td>
                         <td className="py-3">₨ {(inv.electricityAmount || 0).toLocaleString()}</td>
+                        <td className="py-3">₨ {(inv.utilityAmount || 0).toLocaleString()}</td>
+                        <td className="py-3">₨ {(inv.waterAmount || 0).toLocaleString()}</td>
+                        <td className="py-3">₨ {(inv.otherAmount || 0).toLocaleString()}</td>
                         <td className="py-3 font-semibold text-primary">₨ {total.toLocaleString()}</td>
                         <td className="py-3"><Badge variant="outline" className={statusColors[inv.status] || ''}>{inv.status.toUpperCase()}</Badge></td>
                         {canManageInvoices && (
@@ -402,6 +414,32 @@ export default function InvoicesPage() {
                     type="number" 
                     value={editingInvoice.electricityAmount || 0} 
                     onChange={e => setEditingInvoice({...editingInvoice, electricityAmount: Number(e.target.value)})} 
+                  />
+                </div>
+              </div>
+              <div className="grid grid-cols-3 gap-4">
+                <div className="space-y-2">
+                  <Label>Utility Amount (₨)</Label>
+                  <Input 
+                    type="number" 
+                    value={editingInvoice.utilityAmount || 0} 
+                    onChange={e => setEditingInvoice({...editingInvoice, utilityAmount: Number(e.target.value)})} 
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label>Water Amount (₨)</Label>
+                  <Input 
+                    type="number" 
+                    value={editingInvoice.waterAmount || 0} 
+                    onChange={e => setEditingInvoice({...editingInvoice, waterAmount: Number(e.target.value)})} 
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label>Other Amount (₨)</Label>
+                  <Input 
+                    type="number" 
+                    value={editingInvoice.otherAmount || 0} 
+                    onChange={e => setEditingInvoice({...editingInvoice, otherAmount: Number(e.target.value)})} 
                   />
                 </div>
               </div>

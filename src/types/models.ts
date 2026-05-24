@@ -57,6 +57,9 @@ export interface Invoice {
   amount: number
   electricityReading?: number
   electricityAmount?: number
+  utilityAmount?: number
+  waterAmount?: number
+  otherAmount?: number
   dueDate: string
   status: InvoiceStatus
   createdAt: string
