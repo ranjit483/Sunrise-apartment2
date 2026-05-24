@@ -14,6 +14,14 @@ import { collection, onSnapshot, query, orderBy, addDoc, updateDoc, doc } from '
 import { Visitor } from '@/types/models'
 import { Loader2, Car, User, LogOut, Bike } from 'lucide-react'
 
+const TOWER_UNITS: Record<string, string[]> = {
+  'Tower A': ['A-0', 'A-1', 'A-2', 'A-3', 'B-0', 'B-1', 'B-2', 'C-1', 'C-2', 'C-3'],
+  'Tower BI': ['D-1', 'D-2', 'D-3', 'G-1', 'G-2', 'G-3'],
+  'Tower B II': ['G-1', 'G-2', 'G-3', 'H-1', 'H-2'],
+  'Office': ['A', 'B'],
+  'Others': ['A']
+}
+
 export default function VisitorsPage() {
   const [visitors, setVisitors] = useState<Visitor[]>([])
   const [loading, setLoading] = useState(true)
@@ -24,7 +32,8 @@ export default function VisitorsPage() {
   
   // Form State
   const [name, setName] = useState('')
-  const [unitId, setUnitId] = useState('')
+  const [hostTower, setHostTower] = useState('')
+  const [hostUnit, setHostUnit] = useState('')
   const [phone, setPhone] = useState('')
   const [purpose, setPurpose] = useState('')
   const [vehicleType, setVehicleType] = useState<'pedestrian' | '2-wheeler' | '4-wheeler'>('pedestrian')
@@ -57,7 +66,7 @@ export default function VisitorsPage() {
       const now = new Date().toISOString()
       const newVisitor: Omit<Visitor, 'id'> = {
         name,
-        unitId,
+        unitId: `${hostTower} / ${hostUnit}`,
         phone,
         purpose,
         vehicleType,
@@ -76,7 +85,8 @@ export default function VisitorsPage() {
       
       // Reset form
       setName('')
-      setUnitId('')
+      setHostTower('')
+      setHostUnit('')
       setPhone('')
       setPurpose('')
       setVehicleType('pedestrian')
@@ -138,34 +148,26 @@ export default function VisitorsPage() {
                   <Input required value={name} onChange={e => setName(e.target.value)} placeholder="e.g. John Doe" />
                 </div>
                 
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <div className="space-y-2">
-                    <Label>Host Unit *</Label>
-                    <Select required value={unitId} onValueChange={setUnitId}>
-                      <SelectTrigger><SelectValue placeholder="Select unit..." /></SelectTrigger>
+                    <Label>Host Tower *</Label>
+                    <Select required value={hostTower} onValueChange={(v) => { setHostTower(v); setHostUnit(''); }}>
+                      <SelectTrigger><SelectValue placeholder="Tower..." /></SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="Tower A / A-0">Tower A / A-0</SelectItem>
-                        <SelectItem value="Tower A / A-1">Tower A / A-1</SelectItem>
-                        <SelectItem value="Tower A / A-2">Tower A / A-2</SelectItem>
-                        <SelectItem value="Tower A / A-3">Tower A / A-3</SelectItem>
-                        <SelectItem value="Tower A / B-0">Tower A / B-0</SelectItem>
-                        <SelectItem value="Tower A / B-1">Tower A / B-1</SelectItem>
-                        <SelectItem value="Tower A / B-2">Tower A / B-2</SelectItem>
-                        <SelectItem value="Tower A / B-3">Tower A / B-3</SelectItem>
-                        <SelectItem value="Tower A / C-1">Tower A / C-1</SelectItem>
-                        <SelectItem value="Tower A / C-2">Tower A / C-2</SelectItem>
-                        <SelectItem value="Tower A / C-3">Tower A / C-3</SelectItem>
-                        <SelectItem value="Tower A / D-1">Tower A / D-1</SelectItem>
-                        <SelectItem value="Tower A / D-2">Tower A / D-2</SelectItem>
-                        <SelectItem value="Tower A / D-3">Tower A / D-3</SelectItem>
-                        <SelectItem value="Tower B I / G-1">Tower B I / G-1</SelectItem>
-                        <SelectItem value="Tower B I / G-2">Tower B I / G-2</SelectItem>
-                        <SelectItem value="Tower B I / G-3">Tower B I / G-3</SelectItem>
-                        <SelectItem value="Tower B II / G-1">Tower B II / G-1</SelectItem>
-                        <SelectItem value="Tower B II / G-2">Tower B II / G-2</SelectItem>
-                        <SelectItem value="Tower B II / G-3">Tower B II / G-3</SelectItem>
-                        <SelectItem value="Office">Office</SelectItem>
-                        <SelectItem value="Others">Others</SelectItem>
+                        {Object.keys(TOWER_UNITS).map(tower => (
+                          <SelectItem key={tower} value={tower}>{tower}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Unit *</Label>
+                    <Select required disabled={!hostTower} value={hostUnit} onValueChange={setHostUnit}>
+                      <SelectTrigger><SelectValue placeholder="Unit..." /></SelectTrigger>
+                      <SelectContent>
+                        {hostTower && TOWER_UNITS[hostTower].map(unit => (
+                          <SelectItem key={unit} value={unit}>{unit}</SelectItem>
+                        ))}
                       </SelectContent>
                     </Select>
                   </div>
