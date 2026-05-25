@@ -188,8 +188,40 @@ export default function InvoicesPage() {
       await batch.commit()
       alert(`Successfully deleted ${count} invoices!`)
     } catch (error: any) {
-      console.error('Error deleting invoices:', error)
       alert('Failed to delete invoices: ' + error.message)
+    }
+  }
+
+  const handleMarkAsPaid = async (invoice: Invoice) => {
+    if (!confirm('Mark this invoice as Paid? This will generate a manual payment receipt.')) return
+    
+    try {
+      const batch = writeBatch(db)
+      const paymentRef = doc(collection(db, 'payments'))
+      const totalAmount = invoice.amount + (invoice.electricityAmount || 0) + (invoice.utilityAmount || 0) + (invoice.waterAmount || 0) + (invoice.otherAmount || 0)
+      
+      batch.set(paymentRef, {
+        id: paymentRef.id,
+        invoiceId: invoice.id,
+        tenantId: invoice.tenantId,
+        amount: totalAmount,
+        method: 'manual',
+        transactionId: 'MANUAL-' + Math.random().toString(36).substring(2, 10).toUpperCase(),
+        status: 'completed',
+        paidAt: new Date().toISOString(),
+        createdAt: new Date().toISOString()
+      })
+
+      const ref = doc(db, 'invoices', invoice.id)
+      batch.update(ref, {
+        status: 'paid',
+        updatedAt: new Date().toISOString()
+      })
+      await batch.commit()
+      alert('Invoice marked as Paid successfully!')
+    } catch (error: any) {
+      console.error('Error marking as paid:', error)
+      alert('Failed to mark as paid: ' + error.message)
     }
   }
 
@@ -351,10 +383,15 @@ export default function InvoicesPage() {
                         <td className="py-3 font-semibold text-primary">₨ {total.toLocaleString()}</td>
                         <td className="py-3"><Badge variant="outline" className={statusColors[inv.status] || ''}>{inv.status.toUpperCase()}</Badge></td>
                         {canManageInvoices && (
-                          <td className="py-3">
+                          <td className="py-3 flex gap-2">
                             {inv.status === 'draft' && (
-                              <Button variant="ghost" size="sm" onClick={() => openEditModal(inv)}>
+                              <Button variant="ghost" size="sm" onClick={() => openEditModal(inv)} title="Edit Draft">
                                 <Edit2 className="h-4 w-4 text-blue-500" />
+                              </Button>
+                            )}
+                            {inv.status === 'pending' && (
+                              <Button variant="outline" size="sm" className="text-xs bg-green-50 text-green-700 hover:bg-green-100 border-green-200" onClick={() => handleMarkAsPaid(inv)}>
+                                Mark Paid
                               </Button>
                             )}
                           </td>
