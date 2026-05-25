@@ -32,25 +32,25 @@ export default function ExpensesPage() {
   })
 
   useEffect(() => {
-    const unsubExp = onSnapshot(query(collection(db, 'expenses'), orderBy('date', 'desc')), (snapshot) => {
+    const unsubExp = onSnapshot(query(collection(db, 'expenses'), orderBy('date', 'desc')), (snapshot: any) => {
       const eData: Expense[] = []
-      snapshot.forEach((doc) => eData.push({ id: doc.id, ...doc.data() } as Expense))
+      snapshot.forEach((doc: any) => eData.push({ id: doc.id, ...doc.data() } as Expense))
       setExpenses(eData)
       setLoading(false)
     })
 
-    const unsubAcc = onSnapshot(query(collection(db, 'chart_of_accounts')), (snapshot) => {
+    const unsubAcc = onSnapshot(query(collection(db, 'chart_of_accounts')), (snapshot: any) => {
       const acc: ChartOfAccount[] = []
-      snapshot.forEach((doc) => {
+      snapshot.forEach((doc: any) => {
         const data = doc.data() as ChartOfAccount
         if (data.type === 'Expense') acc.push(data)
       })
       setAccounts(acc)
     })
 
-    const unsubBuild = onSnapshot(query(collection(db, 'buildings')), (snapshot) => {
+    const unsubBuild = onSnapshot(query(collection(db, 'buildings')), (snapshot: any) => {
       const bData: Building[] = []
-      snapshot.forEach(doc => bData.push({ id: doc.id, ...doc.data() } as Building))
+      snapshot.forEach((doc: any) => bData.push({ id: doc.id, ...doc.data() } as Building))
       setBuildings(bData)
     })
 

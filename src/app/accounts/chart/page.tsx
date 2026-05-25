@@ -30,9 +30,9 @@ export default function ChartOfAccountsPage() {
 
   useEffect(() => {
     const q = query(collection(db, 'chart_of_accounts'))
-    const unsubscribe = onSnapshot(q, (snapshot) => {
+    const unsubscribe = onSnapshot(q, (snapshot: any) => {
       const data: ChartOfAccount[] = []
-      snapshot.forEach((doc) => data.push(doc.data() as ChartOfAccount))
+      snapshot.forEach((doc: any) => data.push(doc.data() as ChartOfAccount))
       setAccounts(data.sort((a, b) => a.code.localeCompare(b.code)))
       setLoading(false)
     })
