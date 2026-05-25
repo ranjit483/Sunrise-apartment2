@@ -21,16 +21,16 @@ export default function ProfitLossPage() {
     
     // Fetch all paid invoices for revenue
     const qInvoices = query(collection(db, 'invoices'), where('status', '==', 'paid'))
-    const unsubInvoices = onSnapshot(qInvoices, (snap) => {
+    const unsubInvoices = onSnapshot(qInvoices, (snap: any) => {
       const invs: any[] = []
-      snap.forEach(doc => invs.push({ id: doc.id, ...doc.data() }))
+      snap.forEach((doc: any) => invs.push({ id: doc.id, ...doc.data() }))
       setInvoices(invs)
       
       // Fetch all approved/paid expenses
       const qExpenses = query(collection(db, 'expenses')) // We filter status client-side to avoid index requirement for now
-      getDocs(qExpenses).then(expSnap => {
+      getDocs(qExpenses).then((expSnap: any) => {
         const exps: any[] = []
-        expSnap.forEach(doc => exps.push({ id: doc.id, ...doc.data() }))
+        expSnap.forEach((doc: any) => exps.push({ id: doc.id, ...doc.data() }))
         setExpenses(exps.filter(e => e.status === 'approved' || e.status === 'paid' || !e.status))
         setLoading(false)
       })

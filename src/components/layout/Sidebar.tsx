@@ -17,6 +17,7 @@ import {
   Car,
   BarChart3,
   Settings,
+  ChevronLeft,
   ChevronRight,
   UserPlus,
   Wallet,

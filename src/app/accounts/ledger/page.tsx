@@ -46,7 +46,7 @@ export default function TenantLedgerPage() {
       const q = query(collection(db, 'users'), where('role', 'in', ['TENANT', 'RESIDENT']))
       const snap = await getDocs(q)
       const data: UserData[] = []
-      snap.forEach(doc => {
+      snap.forEach((doc: any) => {
         data.push(doc.data() as UserData)
       })
       // Sort alphabetically
@@ -70,15 +70,15 @@ export default function TenantLedgerPage() {
 
     // Listen to Invoices
     const qInvoices = query(collection(db, 'invoices'), where('tenantId', '==', selectedTenant))
-    const unsubInvoices = onSnapshot(qInvoices, (invSnap) => {
+    const unsubInvoices = onSnapshot(qInvoices, (invSnap: any) => {
       const invoices: any[] = []
-      invSnap.forEach(doc => invoices.push({ id: doc.id, ...doc.data() }))
+      invSnap.forEach((doc: any) => invoices.push({ id: doc.id, ...doc.data() }))
       
       // Listen to Payments
       const qPayments = query(collection(db, 'payments'), where('tenantId', '==', selectedTenant))
-      getDocs(qPayments).then((paySnap) => {
+      getDocs(qPayments).then((paySnap: any) => {
         const payments: any[] = []
-        paySnap.forEach(doc => payments.push({ id: doc.id, ...doc.data() }))
+        paySnap.forEach((doc: any) => payments.push({ id: doc.id, ...doc.data() }))
         
         processLedger(invoices, payments)
         setLoading(false)
