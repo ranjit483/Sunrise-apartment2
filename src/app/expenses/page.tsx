@@ -12,6 +12,42 @@ import { db } from '@/config/firebase'
 import { collection, onSnapshot, query, orderBy, doc, setDoc, updateDoc } from 'firebase/firestore'
 import { Expense, ChartOfAccount, Building } from '@/types/models'
 import { Loader2, Plus, CheckCircle2, XCircle } from 'lucide-react'
+
+const EXPENSE_CATEGORIES = [
+  "1. Goble Bank LTD.",
+  "2. Staff Salaries",
+  "3. Staff Allowances",
+  "4. Provident Fund (PF) Contribution",
+  "5. Gratuity/Pension Expense",
+  "6. Staff Welfare/Training",
+  "6. Electricity & Water",
+  "7. Communication Expenses",
+  "8. Office Stationery & Supplies",
+  "9. Repair & Maintenance (Office)",
+  "10. Cleaning & Janitorial",
+  "12. Audit Fees",
+  "13. Legal & Professional Charges",
+  "14. Registration & Renewal Fees",
+  "15. Insurance Expenses",
+  "16. Postage & Courier",
+  "17. Advertising & Sales Promotion",
+  "18. Business Travel & Conveyance",
+  "19. Outstation Travel & Lodging",
+  "20. Client Hospitality",
+  "21. Bank Charges & Commission",
+  "22. Interest on Loans",
+  "23. Depreciation",
+  "24. Fines & Penalties",
+  "25. Vehicle Running Expenses",
+  "26. Subscription & Periodicals",
+  "27. Printing & Photocopying",
+  "28. Donations & CSR",
+  "29. Miscellaneous Expenses",
+  "30. Input VAT (Non-Recoverable)",
+  "31. Parties Payment",
+  "32. Elevator",
+  "33. Water Treatment"
+]
 import { useAuth } from '@/context/AuthContext'
 
 export default function ExpensesPage() {
@@ -76,15 +112,18 @@ export default function ExpensesPage() {
     
     setIsSaving(true)
     try {
+      // Allow selectedAcc fallback if they had an old id, but new ones will just use the string.
       const selectedAcc = accounts.find(a => a.id === formData.accountId)
+      const categoryName = selectedAcc ? selectedAcc.name : formData.accountId
+
       const id = `exp-${Date.now()}`
       const ref = doc(db, 'expenses', id)
       
       const payload: Expense = {
         id,
-        accountId: formData.accountId,
+        accountId: formData.accountId, // Store the string selection or old id
         buildingId: formData.buildingId || undefined,
-        category: selectedAcc?.name || 'Uncategorized',
+        category: categoryName || 'Uncategorized',
         description: formData.description,
         amount: Number(formData.amount),
         date: formData.date,
@@ -215,7 +254,9 @@ export default function ExpensesPage() {
                 onChange={(e) => setFormData({...formData, accountId: e.target.value})}
               >
                 <option value="">Select an account...</option>
-                {accounts.map(a => <option key={a.id} value={a.id}>{a.code} - {a.name}</option>)}
+                {EXPENSE_CATEGORIES.map(category => (
+                  <option key={category} value={category}>{category}</option>
+                ))}
               </select>
             </div>
             
