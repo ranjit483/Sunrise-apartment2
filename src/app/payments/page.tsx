@@ -9,7 +9,7 @@ import { db } from '@/config/firebase'
 import { collection, onSnapshot, query, orderBy, where, doc, writeBatch } from 'firebase/firestore'
 import { Payment, Invoice } from '@/types/models'
 import { Loader2, DollarSign } from 'lucide-react'
-import { useAuth } from '@/hooks/useAuth'
+import { useAuth } from '@/context/AuthContext'
 
 export default function PaymentsPage() {
   const { user, profile } = useAuth()
