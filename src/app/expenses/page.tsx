@@ -119,17 +119,23 @@ export default function ExpensesPage() {
       const id = `exp-${Date.now()}`
       const ref = doc(db, 'expenses', id)
       
-      const payload: Expense = {
+      const payload: any = {
         id,
-        accountId: formData.accountId, // Store the string selection or old id
-        buildingId: formData.buildingId || undefined,
+        accountId: formData.accountId,
         category: categoryName || 'Uncategorized',
         description: formData.description,
         amount: Number(formData.amount),
         date: formData.date,
         status: canApprove ? 'approved' : 'pending_approval',
-        approvedBy: canApprove ? user?.uid : undefined,
         createdAt: new Date().toISOString()
+      }
+
+      if (formData.buildingId) {
+        payload.buildingId = formData.buildingId
+      }
+
+      if (canApprove && user?.uid) {
+        payload.approvedBy = user.uid
       }
 
       await setDoc(ref, payload)
