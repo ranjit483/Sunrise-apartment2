@@ -35,19 +35,17 @@ export function AdminView({ profile }: { profile: any }) {
   }, [])
 
   const isManager = profile?.role === 'MANAGER'
-  const myBuildings = isManager ? buildings.filter(b => b.managerId === profile.uid) : buildings
+  // Removed manager filtering per user request so managers see the same global dashboard stats as Super Admin
+  const myBuildings = buildings
   const myBuildingIds = myBuildings.map(b => b.id)
 
-  const myUnits = isManager ? units.filter(u => myBuildingIds.includes(u.buildingId)) : units
+  const myUnits = units
   
-  const myInvoices = isManager ? invoices.filter(i => {
-    const unit = units.find(u => u.id === i.unitId)
-    return unit && myBuildingIds.includes(unit.buildingId)
-  }) : invoices
+  const myInvoices = invoices
 
-  const myTickets = isManager ? tickets.filter(t => myBuildingIds.includes(t.buildingId)) : tickets
+  const myTickets = tickets
   
-  const myExpenses = isManager ? expenses.filter(e => e.buildingId && myBuildingIds.includes(e.buildingId)) : expenses
+  const myExpenses = expenses
 
   // Calculate KPIs
   const occupiedUnits = myUnits.filter(u => u.status === 'occupied').length
