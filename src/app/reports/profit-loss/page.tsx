@@ -1,0 +1,234 @@
+'use client'
+
+import { useState, useEffect, useMemo } from 'react'
+import { DashboardLayout } from '@/components/layout/DashboardLayout'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { collection, query, onSnapshot, getDocs, where } from 'firebase/firestore'
+import { db } from '@/config/firebase'
+import { Label } from '@/components/ui/label'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { Loader2, Download, Printer } from 'lucide-react'
+import { Button } from '@/components/ui/button'
+
+export default function ProfitLossPage() {
+  const [loading, setLoading] = useState(true)
+  const [invoices, setInvoices] = useState<any[]>([])
+  const [expenses, setExpenses] = useState<any[]>([])
+  const [dateFilter, setDateFilter] = useState<string>('this_month')
+
+  useEffect(() => {
+    setLoading(true)
+    
+    // Fetch all paid invoices for revenue
+    const qInvoices = query(collection(db, 'invoices'), where('status', '==', 'paid'))
+    const unsubInvoices = onSnapshot(qInvoices, (snap) => {
+      const invs: any[] = []
+      snap.forEach(doc => invs.push({ id: doc.id, ...doc.data() }))
+      setInvoices(invs)
+      
+      // Fetch all approved/paid expenses
+      const qExpenses = query(collection(db, 'expenses')) // We filter status client-side to avoid index requirement for now
+      getDocs(qExpenses).then(expSnap => {
+        const exps: any[] = []
+        expSnap.forEach(doc => exps.push({ id: doc.id, ...doc.data() }))
+        setExpenses(exps.filter(e => e.status === 'approved' || e.status === 'paid' || !e.status))
+        setLoading(false)
+      })
+    })
+
+    return () => unsubInvoices()
+  }, [])
+
+  const filteredData = useMemo(() => {
+    const now = new Date()
+    let startDate: Date
+    let endDate = new Date() // today
+
+    if (dateFilter === 'this_month') {
+      startDate = new Date(now.getFullYear(), now.getMonth(), 1)
+    } else if (dateFilter === 'last_month') {
+      startDate = new Date(now.getFullYear(), now.getMonth() - 1, 1)
+      endDate = new Date(now.getFullYear(), now.getMonth(), 0)
+    } else if (dateFilter === 'ytd') {
+      startDate = new Date(now.getFullYear(), 0, 1)
+    } else {
+      startDate = new Date(2000, 0, 1) // all time
+    }
+
+    const filteredInvoices = invoices.filter(inv => {
+      // Invoices use 'month' (YYYY-MM) or 'createdAt'. We'll use createdAt if available, else month-01
+      const invDate = new Date(inv.createdAt ? inv.createdAt : `${inv.month}-01`)
+      return invDate >= startDate && invDate <= endDate
+    })
+
+    const filteredExpenses = expenses.filter(exp => {
+      // Expenses use 'date' (YYYY-MM-DD)
+      const expDate = new Date(exp.date || exp.createdAt)
+      return expDate >= startDate && expDate <= endDate
+    })
+
+    // Compute Revenues
+    let totalRent = 0
+    let totalElectricity = 0
+    let totalUtility = 0
+    let totalWater = 0
+    let totalOther = 0
+
+    filteredInvoices.forEach(inv => {
+      // If we don't have broken down amounts, it's all rent
+      if (!inv.electricityAmount && !inv.utilityAmount && !inv.waterAmount && !inv.otherAmount) {
+        totalRent += inv.amount
+      } else {
+        totalRent += (inv.amount - ((inv.electricityAmount||0) + (inv.utilityAmount||0) + (inv.waterAmount||0) + (inv.otherAmount||0)))
+        totalElectricity += (inv.electricityAmount || 0)
+        totalUtility += (inv.utilityAmount || 0)
+        totalWater += (inv.waterAmount || 0)
+        totalOther += (inv.otherAmount || 0)
+      }
+    })
+
+    const totalRevenue = totalRent + totalElectricity + totalUtility + totalWater + totalOther
+
+    // Compute Expenses
+    const expensesByCategory: Record<string, number> = {}
+    let totalExpense = 0
+
+    filteredExpenses.forEach(exp => {
+      const cat = exp.category || 'Uncategorized'
+      expensesByCategory[cat] = (expensesByCategory[cat] || 0) + Number(exp.amount)
+      totalExpense += Number(exp.amount)
+    })
+
+    // Sort categories alphabetically
+    const sortedExpenseCategories = Object.keys(expensesByCategory).sort()
+
+    return {
+      totalRent,
+      totalElectricity,
+      totalUtility,
+      totalWater,
+      totalOther,
+      totalRevenue,
+      expensesByCategory,
+      sortedExpenseCategories,
+      totalExpense,
+      netProfit: totalRevenue - totalExpense
+    }
+  }, [invoices, expenses, dateFilter])
+
+  return (
+    <DashboardLayout title="Profit & Loss Statement">
+      <div className="space-y-6 max-w-5xl mx-auto">
+        <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 print:hidden">
+          <div>
+            <h2 className="text-3xl font-bold">Profit & Loss</h2>
+            <p className="text-muted-foreground">Financial statement of revenues and expenses</p>
+          </div>
+          <div className="flex gap-2">
+            <Select value={dateFilter} onValueChange={setDateFilter}>
+              <SelectTrigger className="w-[180px]">
+                <SelectValue placeholder="Select period" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="this_month">This Month</SelectItem>
+                <SelectItem value="last_month">Last Month</SelectItem>
+                <SelectItem value="ytd">Year to Date (YTD)</SelectItem>
+                <SelectItem value="all_time">All Time</SelectItem>
+              </SelectContent>
+            </Select>
+            <Button variant="outline" className="gap-2" onClick={() => window.print()}>
+              <Printer className="h-4 w-4" /> Print
+            </Button>
+          </div>
+        </div>
+
+        {loading ? (
+          <div className="flex justify-center py-20"><Loader2 className="h-8 w-8 animate-spin text-muted-foreground" /></div>
+        ) : (
+          <Card className="bg-white print:shadow-none print:border-none">
+            <CardHeader className="text-center border-b pb-6">
+              <CardTitle className="text-2xl uppercase tracking-wider">Statement of Profit & Loss</CardTitle>
+              <p className="text-muted-foreground mt-2">
+                For the period: {dateFilter.replace('_', ' ').toUpperCase()}
+              </p>
+            </CardHeader>
+            <CardContent className="p-0 sm:p-6">
+              <div className="w-full">
+                {/* Revenue Section */}
+                <div className="mb-8">
+                  <h3 className="font-bold text-lg border-b pb-2 mb-4 text-emerald-800">REVENUE (INCOME)</h3>
+                  <div className="space-y-3 px-4">
+                    {filteredData.totalRent > 0 && (
+                      <div className="flex justify-between">
+                        <span className="text-muted-foreground">Rent Income</span>
+                        <span>₨ {filteredData.totalRent.toLocaleString()}</span>
+                      </div>
+                    )}
+                    {filteredData.totalElectricity > 0 && (
+                      <div className="flex justify-between">
+                        <span className="text-muted-foreground">Electricity Income</span>
+                        <span>₨ {filteredData.totalElectricity.toLocaleString()}</span>
+                      </div>
+                    )}
+                    {filteredData.totalUtility > 0 && (
+                      <div className="flex justify-between">
+                        <span className="text-muted-foreground">Utility Income</span>
+                        <span>₨ {filteredData.totalUtility.toLocaleString()}</span>
+                      </div>
+                    )}
+                    {filteredData.totalWater > 0 && (
+                      <div className="flex justify-between">
+                        <span className="text-muted-foreground">Water Income</span>
+                        <span>₨ {filteredData.totalWater.toLocaleString()}</span>
+                      </div>
+                    )}
+                    {filteredData.totalOther > 0 && (
+                      <div className="flex justify-between">
+                        <span className="text-muted-foreground">Other Income</span>
+                        <span>₨ {filteredData.totalOther.toLocaleString()}</span>
+                      </div>
+                    )}
+                  </div>
+                  <div className="flex justify-between font-bold text-lg mt-4 px-4 pt-4 border-t border-dashed">
+                    <span>Total Revenue</span>
+                    <span className="text-emerald-700">₨ {filteredData.totalRevenue.toLocaleString()}</span>
+                  </div>
+                </div>
+
+                {/* Expenses Section */}
+                <div className="mb-8">
+                  <h3 className="font-bold text-lg border-b pb-2 mb-4 text-red-800">OPERATING EXPENSES</h3>
+                  <div className="space-y-3 px-4">
+                    {filteredData.sortedExpenseCategories.length === 0 ? (
+                      <p className="text-muted-foreground italic text-sm">No expenses recorded in this period.</p>
+                    ) : (
+                      filteredData.sortedExpenseCategories.map(cat => (
+                        <div key={cat} className="flex justify-between">
+                          <span className="text-muted-foreground">{cat}</span>
+                          <span>₨ {filteredData.expensesByCategory[cat].toLocaleString()}</span>
+                        </div>
+                      ))
+                    )}
+                  </div>
+                  <div className="flex justify-between font-bold text-lg mt-4 px-4 pt-4 border-t border-dashed">
+                    <span>Total Expenses</span>
+                    <span className="text-red-700">₨ {filteredData.totalExpense.toLocaleString()}</span>
+                  </div>
+                </div>
+
+                {/* Net Profit Section */}
+                <div className={`mt-12 flex justify-between items-center font-bold text-xl p-4 rounded-lg ${
+                  filteredData.netProfit >= 0 ? 'bg-emerald-50 text-emerald-900 border border-emerald-200' : 'bg-red-50 text-red-900 border border-red-200'
+                }`}>
+                  <span>NET {filteredData.netProfit >= 0 ? 'PROFIT' : 'LOSS'}</span>
+                  <span>₨ {Math.abs(filteredData.netProfit).toLocaleString()}</span>
+                </div>
+
+              </div>
+            </CardContent>
+          </Card>
+        )}
+      </div>
+    </DashboardLayout>
+  )
+}

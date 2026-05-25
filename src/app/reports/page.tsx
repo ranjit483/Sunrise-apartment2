@@ -4,6 +4,7 @@ import { DashboardLayout } from '@/components/layout/DashboardLayout'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { BarChart3, Download, FileText } from 'lucide-react'
+import Link from 'next/link'
 
 export default function ReportsPage() {
   return (
@@ -20,14 +21,16 @@ export default function ReportsPage() {
               </div>
             </CardContent>
           </Card>
-          <Card className="cursor-pointer hover:shadow-lg transition-shadow">
-            <CardContent className="p-6">
-              <div className="flex items-center gap-4">
-                <div className="p-3 rounded-lg bg-green-100"><FileText className="h-6 w-6 text-green-600" /></div>
-                <div><p className="font-medium">Financial Report</p><p className="text-sm text-muted-foreground">Revenue and expenses</p></div>
-              </div>
-            </CardContent>
-          </Card>
+          <Link href="/reports/profit-loss">
+            <Card className="cursor-pointer hover:shadow-lg transition-shadow h-full">
+              <CardContent className="p-6">
+                <div className="flex items-center gap-4">
+                  <div className="p-3 rounded-lg bg-green-100"><FileText className="h-6 w-6 text-green-600" /></div>
+                  <div><p className="font-medium">Financial Report</p><p className="text-sm text-muted-foreground">Profit & Loss Statement</p></div>
+                </div>
+              </CardContent>
+            </Card>
+          </Link>
           <Card className="cursor-pointer hover:shadow-lg transition-shadow">
             <CardContent className="p-6">
               <div className="flex items-center gap-4">

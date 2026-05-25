@@ -17,10 +17,10 @@ import {
   Car,
   BarChart3,
   Settings,
-  ChevronLeft,
   ChevronRight,
   UserPlus,
   Wallet,
+  BookOpen,
 } from 'lucide-react'
 import { useState } from 'react'
 import { useAuth } from '@/context/AuthContext'
@@ -44,6 +44,7 @@ const navItems: NavItem[] = [
   { title: 'Leases', href: '/leases', icon: FileText, minClearance: 4, excludeRoles: ['RESIDENT', 'TENANT'] },
   { title: 'Users', href: '/users', icon: Users, minClearance: 3 },
   { title: 'Chart of Accounts', href: '/accounts/chart', icon: Wallet, minClearance: 3, excludeRoles: ['RESIDENT', 'TENANT', 'GUARD', 'OFFICE_ASSISTANT'] },
+  { title: 'Tenant Ledger', href: '/accounts/ledger', icon: BookOpen, minClearance: 3, excludeRoles: ['RESIDENT', 'TENANT', 'GUARD', 'OFFICE_ASSISTANT'] },
   { title: 'Invoices', href: '/invoices', icon: FileText, minClearance: 4, excludeRoles: ['RESIDENT', 'TENANT'] },
   { title: 'Payments', href: '/payments', icon: CreditCard, minClearance: 4 },
   { title: 'Expenses', href: '/expenses', icon: CreditCard, minClearance: 3, excludeRoles: ['OFFICE_ASSISTANT'] },
