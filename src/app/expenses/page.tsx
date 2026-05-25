@@ -79,7 +79,7 @@ export default function ExpensesPage() {
       const acc: ChartOfAccount[] = []
       snapshot.forEach((doc: any) => {
         const data = doc.data() as ChartOfAccount
-        if (data.type === 'Expense') acc.push(data)
+        acc.push({ ...data, id: doc.id })
       })
       setAccounts(acc)
     })
@@ -262,6 +262,9 @@ export default function ExpensesPage() {
                 <option value="">Select an account...</option>
                 {EXPENSE_CATEGORIES.map(category => (
                   <option key={category} value={category}>{category}</option>
+                ))}
+                {accounts.map(acc => (
+                  <option key={acc.id} value={acc.name}>{acc.name} ({acc.type})</option>
                 ))}
               </select>
             </div>
