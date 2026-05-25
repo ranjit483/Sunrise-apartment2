@@ -20,6 +20,7 @@ import {
   ChevronLeft,
   ChevronRight,
   UserPlus,
+  Wallet,
 } from 'lucide-react'
 import { useState } from 'react'
 import { useAuth } from '@/context/AuthContext'
@@ -42,6 +43,7 @@ const navItems: NavItem[] = [
   { title: 'Units', href: '/units', icon: Home, minClearance: 4, excludeRoles: ['RESIDENT', 'TENANT'] },
   { title: 'Leases', href: '/leases', icon: FileText, minClearance: 4, excludeRoles: ['RESIDENT', 'TENANT'] },
   { title: 'Users', href: '/users', icon: Users, minClearance: 3 },
+  { title: 'Chart of Accounts', href: '/accounts/chart', icon: Wallet, minClearance: 2, excludeRoles: ['RESIDENT', 'TENANT', 'GUARD'] },
   { title: 'Invoices', href: '/invoices', icon: FileText, minClearance: 4, excludeRoles: ['RESIDENT', 'TENANT'] },
   { title: 'Payments', href: '/payments', icon: CreditCard, minClearance: 4 },
   { title: 'Expenses', href: '/expenses', icon: CreditCard, minClearance: 2 },

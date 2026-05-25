@@ -8,6 +8,15 @@ export type PaymentStatus = 'pending' | 'completed' | 'failed' | 'refunded'
 export type TicketStatus = 'open' | 'in_progress' | 'resolved' | 'closed'
 export type TicketPriority = 'low' | 'medium' | 'high' | 'critical'
 
+export interface ChartOfAccount {
+  id: string
+  code: string
+  name: string
+  type: 'Asset' | 'Liability' | 'Equity' | 'Revenue' | 'Expense'
+  isSystemLocked: boolean
+  createdAt: string
+}
+
 export interface Building {
   id: string
   name: string
@@ -116,10 +125,15 @@ export interface AuditLog {
 
 export interface Expense {
   id: string
+  accountId?: string
+  buildingId?: string
   category: string
   description: string
   amount: number
   date: string
+  status: 'pending_approval' | 'approved' | 'rejected' | 'paid'
+  receiptUrl?: string
+  approvedBy?: string
   createdAt: string
 }
 

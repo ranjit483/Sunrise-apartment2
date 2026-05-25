@@ -1,12 +1,30 @@
 import { NextResponse } from 'next/server'
 import { db } from '@/config/firebase'
 import { collection, writeBatch, doc } from 'firebase/firestore'
-import { Building, Unit, Lease, Invoice, Payment, MaintenanceTicket } from '@/types/models'
+import { Building, Unit, Lease, Invoice, Payment, MaintenanceTicket, ChartOfAccount } from '@/types/models'
 
 // Temporary route to seed dummy data
 export async function POST() {
   try {
     const batch = writeBatch(db)
+
+    // 0. Chart of Accounts
+    const accounts: Omit<ChartOfAccount, 'id'>[] = [
+      { code: '4000', name: 'Rent Income', type: 'Revenue', isSystemLocked: true, createdAt: new Date().toISOString() },
+      { code: '4100', name: 'Maintenance Fee', type: 'Revenue', isSystemLocked: true, createdAt: new Date().toISOString() },
+      { code: '4200', name: 'Utility Income', type: 'Revenue', isSystemLocked: true, createdAt: new Date().toISOString() },
+      { code: '4300', name: 'Late Fee', type: 'Revenue', isSystemLocked: true, createdAt: new Date().toISOString() },
+      { code: '5000', name: 'Maintenance & Repair', type: 'Expense', isSystemLocked: true, createdAt: new Date().toISOString() },
+      { code: '5100', name: 'Utility Bills', type: 'Expense', isSystemLocked: true, createdAt: new Date().toISOString() },
+      { code: '5200', name: 'Staff Salary', type: 'Expense', isSystemLocked: true, createdAt: new Date().toISOString() },
+      { code: '5300', name: 'Property Tax', type: 'Expense', isSystemLocked: true, createdAt: new Date().toISOString() },
+      { code: '5400', name: 'Cleaning Services', type: 'Expense', isSystemLocked: true, createdAt: new Date().toISOString() },
+    ]
+
+    accounts.forEach(acc => {
+      const ref = doc(collection(db, 'chart_of_accounts'))
+      batch.set(ref, { ...acc, id: ref.id })
+    })
 
     // 1. Buildings
     const buildings: Omit<Building, 'id'>[] = [

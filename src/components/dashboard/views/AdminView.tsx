@@ -16,36 +16,59 @@ export function AdminView({ profile }: { profile: any }) {
   const [units, setUnits] = useState<Unit[]>([])
   const [invoices, setInvoices] = useState<Invoice[]>([])
   const [tickets, setTickets] = useState<MaintenanceTicket[]>([])
+  const [expenses, setExpenses] = useState<any[]>([])
 
   useEffect(() => {
     const unsubBuildings = onSnapshot(collection(db, 'buildings'), (snap: any) => setBuildings(snap.docs.map((d: any) => d.data() as Building)))
     const unsubUnits = onSnapshot(collection(db, 'units'), (snap: any) => setUnits(snap.docs.map((d: any) => d.data() as Unit)))
     const unsubInvoices = onSnapshot(collection(db, 'invoices'), (snap: any) => setInvoices(snap.docs.map((d: any) => d.data() as Invoice)))
-    const unsubTickets = onSnapshot(collection(db, 'maintenance'), (snap: any) => setTickets(snap.docs.map((d: any) => d.data() as MaintenanceTicket)))
+    const unsubTickets = onSnapshot(collection(db, 'maintenance_tickets'), (snap: any) => setTickets(snap.docs.map((d: any) => d.data() as MaintenanceTicket)))
+    const unsubExpenses = onSnapshot(collection(db, 'expenses'), (snap: any) => setExpenses(snap.docs.map((d: any) => d.data() as any)))
 
     return () => {
       unsubBuildings()
       unsubUnits()
       unsubInvoices()
       unsubTickets()
+      unsubExpenses()
     }
   }, [])
 
-  // Calculate KPIs
-  const occupiedUnits = units.filter(u => u.status === 'occupied').length
-  const occupancyRate = units.length > 0 ? Math.round((occupiedUnits / units.length) * 100) : 0
+  const isManager = profile?.role === 'MANAGER'
+  const myBuildings = isManager ? buildings.filter(b => b.managerId === profile.uid) : buildings
+  const myBuildingIds = myBuildings.map(b => b.id)
+
+  const myUnits = isManager ? units.filter(u => myBuildingIds.includes(u.buildingId)) : units
   
-  const monthlyRevenue = invoices.filter(i => i.status === 'paid').reduce((acc, i) => acc + i.amount, 0)
-  const pendingPayments = invoices.filter(i => i.status === 'pending' || i.status === 'overdue').reduce((acc, i) => acc + i.amount, 0)
-  const openTickets = tickets.filter(t => t.status === 'open' || t.status === 'in_progress').length
+  const myInvoices = isManager ? invoices.filter(i => {
+    const unit = units.find(u => u.id === i.unitId)
+    return unit && myBuildingIds.includes(unit.buildingId)
+  }) : invoices
+
+  const myTickets = isManager ? tickets.filter(t => myBuildingIds.includes(t.buildingId)) : tickets
+  
+  const myExpenses = isManager ? expenses.filter(e => e.buildingId && myBuildingIds.includes(e.buildingId)) : expenses
+
+  // Calculate KPIs
+  const occupiedUnits = myUnits.filter(u => u.status === 'occupied').length
+  const occupancyRate = myUnits.length > 0 ? Math.round((occupiedUnits / myUnits.length) * 100) : 0
+  
+  const monthlyRevenue = myInvoices.filter(i => i.status === 'paid').reduce((acc, i) => acc + i.amount, 0)
+  const totalExpenses = myExpenses.filter(e => e.status === 'approved' || e.status === 'paid' || !e.status).reduce((acc, e) => acc + e.amount, 0)
+  const netProfit = monthlyRevenue - totalExpenses
+
+  const pendingPayments = myInvoices.filter(i => i.status === 'pending' || i.status === 'overdue').reduce((acc, i) => acc + i.amount, 0)
+  const openTickets = myTickets.filter(t => t.status === 'open' || t.status === 'in_progress').length
 
   const kpis = [
-    { title: 'Total Buildings', value: buildings.length.toString(), change: '', trend: 'up', icon: Building2, color: 'bg-blue-500' },
-    { title: 'Total Units', value: units.length.toString(), change: '', trend: 'up', icon: Home, color: 'bg-green-500' },
+    { title: 'Total Buildings', value: myBuildings.length.toString(), change: '', trend: 'up', icon: Building2, color: 'bg-blue-500' },
+    { title: 'Total Units', value: myUnits.length.toString(), change: '', trend: 'up', icon: Home, color: 'bg-green-500' },
     { title: 'Occupied Units', value: occupiedUnits.toString(), change: `${occupancyRate}%`, trend: 'up', icon: Users, color: 'bg-purple-500' },
-    { title: 'Monthly Revenue', value: `₨ ${monthlyRevenue.toLocaleString()}`, change: '', trend: 'up', icon: DollarSign, color: 'bg-yellow-500' },
-    { title: 'Pending Payments', value: `₨ ${pendingPayments.toLocaleString()}`, change: '', trend: 'down', icon: CreditCard, color: 'bg-red-500' },
-    { title: 'Open Tickets', value: openTickets.toString(), change: '', trend: 'up', icon: Wrench, color: 'bg-orange-500' },
+    { title: 'Total Revenue', value: `₨ ${monthlyRevenue.toLocaleString()}`, change: '', trend: 'up', icon: DollarSign, color: 'bg-emerald-500' },
+    { title: 'Total Expenses', value: `₨ ${totalExpenses.toLocaleString()}`, change: '', trend: 'down', icon: CreditCard, color: 'bg-orange-500' },
+    { title: 'Net Profit', value: `₨ ${netProfit.toLocaleString()}`, change: '', trend: netProfit >= 0 ? 'up' : 'down', icon: TrendingUp, color: netProfit >= 0 ? 'bg-indigo-500' : 'bg-red-500' },
+    { title: 'Pending Payments', value: `₨ ${pendingPayments.toLocaleString()}`, change: 'Receivable', trend: 'down', icon: CreditCard, color: 'bg-red-500' },
+    { title: 'Open Tickets', value: openTickets.toString(), change: '', trend: 'up', icon: Wrench, color: 'bg-yellow-600' },
   ]
 
   // Temporary mock data for charts since we don't have historical data yet
@@ -55,14 +78,14 @@ export function AdminView({ profile }: { profile: any }) {
     { month: 'Mar', revenue: 145000, expenses: 52000 },
     { month: 'Apr', revenue: 138000, expenses: 49000 },
     { month: 'May', revenue: 152000, expenses: 55000 },
-    { month: 'Jun', revenue: monthlyRevenue || 168000, expenses: 58000 },
+    { month: 'Jun', revenue: monthlyRevenue || 168000, expenses: totalExpenses || 58000 },
   ]
 
-  const vacantUnits = units.filter(u => u.status === 'vacant').length
-  const maintenanceUnits = units.filter(u => u.status === 'maintenance').length
-  const reservedUnits = units.filter(u => u.status === 'reserved').length
+  const vacantUnits = myUnits.filter(u => u.status === 'vacant').length
+  const maintenanceUnits = myUnits.filter(u => u.status === 'maintenance').length
+  const reservedUnits = myUnits.filter(u => u.status === 'reserved').length
 
-  const occupancyData = units.length > 0 ? [
+  const occupancyData = myUnits.length > 0 ? [
     { name: 'Occupied', value: occupiedUnits, color: '#95DBAE' },
     { name: 'Vacant', value: vacantUnits, color: '#F59E0B' },
     { name: 'Reserved', value: reservedUnits, color: '#3B82F6' },
@@ -87,14 +110,14 @@ export function AdminView({ profile }: { profile: any }) {
         </div>
         <div className="flex flex-wrap gap-2 w-full md:w-auto mt-2 md:mt-0">
           {profile?.role === 'SUPER_ADMIN' && <SeedButton />}
-          <Button variant="outline" className="flex-1 md:flex-none">Export Report</Button>
+          <Button variant="outline" className="flex-1 md:flex-none">Export Reports</Button>
           <Button className="flex-1 md:flex-none bg-emerald-400 hover:bg-emerald-500 text-black">Generate Invoice</Button>
         </div>
       </div>
 
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-8">
         {kpis.map((kpi, index) => (
-          <Card key={index}>
+          <Card key={index} className="col-span-2">
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
