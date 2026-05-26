@@ -143,28 +143,29 @@ function LandingContent() {
       </header>
 
       <section 
-        className="pt-32 pb-20 px-4 relative bg-cover bg-center"
+        className="pt-32 pb-20 px-4 relative bg-cover bg-center min-h-[85vh] flex items-center"
         style={{ backgroundImage: 'url("/apartment-bg.jpg")' }}
       >
-        <div className="absolute inset-0 bg-white/85 backdrop-blur-[2px]"></div>
-        <div className="max-w-7xl mx-auto relative z-10">
+        <div className="absolute inset-0 bg-black/50"></div>
+        <div className="absolute inset-0 bg-gradient-to-t from-white via-transparent to-transparent"></div>
+        <div className="max-w-7xl mx-auto relative z-10 w-full mt-10">
           <div className="text-center">
-            <Badge variant="secondary" className="mb-4">🏢 Nakhhu-13, Lalitpur, Nepal</Badge>
-            <h1 className="text-4xl md:text-6xl font-bold text-gray-900 mb-6">
+            <Badge variant="outline" className="mb-4 text-white border-white/50 bg-black/20 backdrop-blur-md">🏢 Nakhhu-13, Lalitpur, Nepal</Badge>
+            <h1 className="text-5xl md:text-7xl font-bold text-white mb-6 drop-shadow-lg">
               Sunrise<br />
-              <span className="text-primary">Apartment</span>
+              <span className="text-emerald-400">Apartment</span>
             </h1>
-            <p className="text-xl text-gray-600 max-w-2xl mx-auto mb-8">
+            <p className="text-xl text-gray-100 max-w-2xl mx-auto mb-8 drop-shadow-md">
               Streamline your apartment management with automated billing, maintenance tracking, 
               visitor management, and comprehensive analytics—all in one platform.
             </p>
           </div>
 
-          <div className="mt-16 grid grid-cols-2 md:grid-cols-4 gap-6">
+          <div className="mt-16 grid grid-cols-2 md:grid-cols-4 gap-6 bg-black/30 backdrop-blur-md rounded-3xl p-8 border border-white/10 shadow-2xl">
             {stats.map((stat, i) => (
               <div key={i} className="text-center">
-                <div className="text-3xl md:text-4xl font-bold text-primary">{stat.value}</div>
-                <div className="text-gray-600">{stat.label}</div>
+                <div className="text-4xl md:text-5xl font-bold text-emerald-400 mb-2 drop-shadow-md">{stat.value}</div>
+                <div className="text-gray-200 font-medium tracking-wide uppercase text-sm">{stat.label}</div>
               </div>
             ))}
           </div>
