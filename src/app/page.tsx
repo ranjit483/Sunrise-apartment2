@@ -22,10 +22,10 @@ const features = [
 ]
 
 const stats = [
-  { value: '58+', label: 'Units Managed' },
-  { value: '4', label: 'Buildings' },
-  { value: '500+', label: 'Residents' },
-  { value: '99.9%', label: 'Uptime' },
+  { value: '200+', label: 'Units Managed' },
+  { value: '3', label: 'Buildings' },
+  { value: '1000+', label: 'Residents' },
+  { value: '99.99%', label: 'Uptime' },
 ]
 
 const testimonials = [
@@ -142,8 +142,12 @@ function LandingContent() {
         )}
       </header>
 
-      <section className="pt-32 pb-20 px-4">
-        <div className="max-w-7xl mx-auto">
+      <section 
+        className="pt-32 pb-20 px-4 relative bg-cover bg-center"
+        style={{ backgroundImage: 'url("/apartment-bg.jpg")' }}
+      >
+        <div className="absolute inset-0 bg-white/85 backdrop-blur-[2px]"></div>
+        <div className="max-w-7xl mx-auto relative z-10">
           <div className="text-center">
             <Badge variant="secondary" className="mb-4">🏢 Nakhhu-13, Lalitpur, Nepal</Badge>
             <h1 className="text-4xl md:text-6xl font-bold text-gray-900 mb-6">
