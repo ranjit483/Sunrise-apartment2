@@ -219,25 +219,6 @@ function LandingContent() {
                 ))}
               </div>
             </div>
-            <div className="relative">
-              <div className="absolute inset-0 bg-gradient-to-br from-primary/20 to-secondary/20 rounded-3xl blur-3xl"></div>
-              <div className="relative bg-white rounded-3xl shadow-2xl p-8">
-                <div className="space-y-4">
-                  <div className="flex items-center justify-between p-4 bg-gray-50 rounded-xl">
-                    <span className="text-gray-600">Total Units</span>
-                    <span className="text-2xl font-bold text-primary">58</span>
-                  </div>
-                  <div className="flex items-center justify-between p-4 bg-gray-50 rounded-xl">
-                    <span className="text-gray-600">Occupancy Rate</span>
-                    <span className="text-2xl font-bold text-green-500">78%</span>
-                  </div>
-                  <div className="flex items-center justify-between p-4 bg-gray-50 rounded-xl">
-                    <span className="text-gray-600">Monthly Revenue</span>
-                    <span className="text-2xl font-bold text-blue-500">₨ 16.8L</span>
-                  </div>
-                </div>
-              </div>
-            </div>
           </div>
         </div>
       </section>
@@ -305,8 +286,8 @@ function LandingContent() {
               <h4 className="font-semibold mb-4">Contact</h4>
               <ul className="space-y-2 text-gray-400 text-sm">
                 <li>Nakhhu-13, Lalitpur</li>
-                <li>info@sunrise-ams.com</li>
-                <li>+977 1 5555555</li>
+                <li>nakhhu@sunrise.com.np</li>
+                <li>+977-01-5185110</li>
               </ul>
             </div>
           </div>
