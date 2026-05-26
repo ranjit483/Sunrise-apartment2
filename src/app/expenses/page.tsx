@@ -12,42 +12,6 @@ import { db } from '@/config/firebase'
 import { collection, onSnapshot, query, orderBy, doc, setDoc, updateDoc } from 'firebase/firestore'
 import { Expense, ChartOfAccount, Building } from '@/types/models'
 import { Loader2, Plus, CheckCircle2, XCircle } from 'lucide-react'
-
-const EXPENSE_CATEGORIES = [
-  "Goble Bank LTD.",
-  "Staff Salaries",
-  "Staff Allowances",
-  "Provident Fund (PF) Contribution",
-  "Gratuity/Pension Expense",
-  "Staff Welfare/Training",
-  "Electricity & Water",
-  "Communication Expenses",
-  "Office Stationery & Supplies",
-  "Repair & Maintenance (Office)",
-  "Cleaning & Janitorial",
-  "Audit Fees",
-  "Legal & Professional Charges",
-  "Registration & Renewal Fees",
-  "Insurance Expenses",
-  "Postage & Courier",
-  "Advertising & Sales Promotion",
-  "Business Travel & Conveyance",
-  "Outstation Travel & Lodging",
-  "Client Hospitality",
-  "Bank Charges & Commission",
-  "Interest on Loans",
-  "Depreciation",
-  "Fines & Penalties",
-  "Vehicle Running Expenses",
-  "Subscription & Periodicals",
-  "Printing & Photocopying",
-  "Donations & CSR",
-  "Miscellaneous Expenses",
-  "Input VAT (Non-Recoverable)",
-  "Parties Payment",
-  "Elevator",
-  "Water Treatment"
-]
 import { useAuth } from '@/context/AuthContext'
 
 export default function ExpensesPage() {
@@ -260,9 +224,6 @@ export default function ExpensesPage() {
                 onChange={(e) => setFormData({...formData, accountId: e.target.value})}
               >
                 <option value="">Select an account...</option>
-                {EXPENSE_CATEGORIES.map(category => (
-                  <option key={category} value={category}>{category}</option>
-                ))}
                 {accounts.map(acc => (
                   <option key={acc.id} value={acc.name}>{acc.name} ({acc.type})</option>
                 ))}
