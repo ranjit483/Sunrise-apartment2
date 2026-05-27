@@ -28,6 +28,7 @@ export interface UserProfile {
   role: UserRole
   clearance_level: number
   status: UserStatus
+  buildingId?: string
   unitNumber?: string
   profileImage?: string
   createdAt: string

@@ -10,7 +10,7 @@ import { Label } from '@/components/ui/label'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
-import { Loader2, User as UserIcon, Mail, Phone, Home, Shield, Activity, Camera } from 'lucide-react'
+import { Loader2, User as UserIcon, Mail, Phone, Home, Shield, Activity, Camera, Building2 } from 'lucide-react'
 import Link from 'next/link'
 
 export default function ProfilePage() {
@@ -22,6 +22,7 @@ export default function ProfilePage() {
   const [formData, setFormData] = useState({
     fullName: '',
     phone: '',
+    buildingId: '',
     unitNumber: '',
   })
 
@@ -31,10 +32,13 @@ export default function ProfilePage() {
       setFormData({
         fullName: profile.fullName || '',
         phone: profile.phone || '',
+        buildingId: profile.buildingId || '',
         unitNumber: profile.unitNumber || '',
       })
     }
   }, [profile])
+
+  const isRestricted = profile?.role === 'TENANT' || profile?.role === 'RESIDENT'
 
   const getInitials = (name: string) => {
     if (!name || typeof name !== 'string') return 'U'
@@ -59,6 +63,7 @@ export default function ProfilePage() {
       await updateDoc(userRef, {
         fullName: formData.fullName,
         phone: formData.phone,
+        buildingId: formData.buildingId,
         unitNumber: formData.unitNumber,
         updatedAt: new Date().toISOString(),
       })
@@ -167,10 +172,13 @@ export default function ProfilePage() {
                       placeholder="Your full name"
                       value={formData.fullName}
                       onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
-                      className="pl-9"
+                      className={`pl-9 ${isRestricted ? 'bg-muted cursor-not-allowed opacity-75' : ''}`}
+                      disabled={isRestricted}
+                      readOnly={isRestricted}
                       required
                     />
                   </div>
+                  {isRestricted && <p className="text-[10px] text-muted-foreground">Name cannot be changed without manager permission.</p>}
                 </div>
 
                 <div className="space-y-2">
@@ -180,7 +188,7 @@ export default function ProfilePage() {
                     <Input
                       id="email"
                       value={profile.email}
-                      className="pl-9 bg-muted"
+                      className="pl-9 bg-muted cursor-not-allowed opacity-75"
                       disabled
                       readOnly
                     />
@@ -203,6 +211,23 @@ export default function ProfilePage() {
                 </div>
 
                 <div className="space-y-2">
+                  <Label htmlFor="buildingId">Building - Tower</Label>
+                  <div className="relative">
+                    <Building2 className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
+                    <Input
+                      id="buildingId"
+                      placeholder="e.g. Tower A"
+                      value={formData.buildingId}
+                      onChange={(e) => setFormData({ ...formData, buildingId: e.target.value })}
+                      className={`pl-9 ${isRestricted ? 'bg-muted cursor-not-allowed opacity-75' : ''}`}
+                      disabled={isRestricted}
+                      readOnly={isRestricted}
+                    />
+                  </div>
+                  {isRestricted && <p className="text-[10px] text-muted-foreground">Tower cannot be changed without manager permission.</p>}
+                </div>
+
+                <div className="space-y-2">
                   <Label htmlFor="unitNumber">Unit / Apartment Number</Label>
                   <div className="relative">
                     <Home className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
@@ -211,9 +236,12 @@ export default function ProfilePage() {
                       placeholder="e.g. A-101"
                       value={formData.unitNumber}
                       onChange={(e) => setFormData({ ...formData, unitNumber: e.target.value })}
-                      className="pl-9"
+                      className={`pl-9 ${isRestricted ? 'bg-muted cursor-not-allowed opacity-75' : ''}`}
+                      disabled={isRestricted}
+                      readOnly={isRestricted}
                     />
                   </div>
+                  {isRestricted && <p className="text-[10px] text-muted-foreground">Unit cannot be changed without manager permission.</p>}
                 </div>
               </div>
             </CardContent>
