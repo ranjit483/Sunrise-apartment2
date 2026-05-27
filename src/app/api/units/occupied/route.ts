@@ -1,45 +1,54 @@
 import { NextResponse } from 'next/server';
-import { initializeApp, getApps } from 'firebase/app';
-import { getAuth, signInWithEmailAndPassword } from 'firebase/auth';
-import { getFirestore, collection, getDocs } from 'firebase/firestore';
 
 export const dynamic = 'force-dynamic';
 
 export async function GET(request: Request) {
   try {
-    const firebaseConfig = {
-      apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
-      authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
-      projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
-      storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
-      messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
-      appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
-    };
+    const apiKey = process.env.NEXT_PUBLIC_FIREBASE_API_KEY;
+    const projectId = process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID;
 
-    const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApps()[0];
-    const auth = getAuth(app);
-    const db = getFirestore(app);
+    // 1. Sign in via REST API
+    const authRes = await fetch(`https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=${apiKey}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ 
+        email: 'ranjitmanaraja@gmail.com', 
+        password: '1234@manaR#', 
+        returnSecureToken: true 
+      }),
+      cache: 'no-store'
+    });
+    const authData = await authRes.json();
+    
+    if (!authData.idToken) {
+      console.error('REST Auth failed:', authData);
+      return NextResponse.json({ occupiedUnits: [] });
+    }
 
-    // Sign in as super admin to bypass security rules for reading users
-    await signInWithEmailAndPassword(auth, 'ranjitmanaraja@gmail.com', '1234@manaR#');
-
-    const snapshot = await getDocs(collection(db, 'users'));
+    // 2. Fetch users via Firestore REST API
+    const dbRes = await fetch(`https://firestore.googleapis.com/v1/projects/${projectId}/databases/(default)/documents/users`, {
+      headers: { 'Authorization': `Bearer ${authData.idToken}` },
+      cache: 'no-store'
+    });
+    const dbData = await dbRes.json();
+    
     const occupiedUnits: { buildingId: string, unitNumber: string }[] = [];
 
-    snapshot.forEach((doc: any) => {
-      const data = doc.data();
-      if (data.buildingId && data.unitNumber) {
-        occupiedUnits.push({
-          buildingId: data.buildingId,
-          unitNumber: data.unitNumber
-        });
-      }
-    });
+    if (dbData.documents) {
+      dbData.documents.forEach((doc: any) => {
+        if (doc.fields && doc.fields.buildingId && doc.fields.unitNumber) {
+          const buildingId = doc.fields.buildingId.stringValue;
+          const unitNumber = doc.fields.unitNumber.stringValue;
+          if (buildingId && unitNumber) {
+            occupiedUnits.push({ buildingId, unitNumber });
+          }
+        }
+      });
+    }
 
     return NextResponse.json({ occupiedUnits });
   } catch (error: any) {
-    console.error('Error fetching occupied units:', error);
-    // On error, return empty array so UI doesn't crash
+    console.error('Error fetching occupied units via REST:', error);
     return NextResponse.json({ occupiedUnits: [] });
   }
 }
