@@ -212,9 +212,15 @@ export function AuthModal({ open, onOpenChange }: AuthModalProps) {
                   <Label htmlFor="phone">Phone Number *</Label>
                   <Input
                     id="phone"
-                    placeholder="9841234567"
+                    placeholder="e.g. 9841234567"
                     value={formData.phone}
-                    onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                    maxLength={10}
+                    onChange={(e) => {
+                      const value = e.target.value.replace(/[^0-9]/g, '')
+                      setFormData({ ...formData, phone: value })
+                    }}
+                    pattern="^9\d{9}$"
+                    title="Phone number must be exactly 10 digits and start with 9"
                     required
                   />
                 </div>
