@@ -68,7 +68,7 @@ export function AuthModal({ open, onOpenChange }: AuthModalProps) {
             return { ...data, id: doc.id } as Building
           })
           // Sort manually to avoid index issues
-          bData.sort((a, b) => (a.name || '').localeCompare(b.name || ''))
+          bData.sort((a: Building, b: Building) => (a.name || '').localeCompare(b.name || ''))
           setBuildings(bData)
 
           const uSnap = await getDocs(collection(db, 'units'))
@@ -77,7 +77,7 @@ export function AuthModal({ open, onOpenChange }: AuthModalProps) {
             return { ...data, id: doc.id } as Unit
           })
           // Sort manually
-          uData.sort((a, b) => (a.unitNumber || '').localeCompare(b.unitNumber || ''))
+          uData.sort((a: Unit, b: Unit) => (a.unitNumber || '').localeCompare(b.unitNumber || ''))
           setUnits(uData)
         } catch (error) {
           console.error('Error fetching buildings and units:', error)
