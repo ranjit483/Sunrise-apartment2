@@ -3,8 +3,9 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword, signInWithPopup, GoogleAuthProvider } from 'firebase/auth'
-import { doc, setDoc, getDoc, serverTimestamp } from 'firebase/firestore'
+import { doc, setDoc, getDoc, serverTimestamp, getDocs, collection, query, orderBy } from 'firebase/firestore'
 import { auth, db } from '@/config/firebase'
+import { Building, Unit } from '@/types/models'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -43,14 +44,38 @@ export function AuthModal({ open, onOpenChange }: AuthModalProps) {
   const [showPassword, setShowPassword] = useState(false)
   const [error, setError] = useState('')
 
+  const [buildings, setBuildings] = useState<Building[]>([])
+  const [units, setUnits] = useState<Unit[]>([])
+
   const [formData, setFormData] = useState({
     email: '',
     password: '',
     fullName: '',
     phone: '',
     role: '' as UserRole | '',
+    buildingId: '',
     unitNumber: '',
   })
+
+  // Fetch buildings and units
+  useEffect(() => {
+    if (open) {
+      const fetchBuildingsAndUnits = async () => {
+        try {
+          const bSnap = await getDocs(query(collection(db, 'buildings'), orderBy('name')))
+          const bData = bSnap.docs.map((doc: any) => doc.data() as Building)
+          setBuildings(bData)
+
+          const uSnap = await getDocs(query(collection(db, 'units'), orderBy('unitNumber')))
+          const uData = uSnap.docs.map((doc: any) => doc.data() as Unit)
+          setUnits(uData)
+        } catch (error) {
+          console.error('Error fetching buildings and units:', error)
+        }
+      }
+      fetchBuildingsAndUnits()
+    }
+  }, [open])
 
   // Handle redirect after successful auth
   useEffect(() => {
@@ -60,7 +85,7 @@ export function AuthModal({ open, onOpenChange }: AuthModalProps) {
   }, [user, profile, authLoading, router])
 
   const resetForm = () => {
-    setFormData({ email: '', password: '', fullName: '', phone: '', role: '', unitNumber: '' })
+    setFormData({ email: '', password: '', fullName: '', phone: '', role: '', buildingId: '', unitNumber: '' })
     setError('')
   }
 
@@ -76,8 +101,8 @@ export function AuthModal({ open, onOpenChange }: AuthModalProps) {
 
     try {
       if (mode === 'signup') {
-        if (!formData.role) {
-          setError('Please select your role')
+        if (!formData.role || !formData.fullName || !formData.phone || !formData.buildingId || !formData.unitNumber) {
+          setError('Please fill in all required fields')
           setLoading(false)
           return
         }
@@ -92,7 +117,8 @@ export function AuthModal({ open, onOpenChange }: AuthModalProps) {
           phone: formData.phone,
           role: formData.role,
           status: 'approved',
-          unitNumber: formData.unitNumber || null,
+          buildingId: formData.buildingId,
+          unitNumber: formData.unitNumber,
           profileImage: user.photoURL || null,
           createdAt: new Date().toISOString(),
           updatedAt: new Date().toISOString(),
@@ -143,7 +169,8 @@ export function AuthModal({ open, onOpenChange }: AuthModalProps) {
           phone: user.phoneNumber || '',
           role: 'TENANT',
           status: 'approved',
-          unitNumber: null,
+          buildingId: '',
+          unitNumber: '',
           profileImage: user.photoURL || null,
           createdAt: new Date().toISOString(),
           updatedAt: new Date().toISOString(),
@@ -183,62 +210,97 @@ export function AuthModal({ open, onOpenChange }: AuthModalProps) {
             </div>
           )}
 
-          {mode === 'signup' && (
-            <div className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="fullName">Full Name</Label>
-                <Input
-                  id="fullName"
-                  placeholder="Enter your full name"
-                  value={formData.fullName}
-                  onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="phone">Phone Number</Label>
-                <Input
-                  id="phone"
-                  placeholder="9841234567"
-                  value={formData.phone}
-                  onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                />
-              </div>
-              <div className="space-y-2">
-                <Label>I am a...</Label>
-                <Select
-                  value={formData.role}
-                  onValueChange={(value) => setFormData({ ...formData, role: value as UserRole })}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select your role" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {roles.map((role) => (
-                      <SelectItem key={role.value} value={role.value}>
-                        <div>
-                          <p className="font-medium">{role.label}</p>
-                          <p className="text-xs text-muted-foreground">{role.description}</p>
-                        </div>
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="unitNumber">Unit/Apartment Number (Optional)</Label>
-                <Input
-                  id="unitNumber"
-                  placeholder="A-101"
-                  value={formData.unitNumber}
-                  onChange={(e) => setFormData({ ...formData, unitNumber: e.target.value })}
-                />
-              </div>
-            </div>
-          )}
-
           <form onSubmit={handleEmailAuth} className="space-y-4">
+            {mode === 'signup' && (
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="fullName">Full Name *</Label>
+                  <Input
+                    id="fullName"
+                    placeholder="Enter your full name"
+                    value={formData.fullName}
+                    onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
+                    required
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="phone">Phone Number *</Label>
+                  <Input
+                    id="phone"
+                    placeholder="9841234567"
+                    value={formData.phone}
+                    onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                    required
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label>I am a... *</Label>
+                  <Select
+                    value={formData.role}
+                    onValueChange={(value) => setFormData({ ...formData, role: value as UserRole })}
+                    required
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select your role" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {roles.map((role) => (
+                        <SelectItem key={role.value} value={role.value}>
+                          <div>
+                            <p className="font-medium">{role.label}</p>
+                            <p className="text-xs text-muted-foreground">{role.description}</p>
+                          </div>
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-2">
+                  <Label>Tower *</Label>
+                  <Select
+                    value={formData.buildingId}
+                    onValueChange={(value) => setFormData({ ...formData, buildingId: value, unitNumber: '' })}
+                    required
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select Tower" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {buildings.map((building) => (
+                        <SelectItem key={building.id} value={building.id}>
+                          {building.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-2">
+                  <Label>Unit *</Label>
+                  <Select
+                    value={formData.unitNumber}
+                    onValueChange={(value) => setFormData({ ...formData, unitNumber: value })}
+                    disabled={!formData.buildingId}
+                    required
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select Unit" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {units
+                        .filter((unit) => unit.buildingId === formData.buildingId)
+                        .map((unit) => (
+                        <SelectItem key={unit.id} value={unit.unitNumber}>
+                          {unit.unitNumber} - {unit.type}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+            )}
+
             <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
+              <Label htmlFor="email">Email *</Label>
               <Input
                 id="email"
                 type="email"
@@ -249,7 +311,7 @@ export function AuthModal({ open, onOpenChange }: AuthModalProps) {
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="password">Password</Label>
+              <Label htmlFor="password">Password *</Label>
               <div className="relative">
                 <Input
                   id="password"
