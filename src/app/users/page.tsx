@@ -26,6 +26,7 @@ interface UserData {
   role: string
   status: string
   unitNumber?: string
+  buildingId?: string
   clearance_level?: number
   createdAt?: string
 }
@@ -129,6 +130,7 @@ export default function UsersPage() {
             phone: data.phone || '',
             role: data.role || 'TENANT',
             status: data.status || 'pending_approval',
+            buildingId: data.buildingId || '',
             unitNumber: data.unitNumber || '',
             createdAt: data.createdAt || ''
           })
@@ -217,6 +219,7 @@ export default function UsersPage() {
                   <th className="pb-3 text-left">User</th>
                   <th className="pb-3 text-left">Phone</th>
                   <th className="pb-3 text-left">Role</th>
+                  <th className="pb-3 text-left">Building</th>
                   <th className="pb-3 text-left">Unit</th>
                   <th className="pb-3 text-left">Status</th>
                   {isAuthorized('manage_users') && <th className="pb-3 text-left">Actions</th>}
@@ -224,7 +227,7 @@ export default function UsersPage() {
               </thead>
               <tbody>
                 {filteredUsers.map((user) => (
-                  <tr key={user.uid} className="border-b">
+                  <tr key={user.uid} className="border-b hover:bg-muted/50 transition-colors">
                     <td className="py-3">
                       <div className="flex items-center gap-3">
                         <Avatar className="h-9 w-9">
@@ -238,6 +241,7 @@ export default function UsersPage() {
                     </td>
                     <td className="py-3">{user.phone}</td>
                     <td className="py-3"><Badge className={roleColors[user.role] || 'bg-gray-100'}>{roleLabels[user.role] || user.role}</Badge></td>
+                    <td className="py-3">{user.buildingId || '-'}</td>
                     <td className="py-3">{user.unitNumber || '-'}</td>
                     <td className="py-3"><Badge variant={user.status === 'approved' ? 'success' : user.status === 'rejected' ? 'destructive' : 'secondary'}>{user.status === 'pending_approval' ? 'Pending' : user.status}</Badge></td>
                     {isAuthorized('manage_users') && (
