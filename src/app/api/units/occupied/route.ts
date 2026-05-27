@@ -26,7 +26,7 @@ export async function GET(request: Request) {
     const snapshot = await getDocs(collection(db, 'users'));
     const occupiedUnits: { buildingId: string, unitNumber: string }[] = [];
 
-    snapshot.forEach((doc) => {
+    snapshot.forEach((doc: any) => {
       const data = doc.data();
       if (data.buildingId && data.unitNumber) {
         occupiedUnits.push({
