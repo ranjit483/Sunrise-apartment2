@@ -62,12 +62,22 @@ export function AuthModal({ open, onOpenChange }: AuthModalProps) {
     if (open) {
       const fetchBuildingsAndUnits = async () => {
         try {
-          const bSnap = await getDocs(query(collection(db, 'buildings'), orderBy('name')))
-          const bData = bSnap.docs.map((doc: any) => doc.data() as Building)
+          const bSnap = await getDocs(collection(db, 'buildings'))
+          const bData = bSnap.docs.map((doc: any) => {
+            const data = doc.data()
+            return { ...data, id: doc.id } as Building
+          })
+          // Sort manually to avoid index issues
+          bData.sort((a, b) => (a.name || '').localeCompare(b.name || ''))
           setBuildings(bData)
 
-          const uSnap = await getDocs(query(collection(db, 'units'), orderBy('unitNumber')))
-          const uData = uSnap.docs.map((doc: any) => doc.data() as Unit)
+          const uSnap = await getDocs(collection(db, 'units'))
+          const uData = uSnap.docs.map((doc: any) => {
+            const data = doc.data()
+            return { ...data, id: doc.id } as Unit
+          })
+          // Sort manually
+          uData.sort((a, b) => (a.unitNumber || '').localeCompare(b.unitNumber || ''))
           setUnits(uData)
         } catch (error) {
           console.error('Error fetching buildings and units:', error)
@@ -212,7 +222,7 @@ export function AuthModal({ open, onOpenChange }: AuthModalProps) {
 
           <form onSubmit={handleEmailAuth} className="space-y-4">
             {mode === 'signup' && (
-              <div className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label htmlFor="fullName">Full Name *</Label>
                   <Input
@@ -266,33 +276,41 @@ export function AuthModal({ open, onOpenChange }: AuthModalProps) {
                       <SelectValue placeholder="Select Tower" />
                     </SelectTrigger>
                     <SelectContent>
-                      {buildings.map((building) => (
-                        <SelectItem key={building.id} value={building.id}>
-                          {building.name}
-                        </SelectItem>
-                      ))}
+                      {buildings.length > 0 ? (
+                        buildings.map((building) => (
+                          <SelectItem key={building.id} value={building.id}>
+                            {building.name}
+                          </SelectItem>
+                        ))
+                      ) : (
+                        <SelectItem value="none" disabled>Loading or No Towers Available...</SelectItem>
+                      )}
                     </SelectContent>
                   </Select>
                 </div>
-                <div className="space-y-2">
+                <div className="space-y-2 md:col-span-2">
                   <Label>Unit *</Label>
                   <Select
                     value={formData.unitNumber}
                     onValueChange={(value) => setFormData({ ...formData, unitNumber: value })}
-                    disabled={!formData.buildingId}
+                    disabled={!formData.buildingId || formData.buildingId === 'none'}
                     required
                   >
                     <SelectTrigger>
                       <SelectValue placeholder="Select Unit" />
                     </SelectTrigger>
                     <SelectContent>
-                      {units
-                        .filter((unit) => unit.buildingId === formData.buildingId)
-                        .map((unit) => (
-                        <SelectItem key={unit.id} value={unit.unitNumber}>
-                          {unit.unitNumber} - {unit.type}
-                        </SelectItem>
-                      ))}
+                      {units.filter((unit) => unit.buildingId === formData.buildingId).length > 0 ? (
+                        units
+                          .filter((unit) => unit.buildingId === formData.buildingId)
+                          .map((unit) => (
+                            <SelectItem key={unit.id} value={unit.unitNumber}>
+                              {unit.unitNumber} - {unit.type}
+                            </SelectItem>
+                          ))
+                      ) : (
+                        <SelectItem value="none" disabled>No Units Found</SelectItem>
+                      )}
                     </SelectContent>
                   </Select>
                 </div>
