@@ -71,12 +71,26 @@ export default function UsersPage() {
       return
     }
 
+    if (editingUser.buildingId && editingUser.unitNumber) {
+      const isOccupied = users.some(u => 
+        u.uid !== editingUser.uid && 
+        u.buildingId === editingUser.buildingId && 
+        u.unitNumber === editingUser.unitNumber
+      )
+      
+      if (isOccupied) {
+        alert('This unit is already assigned to another user.')
+        return
+      }
+    }
+
     setSaving(true)
     try {
       const userRef = doc(db, 'users', editingUser.uid)
       await updateDoc(userRef, {
         fullName: editingUser.fullName,
         phone: editingUser.phone,
+        buildingId: editingUser.buildingId,
         unitNumber: editingUser.unitNumber,
         role: editingUser.role,
         status: editingUser.status,

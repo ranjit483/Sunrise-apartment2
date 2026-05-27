@@ -62,6 +62,22 @@ export function AuthModal({ open, onOpenChange }: AuthModalProps) {
     unitNumber: '',
   })
 
+  const [occupiedUnits, setOccupiedUnits] = useState<{buildingId: string, unitNumber: string}[]>([])
+
+  // Fetch occupied units
+  useEffect(() => {
+    if (open) {
+      fetch('/api/units/occupied')
+        .then(res => res.json())
+        .then(data => {
+          if (data.occupiedUnits) {
+            setOccupiedUnits(data.occupiedUnits)
+          }
+        })
+        .catch(err => console.error('Failed to fetch occupied units:', err))
+    }
+  }, [open])
+
   // Handle redirect after successful auth
   useEffect(() => {
     if (user && profile && !authLoading) {
@@ -92,6 +108,15 @@ export function AuthModal({ open, onOpenChange }: AuthModalProps) {
           return
         }
 
+        const isOccupied = occupiedUnits.some(
+          u => u.buildingId === formData.buildingId && u.unitNumber === formData.unitNumber
+        )
+        if (isOccupied) {
+          setError('This unit is already occupied. Please select another unit.')
+          setLoading(false)
+          return
+        }
+
         const userCredential = await createUserWithEmailAndPassword(auth, formData.email, formData.password)
         const user = userCredential.user
 
@@ -101,22 +126,20 @@ export function AuthModal({ open, onOpenChange }: AuthModalProps) {
           fullName: formData.fullName,
           phone: formData.phone,
           role: formData.role,
-          status: 'approved',
           buildingId: formData.buildingId,
           unitNumber: formData.unitNumber,
-          profileImage: user.photoURL || null,
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString(),
+          status: 'pending_approval',
+          createdAt: serverTimestamp(),
+          updatedAt: serverTimestamp()
         })
 
         await refreshProfile()
+        onOpenChange(false)
       } else {
         await signInWithEmailAndPassword(auth, formData.email, formData.password)
         await refreshProfile()
+        onOpenChange(false)
       }
-
-
-      onOpenChange(false)
     } catch (err: any) {
       console.error('Auth error:', err)
       if (err.code === 'auth/email-already-in-use') {
@@ -144,21 +167,19 @@ export function AuthModal({ open, onOpenChange }: AuthModalProps) {
       const result = await signInWithPopup(auth, provider)
       const user = result.user
 
-      const existingDoc = await getDoc(doc(db, 'users', user.uid))
-
-      if (!existingDoc.exists()) {
+      const userDoc = await getDoc(doc(db, 'users', user.uid))
+      if (!userDoc.exists()) {
         await setDoc(doc(db, 'users', user.uid), {
           uid: user.uid,
           email: user.email,
-          fullName: user.displayName || '',
+          fullName: user.displayName || 'Google User',
           phone: user.phoneNumber || '',
           role: 'TENANT',
-          status: 'approved',
+          status: 'pending_approval',
           buildingId: '',
           unitNumber: '',
-          profileImage: user.photoURL || null,
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString(),
+          createdAt: serverTimestamp(),
+          updatedAt: serverTimestamp()
         })
       }
 
@@ -175,6 +196,12 @@ export function AuthModal({ open, onOpenChange }: AuthModalProps) {
       setLoading(false)
     }
   }
+
+  const availableUnitsForSelectedTower = formData.buildingId 
+    ? (TOWER_UNITS[formData.buildingId] || []).filter(unit => 
+        !occupiedUnits.some(ou => ou.buildingId === formData.buildingId && ou.unitNumber === unit)
+      )
+    : []
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -254,7 +281,7 @@ export function AuthModal({ open, onOpenChange }: AuthModalProps) {
                     required
                   >
                     <SelectTrigger>
-                      <SelectValue placeholder="Select Tower" />
+                      <SelectValue placeholder="Select tower" />
                     </SelectTrigger>
                     <SelectContent>
                       {Object.keys(TOWER_UNITS).map((tower) => (
@@ -266,26 +293,28 @@ export function AuthModal({ open, onOpenChange }: AuthModalProps) {
                   </Select>
                 </div>
                 <div className="space-y-2 md:col-span-2">
-                  <Label>Unit *</Label>
+                  <Label>Unit / Apartment *</Label>
                   <Select
                     value={formData.unitNumber}
                     onValueChange={(value) => setFormData({ ...formData, unitNumber: value })}
-                    disabled={!formData.buildingId || formData.buildingId === 'none'}
+                    disabled={!formData.buildingId || availableUnitsForSelectedTower.length === 0}
                     required
                   >
                     <SelectTrigger>
-                      <SelectValue placeholder="Select Unit" />
+                      <SelectValue placeholder={
+                        !formData.buildingId 
+                          ? "Select tower first" 
+                          : availableUnitsForSelectedTower.length === 0 
+                            ? "No units available" 
+                            : "Select unit"
+                      } />
                     </SelectTrigger>
                     <SelectContent>
-                      {formData.buildingId && TOWER_UNITS[formData.buildingId] ? (
-                        TOWER_UNITS[formData.buildingId].map((unit) => (
-                          <SelectItem key={unit} value={unit}>
-                            {unit}
-                          </SelectItem>
-                        ))
-                      ) : (
-                        <SelectItem value="none" disabled>Select a Tower first</SelectItem>
-                      )}
+                      {availableUnitsForSelectedTower.map((unit) => (
+                        <SelectItem key={unit} value={unit}>
+                          {unit}
+                        </SelectItem>
+                      ))}
                     </SelectContent>
                   </Select>
                 </div>
