@@ -36,6 +36,14 @@ const roles: { value: UserRole; label: string; description: string }[] = [
   { value: 'ACCOUNTANT', label: 'Accountant', description: 'Manage finances and billing' },
 ]
 
+const TOWER_UNITS: Record<string, string[]> = {
+  'Tower A': ['A-0', 'A-1', 'A-2', 'A-3', 'B-0', 'B-1', 'B-2', 'C-1', 'C-2', 'C-3'],
+  'Tower BI': ['D-1', 'D-2', 'D-3', 'G-1', 'G-2', 'G-3'],
+  'Tower B II': ['G-1', 'G-2', 'G-3', 'H-1', 'H-2'],
+  'Office': ['A', 'B'],
+  'Others': ['A']
+}
+
 export function AuthModal({ open, onOpenChange }: AuthModalProps) {
   const router = useRouter()
   const { user, profile, loading: authLoading, refreshProfile } = useAuth()
@@ -43,9 +51,6 @@ export function AuthModal({ open, onOpenChange }: AuthModalProps) {
   const [loading, setLoading] = useState(false)
   const [showPassword, setShowPassword] = useState(false)
   const [error, setError] = useState('')
-
-  const [buildings, setBuildings] = useState<Building[]>([])
-  const [units, setUnits] = useState<Unit[]>([])
 
   const [formData, setFormData] = useState({
     email: '',
@@ -56,36 +61,6 @@ export function AuthModal({ open, onOpenChange }: AuthModalProps) {
     buildingId: '',
     unitNumber: '',
   })
-
-  // Fetch buildings and units
-  useEffect(() => {
-    if (open) {
-      const fetchBuildingsAndUnits = async () => {
-        try {
-          const bSnap = await getDocs(collection(db, 'buildings'))
-          const bData = bSnap.docs.map((doc: any) => {
-            const data = doc.data()
-            return { ...data, id: doc.id } as Building
-          })
-          // Sort manually to avoid index issues
-          bData.sort((a: Building, b: Building) => (a.name || '').localeCompare(b.name || ''))
-          setBuildings(bData)
-
-          const uSnap = await getDocs(collection(db, 'units'))
-          const uData = uSnap.docs.map((doc: any) => {
-            const data = doc.data()
-            return { ...data, id: doc.id } as Unit
-          })
-          // Sort manually
-          uData.sort((a: Unit, b: Unit) => (a.unitNumber || '').localeCompare(b.unitNumber || ''))
-          setUnits(uData)
-        } catch (error) {
-          console.error('Error fetching buildings and units:', error)
-        }
-      }
-      fetchBuildingsAndUnits()
-    }
-  }, [open])
 
   // Handle redirect after successful auth
   useEffect(() => {
@@ -276,15 +251,11 @@ export function AuthModal({ open, onOpenChange }: AuthModalProps) {
                       <SelectValue placeholder="Select Tower" />
                     </SelectTrigger>
                     <SelectContent>
-                      {buildings.length > 0 ? (
-                        buildings.map((building) => (
-                          <SelectItem key={building.id} value={building.id}>
-                            {building.name}
-                          </SelectItem>
-                        ))
-                      ) : (
-                        <SelectItem value="none" disabled>Loading or No Towers Available...</SelectItem>
-                      )}
+                      {Object.keys(TOWER_UNITS).map((tower) => (
+                        <SelectItem key={tower} value={tower}>
+                          {tower}
+                        </SelectItem>
+                      ))}
                     </SelectContent>
                   </Select>
                 </div>
@@ -300,16 +271,14 @@ export function AuthModal({ open, onOpenChange }: AuthModalProps) {
                       <SelectValue placeholder="Select Unit" />
                     </SelectTrigger>
                     <SelectContent>
-                      {units.filter((unit) => unit.buildingId === formData.buildingId).length > 0 ? (
-                        units
-                          .filter((unit) => unit.buildingId === formData.buildingId)
-                          .map((unit) => (
-                            <SelectItem key={unit.id} value={unit.unitNumber}>
-                              {unit.unitNumber} - {unit.type}
-                            </SelectItem>
-                          ))
+                      {formData.buildingId && TOWER_UNITS[formData.buildingId] ? (
+                        TOWER_UNITS[formData.buildingId].map((unit) => (
+                          <SelectItem key={unit} value={unit}>
+                            {unit}
+                          </SelectItem>
+                        ))
                       ) : (
-                        <SelectItem value="none" disabled>No Units Found</SelectItem>
+                        <SelectItem value="none" disabled>Select a Tower first</SelectItem>
                       )}
                     </SelectContent>
                   </Select>
