@@ -296,51 +296,55 @@ export function AuthModal({ open, onOpenChange }: AuthModalProps) {
                     </SelectContent>
                   </Select>
                 </div>
-                <div className="space-y-2">
-                  <Label>Tower *</Label>
-                  <Select
-                    value={formData.buildingId}
-                    onValueChange={(value) => setFormData({ ...formData, buildingId: value, unitNumber: '' })}
-                    required
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select tower" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {Object.keys(TOWER_UNITS).map((tower) => (
-                        <SelectItem key={tower} value={tower}>
-                          {tower}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div className="space-y-2 md:col-span-2">
-                  <Label>Unit / Apartment *</Label>
-                  <Select
-                    value={formData.unitNumber}
-                    onValueChange={(value) => setFormData({ ...formData, unitNumber: value })}
-                    disabled={!formData.buildingId || availableUnitsForSelectedTower.length === 0}
-                    required
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder={
-                        !formData.buildingId 
-                          ? "Select tower first" 
-                          : availableUnitsForSelectedTower.length === 0 
-                            ? "No units available" 
-                            : "Select unit"
-                      } />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {availableUnitsForSelectedTower.map((unit) => (
-                        <SelectItem key={unit} value={unit}>
-                          {unit}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
+                {['TENANT', 'RESIDENT'].includes(formData.role) && (
+                  <>
+                    <div className="space-y-2">
+                      <Label>Tower *</Label>
+                      <Select
+                        value={formData.buildingId}
+                        onValueChange={(value) => setFormData({ ...formData, buildingId: value, unitNumber: '' })}
+                        required
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select tower" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {Object.keys(TOWER_UNITS).map((tower) => (
+                            <SelectItem key={tower} value={tower}>
+                              {tower}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div className="space-y-2 md:col-span-2">
+                      <Label>Unit / Apartment *</Label>
+                      <Select
+                        value={formData.unitNumber}
+                        onValueChange={(value) => setFormData({ ...formData, unitNumber: value })}
+                        disabled={!formData.buildingId || availableUnitsForSelectedTower.length === 0}
+                        required
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder={
+                            !formData.buildingId 
+                              ? "Select tower first" 
+                              : availableUnitsForSelectedTower.length === 0 
+                                ? "No units available" 
+                                : "Select unit"
+                          } />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {availableUnitsForSelectedTower.map((unit) => (
+                            <SelectItem key={unit} value={unit}>
+                              {unit}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </>
+                )}
               </div>
             )}
 
