@@ -114,10 +114,12 @@ export interface MaintenanceTicket {
 export interface Complaint {
   id: string
   tenantId: string
+  tenantName?: string
   title: string
   description: string
   category?: string
   status: TicketStatus
+  adminRemarks?: string
   createdAt: string
   updatedAt: string
 }
