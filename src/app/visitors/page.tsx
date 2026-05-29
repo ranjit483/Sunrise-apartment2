@@ -320,6 +320,7 @@ export default function VisitorsPage() {
                       <th className="pb-3 text-left">Visitor Info</th>
                       <th className="pb-3 text-left">Destination</th>
                       <th className="pb-3 text-left">Vehicle Info</th>
+                      <th className="pb-3 text-left">Parking Slot</th>
                       <th className="pb-3 text-left">Timing</th>
                       <th className="pb-3 text-left">Status</th>
                       <th className="pb-3 text-right">Actions</th>
@@ -340,11 +341,19 @@ export default function VisitorsPage() {
                               {v.vehicleType ? v.vehicleType.charAt(0).toUpperCase() + v.vehicleType.slice(1) : 'Unknown'}
                             </Badge>
                             {v.vehicleType && v.vehicleType !== 'pedestrian' && (
-                              <div className="text-xs text-muted-foreground">
-                                {v.licensePlate} {v.parkingSlot ? `(Slot: ${v.parkingSlot})` : ''}
+                              <div className="text-xs text-muted-foreground mt-0.5 font-medium">
+                                {v.province ? `${v.province} ` : ''}{v.licensePlate}
+                                {v.vehicleBrand ? ` • ${v.vehicleBrand}` : ''}
                               </div>
                             )}
                           </div>
+                        </td>
+                        <td className="py-3">
+                          {v.vehicleType !== 'pedestrian' && v.parkingSlot ? (
+                            <span className="font-semibold text-gray-700">{v.parkingSlot}</span>
+                          ) : (
+                            <span className="text-gray-400 font-normal">—</span>
+                          )}
                         </td>
                         <td className="py-3">
                           <p className="text-xs"><span className="font-semibold">In:</span> {new Date(v.entryTime).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</p>
