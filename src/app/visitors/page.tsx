@@ -246,36 +246,40 @@ export default function VisitorsPage() {
 
                 {vehicleType !== 'pedestrian' && (
                   <div className="space-y-4 pt-2 pb-2 bg-gray-50 p-3 rounded-md border">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div className="space-y-2">
-                        <Label>License Plate (Province - Number) *</Label>
-                        <div className="flex gap-2">
+                    <div className="space-y-2">
+                      <Label className="font-semibold text-gray-700">License Plate</Label>
+                      <div className="grid grid-cols-3 gap-2">
+                        <div className="space-y-1">
+                          <Label className="text-xs text-gray-500 font-medium">Province *</Label>
                           <Select required value={province} onValueChange={setProvince}>
-                            <SelectTrigger className="w-[140px]"><SelectValue placeholder="Province" /></SelectTrigger>
-                            <SelectContent>
+                            <SelectTrigger><SelectValue placeholder="Select..." /></SelectTrigger>
+                            <SelectContent className="max-h-[200px]">
                               {PROVINCES.map(prov => (
                                 <SelectItem key={prov} value={prov}>{prov}</SelectItem>
                               ))}
                             </SelectContent>
                           </Select>
-                          <Input className="flex-1" required={province !== ''} value={licensePlate} onChange={e => setLicensePlate(e.target.value)} placeholder="e.g. BA 1 PA 1234" />
                         </div>
-                      </div>
-                      <div className="space-y-2">
-                        <Label>Type Of</Label>
-                        <Select value={vehicleBrand} onValueChange={setVehicleBrand}>
-                          <SelectTrigger><SelectValue placeholder="Select type..." /></SelectTrigger>
-                          <SelectContent className="max-h-[200px]">
-                            {VEHICLE_BRANDS.map(brand => (
-                              <SelectItem key={brand} value={brand}>{brand}</SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
+                        <div className="space-y-1">
+                          <Label className="text-xs text-gray-500 font-medium">Vehical Number *</Label>
+                          <Input required={province !== ''} value={licensePlate} onChange={e => setLicensePlate(e.target.value)} placeholder="Vehical Number" />
+                        </div>
+                        <div className="space-y-1">
+                          <Label className="text-xs text-gray-500 font-medium">Type Of</Label>
+                          <Select value={vehicleBrand} onValueChange={setVehicleBrand}>
+                            <SelectTrigger><SelectValue placeholder="Select type..." /></SelectTrigger>
+                            <SelectContent className="max-h-[200px]">
+                              {VEHICLE_BRANDS.map(brand => (
+                                <SelectItem key={brand} value={brand}>{brand}</SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </div>
                       </div>
                     </div>
                     <div className="space-y-2">
                       <Label>Assigned Parking Slot</Label>
-                      <Input value={parkingSlot} onChange={e => setParkingSlot(e.target.value)} placeholder="e.g. V-01" />
+                      <Input value={parkingSlot} onChange={e => setParkingSlot(e.target.value)} placeholder="e.g. V-1" />
                     </div>
                   </div>
                 )}
