@@ -246,21 +246,20 @@ export default function VisitorsPage() {
 
                 {vehicleType !== 'pedestrian' && (
                   <div className="space-y-4 pt-2 pb-2 bg-gray-50 p-3 rounded-md border">
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div className="space-y-2">
-                        <Label>Province *</Label>
-                        <Select required value={province} onValueChange={setProvince}>
-                          <SelectTrigger><SelectValue placeholder="Select province..." /></SelectTrigger>
-                          <SelectContent>
-                            {PROVINCES.map(prov => (
-                              <SelectItem key={prov} value={prov}>{prov}</SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                      </div>
-                      <div className="space-y-2">
-                        <Label>License Plate</Label>
-                        <Input value={licensePlate} onChange={e => setLicensePlate(e.target.value)} placeholder="e.g. BA 1 PA 1234" />
+                        <Label>License Plate (Province - Number) *</Label>
+                        <div className="flex gap-2">
+                          <Select required value={province} onValueChange={setProvince}>
+                            <SelectTrigger className="w-[140px]"><SelectValue placeholder="Province" /></SelectTrigger>
+                            <SelectContent>
+                              {PROVINCES.map(prov => (
+                                <SelectItem key={prov} value={prov}>{prov}</SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                          <Input className="flex-1" required={province !== ''} value={licensePlate} onChange={e => setLicensePlate(e.target.value)} placeholder="e.g. BA 1 PA 1234" />
+                        </div>
                       </div>
                       <div className="space-y-2">
                         <Label>Type Of</Label>
