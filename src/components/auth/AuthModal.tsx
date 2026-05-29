@@ -125,19 +125,28 @@ export function AuthModal({ open, onOpenChange }: AuthModalProps) {
 
     try {
       if (mode === 'signup') {
-        if (!formData.role || !formData.fullName || !formData.phone || !formData.buildingId || !formData.unitNumber) {
+        const isTenantOrResident = ['TENANT', 'RESIDENT'].includes(formData.role)
+        
+        if (
+          !formData.role || 
+          !formData.fullName || 
+          !formData.phone || 
+          (isTenantOrResident && (!formData.buildingId || !formData.unitNumber))
+        ) {
           setError('Please fill in all required fields')
           setLoading(false)
           return
         }
 
-        const isOccupied = occupiedUnits.some(
-          u => u.buildingId === formData.buildingId && u.unitNumber === formData.unitNumber
-        )
-        if (isOccupied) {
-          setError('This unit is already occupied. Please select another unit.')
-          setLoading(false)
-          return
+        if (isTenantOrResident) {
+          const isOccupied = occupiedUnits.some(
+            u => u.buildingId === formData.buildingId && u.unitNumber === formData.unitNumber
+          )
+          if (isOccupied) {
+            setError('This unit is already occupied. Please select another unit.')
+            setLoading(false)
+            return
+          }
         }
 
         const userCredential = await createUserWithEmailAndPassword(auth, formData.email, formData.password)
@@ -149,8 +158,8 @@ export function AuthModal({ open, onOpenChange }: AuthModalProps) {
           fullName: formData.fullName,
           phone: formData.phone,
           role: formData.role,
-          buildingId: formData.buildingId,
-          unitNumber: formData.unitNumber,
+          buildingId: isTenantOrResident ? formData.buildingId : '',
+          unitNumber: isTenantOrResident ? formData.unitNumber : '',
           status: 'pending_approval',
           createdAt: serverTimestamp(),
           updatedAt: serverTimestamp()
