@@ -766,12 +766,18 @@ export default function MaintenancePage() {
                     </div>
                     <div className="flex justify-between text-sm font-bold text-gray-900 border-t border-indigo-100/60 pt-2">
                       <span>Total Actual cost:</span>
-                      <span className="text-indigo-700 text-lg">₨{currentTicket.actualCost || 0}</span>
+                      <span className="text-indigo-700 text-lg">
+                        ₨{currentTicket.actualCost && currentTicket.actualCost > 0 
+                          ? currentTicket.actualCost 
+                          : ((currentTicket as any).estimatedCost || 0)}
+                      </span>
                     </div>
-                    {currentTicket.actualCost && currentTicket.actualCost > 0 ? (
+                    {(currentTicket.actualCost || ((currentTicket as any).estimatedCost && (currentTicket as any).estimatedCost > 0)) ? (
                       <div className="p-2 rounded bg-indigo-50 border border-indigo-100 text-[11px] text-indigo-800 font-medium flex gap-1 items-start">
                         <FileText className="h-3 w-3 flex-shrink-0 mt-0.5" />
-                        Cost has been automatically charged and posted to the Monthly Apartment Maintenance Ledger.
+                        {currentTicket.status === 'resolved' || currentTicket.status === 'closed'
+                          ? 'Actual cost has been automatically charged and posted to the Monthly Apartment Maintenance Ledger.'
+                          : 'Allocated parts cost is estimated and will be charged to the Maintenance Ledger upon resolution.'}
                       </div>
                     ) : null}
                   </div>
@@ -821,9 +827,13 @@ export default function MaintenancePage() {
                       </Dialog>
                     )}
 
-                    {/* 2. Technician work action status */}
                     {(isStaffOrTech || isAdminOrManager) && currentTicket.status === 'in_progress' && (
-                      <Dialog open={isResolveOpen} onOpenChange={setIsResolveOpen}>
+                      <Dialog open={isResolveOpen} onOpenChange={(open) => {
+                        if (open) {
+                          setActualCost(String((currentTicket as any).estimatedCost || 0))
+                        }
+                        setIsResolveOpen(open)
+                      }}>
                         <DialogTrigger asChild>
                           <Button className="w-full bg-emerald-600 text-white hover:bg-emerald-700 font-bold flex items-center justify-center gap-2">
                             <CheckCircle className="h-4 w-4" />
