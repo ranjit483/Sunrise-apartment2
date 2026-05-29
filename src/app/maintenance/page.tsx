@@ -70,6 +70,25 @@ export default function MaintenancePage() {
   const { profile } = useAuth()
   const [tickets, setTickets] = useState<MaintenanceTicket[]>([])
   const [loading, setLoading] = useState(true)
+  const [staff, setStaff] = useState<any[]>([])
+
+  useEffect(() => {
+    const q = query(collection(db, 'users'))
+    const unsubscribe = onSnapshot(q, (snapshot: any) => {
+      const sData: any[] = []
+      snapshot.forEach((doc: any) => {
+        const u = doc.data()
+        if (['PLUMBER', 'ELECTRICIAN', 'GENERAL_STAFF', 'CLEANER', 'GUARD', 'MANAGER', 'OFFICE_ASSISTANT'].includes(u.role)) {
+          sData.push({ uid: doc.id, ...u })
+        }
+      })
+      setStaff(sData)
+    }, (error: any) => {
+      console.error('Error fetching staff users:', error)
+    })
+
+    return () => unsubscribe()
+  }, [])
   
   // Modals state
   const [isNewRequestOpen, setIsNewRequestOpen] = useState(false)
@@ -122,6 +141,7 @@ export default function MaintenancePage() {
   // Get matching tickets for current user role
   const isStaffOrTech = profile ? ['PLUMBER', 'ELECTRICIAN', 'CLEANER', 'GUARD', 'GENERAL_STAFF'].includes(profile.role) : false
   const isAdminOrManager = profile ? ['SUPER_ADMIN', 'MANAGER', 'ACCOUNTANT'].includes(profile.role) : false
+  const staffListToDisplay = staff.length > 0 ? staff : DEFAULT_STAFF
 
   const filteredTickets = tickets.filter(t => {
     // 1. Role boundaries
@@ -201,7 +221,7 @@ export default function MaintenancePage() {
     }
   }
 
-  const handleAssignTechnician = async (tech: typeof DEFAULT_STAFF[0]) => {
+  const handleAssignTechnician = async (tech: any) => {
     if (!currentTicket) return
     try {
       const ticketRef = doc(db, 'maintenance', currentTicket.id)
@@ -779,11 +799,13 @@ export default function MaintenancePage() {
                             </DialogDescription>
                           </DialogHeader>
                           <div className="space-y-3 pt-2 max-h-[300px] overflow-y-auto">
-                            {DEFAULT_STAFF.map(tech => (
+                            {staffListToDisplay.map(tech => (
                               <div key={tech.uid} className="flex justify-between items-center p-3 rounded-lg border hover:bg-gray-50 transition">
                                 <div>
                                   <p className="font-bold text-gray-800">{tech.fullName}</p>
-                                  <p className="text-xs text-gray-500">Specialization: {tech.specialization} | Status: <span className="font-semibold text-emerald-600">{tech.availability}</span></p>
+                                  <p className="text-xs text-gray-500">
+                                    Specialization: <span className="font-semibold text-indigo-600">{tech.specialization || tech.role.replace('_', ' ')}</span> | Status: <span className="font-semibold text-emerald-600">{tech.availability || 'Available'}</span>
+                                  </p>
                                 </div>
                                 <Button 
                                   size="sm" 
