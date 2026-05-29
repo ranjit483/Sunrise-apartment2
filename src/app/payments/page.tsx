@@ -39,10 +39,22 @@ export default function PaymentsPage() {
       setLoading(false)
     })
 
-    // Fetch pending invoices for residents
+    // Fetch pending invoices for calculating pending totals
     let unsubscribeInvoices = () => {}
     if (isResident && user?.uid) {
       const invQ = query(collection(db, 'invoices'), where('tenantId', '==', user.uid))
+      unsubscribeInvoices = onSnapshot(invQ, (snapshot: any) => {
+        const iData: Invoice[] = []
+        snapshot.forEach((doc: any) => {
+          const inv = { id: doc.id, ...doc.data() } as Invoice
+          if (inv.status === 'pending' || inv.status === 'overdue') {
+            iData.push(inv)
+          }
+        })
+        setPendingInvoices(iData)
+      })
+    } else if (!isResident) {
+      const invQ = query(collection(db, 'invoices'))
       unsubscribeInvoices = onSnapshot(invQ, (snapshot: any) => {
         const iData: Invoice[] = []
         snapshot.forEach((doc: any) => {
@@ -102,6 +114,15 @@ export default function PaymentsPage() {
 
   const isResident = profile?.role === 'RESIDENT' || profile?.role === 'TENANT'
   const totalCollected = payments.filter(p => p.status === 'completed').reduce((acc, p) => acc + p.amount, 0)
+  
+  const currentMonth = new Date().getMonth()
+  const currentYear = new Date().getFullYear()
+  const thisMonthCollected = payments.filter(p => {
+    if (p.status !== 'completed') return false
+    const d = new Date(p.paidAt || p.createdAt)
+    return d.getMonth() === currentMonth && d.getFullYear() === currentYear
+  }).reduce((acc, p) => acc + p.amount, 0)
+
   const pendingTotal = pendingInvoices.reduce((acc, i) => acc + i.amount + (i.electricityAmount || 0) + (i.utilityAmount || 0) + (i.waterAmount || 0) + (i.otherAmount || 0), 0)
   const transactionsCount = payments.length
 
@@ -116,8 +137,8 @@ export default function PaymentsPage() {
         <div className="grid gap-4 md:grid-cols-4">
           <Card><CardContent className="p-6"><p className="text-sm text-muted-foreground">{isResident ? 'Total Paid' : 'Total Collected'}</p><p className="text-2xl font-bold">₨ {totalCollected.toLocaleString()}</p></CardContent></Card>
           {isResident && <Card><CardContent className="p-6"><p className="text-sm text-muted-foreground">Due Balance</p><p className="text-2xl font-bold text-red-500">₨ {pendingTotal.toLocaleString()}</p></CardContent></Card>}
-          {!isResident && <Card><CardContent className="p-6"><p className="text-sm text-muted-foreground">This Month</p><p className="text-2xl font-bold">₨ {totalCollected.toLocaleString()}</p></CardContent></Card>}
-          {!isResident && <Card><CardContent className="p-6"><p className="text-sm text-muted-foreground">Pending</p><p className="text-2xl font-bold">₨ 0</p></CardContent></Card>}
+          {!isResident && <Card><CardContent className="p-6"><p className="text-sm text-muted-foreground">This Month</p><p className="text-2xl font-bold">₨ {thisMonthCollected.toLocaleString()}</p></CardContent></Card>}
+          {!isResident && <Card><CardContent className="p-6"><p className="text-sm text-muted-foreground">Pending</p><p className="text-2xl font-bold">₨ {pendingTotal.toLocaleString()}</p></CardContent></Card>}
           <Card><CardContent className="p-6"><p className="text-sm text-muted-foreground">Transactions</p><p className="text-2xl font-bold">{transactionsCount}</p></CardContent></Card>
         </div>
 
