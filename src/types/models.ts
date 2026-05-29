@@ -101,6 +101,14 @@ export interface MaintenanceTicket {
   attachments: string[]
   createdAt: string
   updatedAt: string
+  scope?: 'Internal_Unit' | 'Common_Area'
+  structuralLocation?: string
+  allocatedParts?: { name: string; quantity: number; cost: number }[]
+  estimatedCost?: number
+  actualCost?: number
+  remarks?: string
+  ticketNo?: string
+  reportedByName?: string
 }
 
 export interface Complaint {
