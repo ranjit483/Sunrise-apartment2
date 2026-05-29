@@ -45,6 +45,9 @@ const TOWER_UNITS: Record<string, string[]> = {
   'Others': ['A']
 }
 
+const PROVINCES = ['Koshi', 'Madhesh', 'Bagmati', 'Gandaki', 'Lumbini', 'Karnali', 'Sudur Pashchim']
+const VEHICLE_BRANDS = ['Suzuki', 'Hyundai', 'Tata', 'Toyota', 'Mahindra', 'Honda', 'Kia', 'BYD', 'Bajaj', 'Yamaha', 'Nissan', 'Ford', 'Volkswagen', 'Mitsubishi', 'Deepal', 'GWM', 'BMW', 'Mercedes-Benz', 'Audi', 'Eicher', 'Hero', 'Others']
+
 export default function VisitorsPage() {
   const [visitors, setVisitors] = useState<Visitor[]>([])
   const [loading, setLoading] = useState(true)
@@ -58,6 +61,7 @@ export default function VisitorsPage() {
   const [hostTower, setHostTower] = useState('')
   const [hostUnit, setHostUnit] = useState('')
   const [phone, setPhone] = useState('')
+  const [province, setProvince] = useState('')
   const [purpose, setPurpose] = useState('')
   const [vehicleType, setVehicleType] = useState<'pedestrian' | '2-wheeler' | '4-wheeler'>('pedestrian')
   const [licensePlate, setLicensePlate] = useState('')
@@ -91,6 +95,7 @@ export default function VisitorsPage() {
         name,
         unitId: `${hostTower} / ${hostUnit}`,
         phone,
+        province,
         purpose,
         vehicleType,
         entryTime: now,
@@ -111,6 +116,7 @@ export default function VisitorsPage() {
       setHostTower('')
       setHostUnit('')
       setPhone('')
+      setProvince('')
       setPurpose('')
       setVehicleType('pedestrian')
       setLicensePlate('')
@@ -196,23 +202,47 @@ export default function VisitorsPage() {
                   </div>
                   <div className="space-y-2">
                     <Label>Phone *</Label>
-                    <Input required value={phone} onChange={e => setPhone(e.target.value)} placeholder="Phone number" />
+                    <Input 
+                      required 
+                      value={phone} 
+                      maxLength={10}
+                      onChange={e => {
+                        const value = e.target.value.replace(/[^0-9]/g, '')
+                        setPhone(value)
+                      }} 
+                      pattern="^9\d{9}$"
+                      title="Phone number must be exactly 10 digits and start with 9"
+                      placeholder="e.g. 9841234567" 
+                    />
                   </div>
                 </div>
 
-                <div className="space-y-2">
-                  <Label>Purpose of Visit *</Label>
-                  <Select required value={purpose} onValueChange={setPurpose}>
-                    <SelectTrigger><SelectValue placeholder="Select purpose..." /></SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="Guest">Guest</SelectItem>
-                      <SelectItem value="Delivery">Delivery</SelectItem>
-                      <SelectItem value="Maintenance">Maintenance</SelectItem>
-                      <SelectItem value="Meade">Meade</SelectItem>
-                      <SelectItem value="Driver">Driver</SelectItem>
-                      <SelectItem value="Other">Other</SelectItem>
-                    </SelectContent>
-                  </Select>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label>Province *</Label>
+                    <Select required value={province} onValueChange={setProvince}>
+                      <SelectTrigger><SelectValue placeholder="Select province..." /></SelectTrigger>
+                      <SelectContent>
+                        {PROVINCES.map(prov => (
+                          <SelectItem key={prov} value={prov}>{prov}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Purpose of Visit *</Label>
+                    <Select required value={purpose} onValueChange={setPurpose}>
+                      <SelectTrigger><SelectValue placeholder="Select purpose..." /></SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="Guest">Guest</SelectItem>
+                        <SelectItem value="Delivery">Delivery</SelectItem>
+                        <SelectItem value="Maintenance">Maintenance</SelectItem>
+                        <SelectItem value="Meade">Meade</SelectItem>
+                        <SelectItem value="Driver">Driver</SelectItem>
+                        <SelectItem value="Other">Other</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
                 </div>
 
                 <div className="space-y-2 pt-2 border-t">
@@ -235,8 +265,15 @@ export default function VisitorsPage() {
                         <Input value={licensePlate} onChange={e => setLicensePlate(e.target.value)} placeholder="e.g. BA 1 PA 1234" />
                       </div>
                       <div className="space-y-2">
-                        <Label>Vehicle Brand</Label>
-                        <Input value={vehicleBrand} onChange={e => setVehicleBrand(e.target.value)} placeholder="e.g. Honda" />
+                        <Label>Type Of</Label>
+                        <Select value={vehicleBrand} onValueChange={setVehicleBrand}>
+                          <SelectTrigger><SelectValue placeholder="Select type..." /></SelectTrigger>
+                          <SelectContent className="max-h-[200px]">
+                            {VEHICLE_BRANDS.map(brand => (
+                              <SelectItem key={brand} value={brand}>{brand}</SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
                       </div>
                     </div>
                     <div className="space-y-2">

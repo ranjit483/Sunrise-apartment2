@@ -142,6 +142,7 @@ export interface Visitor {
   name: string
   unitId: string
   phone: string
+  province?: string
   purpose: string
   vehicleType?: 'pedestrian' | '2-wheeler' | '4-wheeler'
   licensePlate?: string
