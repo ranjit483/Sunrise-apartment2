@@ -217,32 +217,19 @@ export default function VisitorsPage() {
                   </div>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label>Province *</Label>
-                    <Select required value={province} onValueChange={setProvince}>
-                      <SelectTrigger><SelectValue placeholder="Select province..." /></SelectTrigger>
-                      <SelectContent>
-                        {PROVINCES.map(prov => (
-                          <SelectItem key={prov} value={prov}>{prov}</SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <div className="space-y-2">
-                    <Label>Purpose of Visit *</Label>
-                    <Select required value={purpose} onValueChange={setPurpose}>
-                      <SelectTrigger><SelectValue placeholder="Select purpose..." /></SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="Guest">Guest</SelectItem>
-                        <SelectItem value="Delivery">Delivery</SelectItem>
-                        <SelectItem value="Maintenance">Maintenance</SelectItem>
-                        <SelectItem value="Meade">Meade</SelectItem>
-                        <SelectItem value="Driver">Driver</SelectItem>
-                        <SelectItem value="Other">Other</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
+                <div className="space-y-2">
+                  <Label>Purpose of Visit *</Label>
+                  <Select required value={purpose} onValueChange={setPurpose}>
+                    <SelectTrigger><SelectValue placeholder="Select purpose..." /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="Guest">Guest</SelectItem>
+                      <SelectItem value="Delivery">Delivery</SelectItem>
+                      <SelectItem value="Maintenance">Maintenance</SelectItem>
+                      <SelectItem value="Meade">Meade</SelectItem>
+                      <SelectItem value="Driver">Driver</SelectItem>
+                      <SelectItem value="Other">Other</SelectItem>
+                    </SelectContent>
+                  </Select>
                 </div>
 
                 <div className="space-y-2 pt-2 border-t">
@@ -259,7 +246,18 @@ export default function VisitorsPage() {
 
                 {vehicleType !== 'pedestrian' && (
                   <div className="space-y-4 pt-2 pb-2 bg-gray-50 p-3 rounded-md border">
-                    <div className="grid grid-cols-2 gap-4">
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                      <div className="space-y-2">
+                        <Label>Province *</Label>
+                        <Select required value={province} onValueChange={setProvince}>
+                          <SelectTrigger><SelectValue placeholder="Select province..." /></SelectTrigger>
+                          <SelectContent>
+                            {PROVINCES.map(prov => (
+                              <SelectItem key={prov} value={prov}>{prov}</SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
                       <div className="space-y-2">
                         <Label>License Plate</Label>
                         <Input value={licensePlate} onChange={e => setLicensePlate(e.target.value)} placeholder="e.g. BA 1 PA 1234" />
