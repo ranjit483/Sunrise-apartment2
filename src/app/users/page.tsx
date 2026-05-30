@@ -54,6 +54,37 @@ const roleLabels: Record<string, string> = {
   ACCOUNTANT: 'Accountant',
 }
 
+const TOWER_UNITS: Record<string, string[]> = {
+  'Tower A': [
+    'A-0', 'A-1', 'A-2', 'A-3', 'A-4', 'A-5', 'A-6', 'A-7', 'A-8', 'A-9', 'A-10',
+    'B-0', 'B-1', 'B-2', 'B-3', 'B-4', 'B-5', 'B-6', 'B-7', 'B-8', 'B-9', 'B-10',
+    'C-1', 'C-2', 'C-3', 'C-4', 'C-5', 'C-6', 'C-7', 'C-8', 'C-9', 'C-10',
+    'D-1', 'D-2', 'D-3', 'D-4', 'D-5', 'D-6', 'D-7', 'D-8', 'D-9', 'D-10', 'D-11', 'D-12',
+    'E-1', 'E-2', 'E-3', 'E-4', 'E-5', 'E-6', 'E-7', 'E-8', 'E-9', 'E-10', 'E-11', 'E-12'
+  ],
+  'Tower BI': [
+    'F-1', 'F-2', 'F-3', 'F-4', 'F-5', 'F-6', 'F-7', 'F-8', 'F-9', 'F-10', 'F-11', 'F-12', 'F-13', 'F-14',
+    'G-1', 'G-2', 'G-3', 'G-4', 'G-5', 'G-6', 'G-7', 'G-8', 'G-9', 'G-10', 'G-11', 'G-12', 'G-13', 'G-14',
+    'H-1', 'H-2', 'H-3', 'H-4', 'H-5', 'H-6', 'H-7', 'H-8', 'H-9', 'H-10', 'H-11', 'H-12', 'H-13', 'H-14',
+    'I-1', 'I-2', 'I-3', 'I-4', 'I-5', 'I-6', 'I-7', 'I-8', 'I-9', 'I-10', 'I-11', 'I-12', 'I-13', 'I-14',
+    'J-1', 'J-2', 'J-3', 'J-4', 'J-5', 'J-6', 'J-7', 'J-8', 'J-9', 'J-10', 'J-11', 'J-12', 'J-13', 'J-14',
+    'K-1', 'K-2', 'K-3', 'K-4', 'K-5', 'K-6', 'K-7', 'K-8', 'K-9', 'K-10', 'K-11', 'K-12', 'K-13', 'K-14',
+    'L1-1', 'L1-2', 'L1-3', 'L1-4', 'L1-5', 'L1-6', 'L1-7', 'L1-8', 'L1-9', 'L1-10', 'L1-11', 'L1-12', 'L1-13', 'L1-14',
+    'L2-1', 'L2-2', 'L2-3', 'L2-4', 'L2-5', 'L2-6', 'L2-7', 'L2-8', 'L2-9', 'L2-10', 'L2-11', 'L2-12', 'L2-13', 'L2-14'
+  ],
+  'Tower B II': [
+    'M-1', 'M-2', 'M-3', 'M-4', 'M-5', 'M-6', 'M-7', 'M-8', 'M-9', 'M-10', 'M-11', 'M-12', 'M-13', 'M-14',
+    'N-1', 'N-2', 'N-3', 'N-4', 'N-5', 'N-6', 'N-7', 'N-8', 'N-9', 'N-10', 'N-11', 'N-12', 'N-13', 'N-14',
+    'O1-1', 'O1-2', 'O1-3', 'O1-4', 'O1-5', 'O1-6', 'O1-7', 'O1-8', 'O1-9', 'O1-10', 'O1-11', 'O1-12', 'O1-13', 'O1-14',
+    'O2-1', 'O2-2', 'O2-3', 'O2-4', 'O2-5', 'O2-6', 'O2-7', 'O2-8', 'O2-9', 'O2-10', 'O2-11', 'O2-12', 'O2-13', 'O2-14',
+    'P1-1', 'P1-2', 'P1-3', 'P1-4', 'P1-5', 'P1-6', 'P1-7', 'P1-8', 'P1-9', 'P1-10', 'P1-11', 'P1-12', 'P1-13', 'P1-14',
+    'P2-1', 'P2-2', 'P2-3', 'P2-4', 'P2-5', 'P2-6', 'P2-7', 'P2-8', 'P2-9', 'P2-10', 'P2-11', 'P2-12', 'P2-13', 'P2-14',
+    'Q-1', 'Q-2', 'Q-3', 'Q-4', 'Q-5', 'Q-6', 'Q-7', 'Q-8', 'Q-9', 'Q-10', 'Q-11', 'Q-12', 'Q-13', 'Q-14'
+  ],
+  'Office': ['A', 'B'],
+  'Others': ['A']
+}
+
 export default function UsersPage() {
   const [users, setUsers] = useState<UserData[]>([])
   const [loading, setLoading] = useState(true)
@@ -68,6 +99,12 @@ export default function UsersPage() {
     if (!editingUser) return
     if (!canManageUser(editingUser.role as any)) {
       alert('You do not have the required clearance to modify this user.')
+      return
+    }
+
+    // Phone number validation: must start with 9 and be exactly 10 digits
+    if (!/^9\d{9}$/.test(editingUser.phone)) {
+      alert('Phone number must be exactly 10 digits and start with 9.')
       return
     }
 
@@ -285,7 +322,7 @@ export default function UsersPage() {
       </div>
 
       <Dialog open={!!editingUser} onOpenChange={(open) => !open && setEditingUser(null)}>
-        <DialogContent>
+        <DialogContent className="max-w-md max-h-[95vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Edit User</DialogTitle>
             <DialogDescription>Update user details, role, and approval status.</DialogDescription>
@@ -298,11 +335,60 @@ export default function UsersPage() {
               </div>
               <div className="space-y-2">
                 <Label>Phone Number</Label>
-                <Input value={editingUser.phone} onChange={(e) => setEditingUser({...editingUser, phone: e.target.value})} />
+                <Input 
+                  value={editingUser.phone} 
+                  maxLength={10}
+                  onChange={(e) => {
+                    const value = e.target.value.replace(/[^0-9]/g, '')
+                    setEditingUser({...editingUser, phone: value})
+                  }} 
+                  pattern="^9\d{9}$"
+                  title="Phone number must be exactly 10 digits and start with 9"
+                  placeholder="e.g. 9841234567"
+                />
               </div>
-              <div className="space-y-2">
-                <Label>Unit/Apartment</Label>
-                <Input value={editingUser.unitNumber || ''} onChange={(e) => setEditingUser({...editingUser, unitNumber: e.target.value})} placeholder="e.g. A-101" />
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label>Tower / Building</Label>
+                  <Select 
+                    value={editingUser.buildingId || 'none'} 
+                    onValueChange={(val) => {
+                      const finalVal = val === 'none' ? '' : val;
+                      setEditingUser({...editingUser, buildingId: finalVal, unitNumber: ''});
+                    }}
+                  >
+                    <SelectTrigger><SelectValue placeholder="Select tower..." /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="none">None / Empty</SelectItem>
+                      {Object.keys(TOWER_UNITS).map(tower => (
+                        <SelectItem key={tower} value={tower}>{tower}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-2">
+                  <Label>Unit / Apartment</Label>
+                  <Select 
+                    value={editingUser.unitNumber || 'none'} 
+                    onValueChange={(val) => {
+                      const finalVal = val === 'none' ? '' : val;
+                      setEditingUser({...editingUser, unitNumber: finalVal});
+                    }}
+                    disabled={!editingUser.buildingId}
+                  >
+                    <SelectTrigger><SelectValue placeholder="Select unit..." /></SelectTrigger>
+                    <SelectContent className="max-h-[200px]">
+                      <SelectItem value="none">None / Empty</SelectItem>
+                      {editingUser.buildingId && TOWER_UNITS[editingUser.buildingId] ? (
+                        TOWER_UNITS[editingUser.buildingId].map(unit => (
+                          <SelectItem key={unit} value={unit}>{unit}</SelectItem>
+                        ))
+                      ) : (
+                        <SelectItem value="none" disabled>Select tower first</SelectItem>
+                      )}
+                    </SelectContent>
+                  </Select>
+                </div>
               </div>
               <div className="space-y-2">
                 <Label>Role</Label>
