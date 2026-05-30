@@ -456,6 +456,141 @@ export default function ParkingPage() {
     return 'bg-slate-50 text-slate-700 border-slate-200'
   }
 
+  const isResidentOrTenant = profile?.role === 'RESIDENT' || profile?.role === 'TENANT'
+  const userUnitId = profile ? `${profile.buildingId} / ${profile.unitNumber}`.toLowerCase() : ''
+  const myAssignedSlots = parkingSlots.filter(p => 
+    p.status === 'occupied' && (
+      (p.unitId && p.unitId.toLowerCase() === userUnitId) ||
+      (profile?.fullName && p.assignedTo && p.assignedTo.toLowerCase() === profile.fullName.toLowerCase())
+    )
+  )
+
+  if (isResidentOrTenant) {
+    return (
+      <DashboardLayout title="My Parking Space">
+        <div className="space-y-6 max-w-3xl mx-auto pb-8">
+          <div>
+            <h2 className="text-3xl font-extrabold tracking-tight text-slate-900">My Parking Spot</h2>
+            <p className="text-muted-foreground">View your assigned vehicle bay and lease credentials</p>
+          </div>
+
+          {myAssignedSlots.length === 0 ? (
+            <Card className="rounded-3xl border-slate-100 shadow-lg p-6 text-center">
+              <CardContent className="space-y-4 pt-4">
+                <div className="p-4 bg-indigo-50 text-indigo-600 rounded-full w-fit mx-auto">
+                  <Car className="h-10 w-10" />
+                </div>
+                <h3 className="text-xl font-bold text-slate-900">No Parking Spot Assigned</h3>
+                <p className="text-slate-500 text-sm max-w-md mx-auto leading-relaxed">
+                  There is currently no parking slot linked to your unit (<span className="font-semibold text-indigo-600">{profile?.buildingId || 'None'} / {profile?.unitNumber || 'None'}</span>).
+                </p>
+                <div className="p-3 bg-amber-50 rounded-2xl text-xs text-amber-700 font-semibold border border-amber-100 flex items-center gap-2 max-w-md mx-auto">
+                  <AlertCircle className="h-5 w-5 shrink-0" />
+                  <span>Please contact the Management Office to assign a dedicated parking space for your vehicle.</span>
+                </div>
+              </CardContent>
+            </Card>
+          ) : (
+            myAssignedSlots.map((slot) => (
+              <Card key={slot.id} className="rounded-3xl border-slate-100 shadow-xl overflow-hidden hover:shadow-2xl transition-all duration-300">
+                <div className="bg-gradient-to-r from-slate-900 to-indigo-950 text-white p-6 md:p-8 relative">
+                  <div className="absolute top-0 right-0 -mt-8 -mr-8 w-32 h-32 bg-indigo-500/10 rounded-full blur-2xl" />
+                  <div className="flex items-center justify-between">
+                    <div className="space-y-1">
+                      <span className="text-xs uppercase font-bold tracking-widest text-indigo-300">Sunrise Parking Grid</span>
+                      <h3 className="text-4xl font-extrabold tracking-tight">{slot.slotNumber}</h3>
+                    </div>
+                    <Badge className="bg-emerald-500 text-white font-extrabold uppercase rounded-full px-3 py-1 text-xs">
+                      Active Assignment
+                    </Badge>
+                  </div>
+                </div>
+
+                <CardContent className="p-6 md:p-8 space-y-6 text-sm">
+                  <div className="grid md:grid-cols-2 gap-6">
+                    <div className="space-y-4">
+                      <div className="flex items-start gap-3">
+                        <div className="p-2 bg-slate-50 text-slate-500 rounded-xl mt-0.5">
+                          <UserCheck className="h-4.5 w-4.5" />
+                        </div>
+                        <div>
+                          <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Assignee Name</p>
+                          <p className="font-bold text-slate-800 text-base mt-0.5">{slot.assignedTo}</p>
+                        </div>
+                      </div>
+
+                      <div className="flex items-start gap-3">
+                        <div className="p-2 bg-slate-50 text-slate-500 rounded-xl mt-0.5">
+                          <Layers className="h-4.5 w-4.5" />
+                        </div>
+                        <div>
+                          <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Unit Association</p>
+                          <p className="font-bold text-slate-800 text-base mt-0.5">{slot.unitId}</p>
+                        </div>
+                      </div>
+
+                      <div className="flex items-start gap-3">
+                        <div className="p-2 bg-slate-50 text-slate-500 rounded-xl mt-0.5">
+                          <Badge variant="outline" className="capitalize text-[10px] font-semibold">{slot.category}</Badge>
+                        </div>
+                        <div>
+                          <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Parking Category</p>
+                          <p className="font-bold text-slate-800 text-base mt-0.5 capitalize">{slot.category} Leased Bay</p>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="space-y-4">
+                      <div className="flex items-start gap-3">
+                        <div className="p-2 bg-slate-50 text-slate-500 rounded-xl mt-0.5">
+                          <Car className="h-4.5 w-4.5" />
+                        </div>
+                        <div>
+                          <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Registered Vehicle</p>
+                          <p className="font-bold text-slate-900 text-base mt-0.5">{slot.vehicleNumber || 'No Plate Linked'}</p>
+                          {slot.vehicleModel && <p className="text-xs text-slate-500 font-medium mt-0.5">{slot.vehicleModel}</p>}
+                        </div>
+                      </div>
+
+                      <div className="flex items-start gap-3">
+                        <div className="p-2 bg-slate-50 text-slate-500 rounded-xl mt-0.5">
+                          <Calendar className="h-4.5 w-4.5" />
+                        </div>
+                        <div>
+                          <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Assigned Date & Time</p>
+                          <p className="font-bold text-slate-800 text-base mt-0.5">
+                            {slot.assignedAt ? new Date(slot.assignedAt).toLocaleDateString([], {dateStyle: 'medium'}) : 'N/A'}
+                          </p>
+                        </div>
+                      </div>
+
+                      {slot.category !== 'visitor' && (
+                        <div className="flex items-start gap-3">
+                          <div className="p-2 bg-indigo-50 text-indigo-600 rounded-xl mt-0.5">
+                            <span className="font-bold text-xs">₨</span>
+                          </div>
+                          <div>
+                            <p className="text-xs font-semibold text-indigo-600 uppercase tracking-wider">Monthly Fee</p>
+                            <p className="font-bold text-indigo-700 text-lg mt-0.5">₨ {slot.monthlyFee}</p>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  <div className="pt-6 border-t border-slate-100 flex items-center gap-2 text-xs text-slate-400">
+                    <Clock className="h-4 w-4" />
+                    <span>SLA Policy: Vehicles must park strictly in their assigned bays. Parking in fire lanes leads to towing.</span>
+                  </div>
+                </CardContent>
+              </Card>
+            ))
+          )}
+        </div>
+      </DashboardLayout>
+    )
+  }
+
   return (
     <DashboardLayout title="Parking Management">
       <div className="space-y-6 max-w-7xl mx-auto pb-8">
