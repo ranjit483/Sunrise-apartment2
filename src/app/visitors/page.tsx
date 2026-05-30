@@ -167,7 +167,7 @@ export default function VisitorsPage() {
             <DialogTrigger asChild>
               <Button className="bg-green-600 hover:bg-green-700">Register Visitor</Button>
             </DialogTrigger>
-            <DialogContent className="max-w-md">
+            <DialogContent className="max-w-md max-h-[95vh] overflow-y-auto">
               <DialogHeader>
                 <DialogTitle>New Visitor Registration</DialogTitle>
               </DialogHeader>
