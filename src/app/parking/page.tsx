@@ -117,8 +117,53 @@ export default function ParkingPage() {
   const [assignUnit, setAssignUnit] = useState('')
   const [assigneeName, setAssigneeName] = useState('')
   const [assignVehicleNo, setAssignVehicleNo] = useState('')
-  const [assignVehicleModel, setAssignVehicleModel] = useState('')
+  const [assignVehicleBrand, setAssignVehicleBrand] = useState('Honda')
+  const [assignVehicleType, setAssignVehicleType] = useState('Car')
   const [assignStatus, setAssignStatus] = useState<'available' | 'occupied' | 'maintenance'>('occupied')
+
+  const [residents, setResidents] = useState<any[]>([])
+  const [activeVisitors, setActiveVisitors] = useState<any[]>([])
+  const [selectedResidentId, setSelectedResidentId] = useState('')
+  const [selectedVisitorId, setSelectedVisitorId] = useState('')
+
+  useEffect(() => {
+    if (!isAssignOpen) return
+
+    const fetchResidents = async () => {
+      try {
+        const querySnapshot = await getDocs(collection(db, 'users'))
+        const resList: any[] = []
+        querySnapshot.forEach((doc: any) => {
+          const data = doc.data()
+          if (data.status === 'approved' && (data.role === 'RESIDENT' || data.role === 'TENANT')) {
+            resList.push({ id: doc.id, ...data })
+          }
+        })
+        setResidents(resList)
+      } catch (err) {
+        console.error('Error fetching residents:', err)
+      }
+    }
+
+    const fetchActiveVisitors = async () => {
+      try {
+        const querySnapshot = await getDocs(collection(db, 'visitors'))
+        const visList: any[] = []
+        querySnapshot.forEach((doc: any) => {
+          const data = doc.data()
+          if (data.status === 'entered') {
+            visList.push({ id: doc.id, ...data })
+          }
+        })
+        setActiveVisitors(visList)
+      } catch (err) {
+        console.error('Error fetching visitors:', err)
+      }
+    }
+
+    fetchResidents()
+    fetchActiveVisitors()
+  }, [isAssignOpen])
 
   useEffect(() => {
     const q = query(collection(db, 'parking'), orderBy('slotNumber', 'asc'))
@@ -256,9 +301,62 @@ export default function ParkingPage() {
     setAssignUnit(slot.unitId ? slot.unitId.split(' / ')[1] || '' : '')
     setAssigneeName(slot.assignedTo || '')
     setAssignVehicleNo(slot.vehicleNumber || '')
-    setAssignVehicleModel(slot.vehicleModel || '')
+    
+    // Parse Brand and Type from vehicleModel (e.g. "Honda (Car)")
+    const modelStr = slot.vehicleModel || ''
+    const matches = modelStr.match(/^([^\(]+)\s*\(([^)]+)\)$/)
+    if (matches) {
+      setAssignVehicleBrand(matches[1].trim())
+      setAssignVehicleType(matches[2].trim())
+    } else {
+      setAssignVehicleBrand(modelStr || 'Honda')
+      setAssignVehicleType('Car')
+    }
+    
     setAssignStatus(slot.status)
+    setSelectedResidentId('')
+    setSelectedVisitorId('')
     setIsAssignOpen(true)
+  }
+
+  const handleSelectResident = (resId: string) => {
+    setSelectedResidentId(resId)
+    if (resId === 'custom') {
+      setAssigneeName('')
+      setAssignTower('')
+      setAssignUnit('')
+      return
+    }
+    const selectedRes = residents.find(r => r.id === resId)
+    if (selectedRes) {
+      setAssigneeName(selectedRes.fullName)
+      setAssignTower(selectedRes.buildingId || '')
+      setAssignUnit(selectedRes.unitNumber || '')
+    }
+  }
+
+  const handleSelectVisitor = (visId: string) => {
+    setSelectedVisitorId(visId)
+    if (visId === 'custom') {
+      setAssigneeName('')
+      setAssignTower('')
+      setAssignUnit('')
+      setAssignVehicleNo('')
+      return
+    }
+    const selectedVis = activeVisitors.find(v => v.id === visId)
+    if (selectedVis) {
+      setAssigneeName(selectedVis.name)
+      if (selectedVis.unitId && selectedVis.unitId.includes(' / ')) {
+        setAssignTower(selectedVis.unitId.split(' / ')[0] || '')
+        setAssignUnit(selectedVis.unitId.split(' / ')[1] || '')
+      } else {
+        setAssignTower(selectedVis.unitId || '')
+        setAssignUnit('')
+      }
+      setAssignVehicleNo(selectedVis.licensePlate || '')
+      setAssignVehicleBrand(selectedVis.vehicleBrand || 'Honda')
+    }
   }
 
   // Save Assignment
@@ -275,7 +373,7 @@ export default function ParkingPage() {
         unitId: isOccupied && assignTower && assignUnit ? `${assignTower} / ${assignUnit}` : isOccupied && assignTower ? assignTower : null,
         assignedTo: isOccupied ? assigneeName : null,
         vehicleNumber: isOccupied ? assignVehicleNo : null,
-        vehicleModel: isOccupied ? assignVehicleModel : null,
+        vehicleModel: isOccupied ? `${assignVehicleBrand} (${assignVehicleType})` : null,
         assignedAt: isOccupied ? (selectedSlot.assignedAt || now) : null,
         updatedAt: now
       }
@@ -706,6 +804,42 @@ export default function ParkingPage() {
                 <>
                   <div className="border-t pt-4 space-y-4">
                     <h4 className="font-bold text-slate-800 text-sm">Assignee Association</h4>
+
+                    {/* Resident Link Dropdown (for Resident/Tenant slots) */}
+                    {(selectedSlot.category === 'resident' || selectedSlot.category === 'tenant') && (
+                      <div className="space-y-2">
+                        <Label htmlFor="linkRes">Link Approved Resident/Tenant Account</Label>
+                        <Select value={selectedResidentId || 'custom'} onValueChange={handleSelectResident}>
+                          <SelectTrigger id="linkRes"><SelectValue placeholder="Choose resident/tenant..." /></SelectTrigger>
+                          <SelectContent className="max-h-[200px]">
+                            <SelectItem value="custom">-- Manual / Custom Entry --</SelectItem>
+                            {residents.map((res) => (
+                              <SelectItem key={res.id} value={res.id}>
+                                {res.fullName} {res.buildingId ? `(${res.buildingId} / ${res.unitNumber})` : ''}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    )}
+
+                    {/* Visitor Link Dropdown (for Visitor slots) */}
+                    {selectedSlot.category === 'visitor' && (
+                      <div className="space-y-2">
+                        <Label htmlFor="linkVis">Link Active Checked-in Visitor</Label>
+                        <Select value={selectedVisitorId || 'custom'} onValueChange={handleSelectVisitor}>
+                          <SelectTrigger id="linkVis"><SelectValue placeholder="Choose active visitor..." /></SelectTrigger>
+                          <SelectContent className="max-h-[200px]">
+                            <SelectItem value="custom">-- Manual / Custom Entry --</SelectItem>
+                            {activeVisitors.map((vis) => (
+                              <SelectItem key={vis.id} value={vis.id}>
+                                {vis.name} {vis.unitId ? `(${vis.unitId})` : ''}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    )}
                     
                     <div className="grid grid-cols-2 gap-4">
                       <div className="space-y-2">
@@ -748,7 +882,7 @@ export default function ParkingPage() {
                   <div className="border-t pt-4 space-y-4">
                     <h4 className="font-bold text-slate-800 text-sm">Vehicle Credentials</h4>
                     
-                    <div className="grid grid-cols-2 gap-4">
+                    <div className="grid grid-cols-1 gap-4">
                       <div className="space-y-2">
                         <Label htmlFor="vNo">Vehicle License Plate *</Label>
                         <Input 
@@ -760,14 +894,30 @@ export default function ParkingPage() {
                         />
                       </div>
 
-                      <div className="space-y-2">
-                        <Label htmlFor="vModel">Brand / Type Of</Label>
-                        <Input 
-                          id="vModel" 
-                          placeholder="e.g. Toyota, Honda, Pedestrian" 
-                          value={assignVehicleModel} 
-                          onChange={(e) => setAssignVehicleModel(e.target.value)} 
-                        />
+                      <div className="grid grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                          <Label htmlFor="vBrand">Brand *</Label>
+                          <Select value={assignVehicleBrand} onValueChange={setAssignVehicleBrand}>
+                            <SelectTrigger id="vBrand"><SelectValue placeholder="Select brand" /></SelectTrigger>
+                            <SelectContent className="max-h-[200px]">
+                              {['Honda', 'Suzuki', 'Hyundai', 'Tata', 'Toyota', 'Yamaha', 'Bajaj', 'Mahindra', 'Kia', 'BYD', 'Deepal', 'GWM', 'BMW', 'Mercedes-Benz', 'Audi', 'Others'].map(brand => (
+                                <SelectItem key={brand} value={brand}>{brand}</SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </div>
+
+                        <div className="space-y-2">
+                          <Label htmlFor="vType">Type *</Label>
+                          <Select value={assignVehicleType} onValueChange={setAssignVehicleType}>
+                            <SelectTrigger id="vType"><SelectValue placeholder="Select type" /></SelectTrigger>
+                            <SelectContent>
+                              {['Car', 'SUV', 'Van', 'Bike', 'Scooter', 'Other'].map(vtype => (
+                                <SelectItem key={vtype} value={vtype}>{vtype}</SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </div>
                       </div>
                     </div>
                   </div>
