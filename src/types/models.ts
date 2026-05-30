@@ -157,6 +157,7 @@ export interface Visitor {
   vehicleType?: 'pedestrian' | '2-wheeler' | '4-wheeler'
   licensePlate?: string
   vehicleBrand?: string
+  vehicleTypeDetail?: string
   parkingSlot?: string
   entryTime: string
   exitTime?: string

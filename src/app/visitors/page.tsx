@@ -47,6 +47,8 @@ const TOWER_UNITS: Record<string, string[]> = {
 
 const PROVINCES = ['Koshi', 'Madhesh', 'Bagmati', 'Gandaki', 'Lumbini', 'Karnali', 'Sudur Pashchim']
 const VEHICLE_BRANDS = ['Suzuki', 'Hyundai', 'Tata', 'Toyota', 'Mahindra', 'Honda', 'Kia', 'BYD', 'Bajaj', 'Yamaha', 'Nissan', 'Ford', 'Volkswagen', 'Mitsubishi', 'Deepal', 'GWM', 'BMW', 'Mercedes-Benz', 'Audi', 'Eicher', 'Hero', 'Others']
+const VISITOR_PARKING_SLOTS = Array.from({ length: 30 }, (_, i) => `VP-${(i + 1).toString().padStart(2, '0')}`)
+const VEHICLE_DETAIL_TYPES = ['Car', 'SUV', 'Van', 'Bike', 'Scooter', 'Other']
 
 export default function VisitorsPage() {
   const [visitors, setVisitors] = useState<Visitor[]>([])
@@ -66,6 +68,7 @@ export default function VisitorsPage() {
   const [vehicleType, setVehicleType] = useState<'pedestrian' | '2-wheeler' | '4-wheeler'>('pedestrian')
   const [licensePlate, setLicensePlate] = useState('')
   const [vehicleBrand, setVehicleBrand] = useState('')
+  const [vehicleTypeDetail, setVehicleTypeDetail] = useState('Car')
   const [parkingSlot, setParkingSlot] = useState('')
 
   useEffect(() => {
@@ -106,6 +109,7 @@ export default function VisitorsPage() {
       if (vehicleType !== 'pedestrian') {
         newVisitor.licensePlate = licensePlate
         newVisitor.vehicleBrand = vehicleBrand
+        newVisitor.vehicleTypeDetail = vehicleTypeDetail
         newVisitor.parkingSlot = parkingSlot
       }
 
@@ -121,6 +125,7 @@ export default function VisitorsPage() {
       setVehicleType('pedestrian')
       setLicensePlate('')
       setVehicleBrand('')
+      setVehicleTypeDetail('Car')
       setParkingSlot('')
       setIsRegisterModalOpen(false)
     } catch (error) {
@@ -248,7 +253,7 @@ export default function VisitorsPage() {
                   <div className="space-y-4 pt-2 pb-2 bg-gray-50 p-3 rounded-md border">
                     <div className="space-y-2">
                       <Label className="font-semibold text-gray-700">License Plate</Label>
-                      <div className="grid grid-cols-3 gap-2">
+                      <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
                         <div className="space-y-1">
                           <Label className="text-xs text-gray-500 font-medium">Province *</Label>
                           <Select required value={province} onValueChange={setProvince}>
@@ -262,12 +267,12 @@ export default function VisitorsPage() {
                         </div>
                         <div className="space-y-1">
                           <Label className="text-xs text-gray-500 font-medium">Vehical Number *</Label>
-                          <Input required={province !== ''} value={licensePlate} onChange={e => setLicensePlate(e.target.value)} placeholder="Vehical Number" />
+                          <Input required={province !== ''} value={licensePlate} onChange={e => setLicensePlate(e.target.value)} placeholder="3456" />
                         </div>
                         <div className="space-y-1">
-                          <Label className="text-xs text-gray-500 font-medium">Type Of</Label>
-                          <Select value={vehicleBrand} onValueChange={setVehicleBrand}>
-                            <SelectTrigger><SelectValue placeholder="Select type..." /></SelectTrigger>
+                          <Label className="text-xs text-gray-500 font-medium">Brand *</Label>
+                          <Select required value={vehicleBrand} onValueChange={setVehicleBrand}>
+                            <SelectTrigger><SelectValue placeholder="Select..." /></SelectTrigger>
                             <SelectContent className="max-h-[200px]">
                               {VEHICLE_BRANDS.map(brand => (
                                 <SelectItem key={brand} value={brand}>{brand}</SelectItem>
@@ -275,11 +280,29 @@ export default function VisitorsPage() {
                             </SelectContent>
                           </Select>
                         </div>
+                        <div className="space-y-1">
+                          <Label className="text-xs text-gray-500 font-medium">Type *</Label>
+                          <Select required value={vehicleTypeDetail} onValueChange={setVehicleTypeDetail}>
+                            <SelectTrigger><SelectValue placeholder="Select..." /></SelectTrigger>
+                            <SelectContent>
+                              {VEHICLE_DETAIL_TYPES.map(type => (
+                                <SelectItem key={type} value={type}>{type}</SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </div>
                       </div>
                     </div>
                     <div className="space-y-2">
-                      <Label>Assigned Parking Slot</Label>
-                      <Input value={parkingSlot} onChange={e => setParkingSlot(e.target.value)} placeholder="e.g. V-1" />
+                      <Label>Assigned Parking Slot *</Label>
+                      <Select required value={parkingSlot} onValueChange={setParkingSlot}>
+                        <SelectTrigger><SelectValue placeholder="Select slot..." /></SelectTrigger>
+                        <SelectContent className="max-h-[200px]">
+                          {VISITOR_PARKING_SLOTS.map(slot => (
+                            <SelectItem key={slot} value={slot}>{slot}</SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
                     </div>
                   </div>
                 )}
@@ -344,6 +367,7 @@ export default function VisitorsPage() {
                               <div className="text-xs text-muted-foreground mt-0.5 font-medium">
                                 {v.province ? `${v.province} ` : ''}{v.licensePlate}
                                 {v.vehicleBrand ? ` • ${v.vehicleBrand}` : ''}
+                                {v.vehicleTypeDetail ? ` (${v.vehicleTypeDetail})` : ''}
                               </div>
                             )}
                           </div>
