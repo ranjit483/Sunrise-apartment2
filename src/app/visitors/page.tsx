@@ -153,6 +153,14 @@ export default function VisitorsPage() {
   const currentlyInside = visitors.filter(v => v.status === 'entered').length
   const pendingApproval = visitors.filter(v => v.status === 'waiting').length
 
+  const occupiedVisitorSlots = visitors
+    .filter(v => v.status === 'entered' && v.parkingSlot)
+    .map(v => v.parkingSlot)
+
+  const availableVisitorSlots = VISITOR_PARKING_SLOTS.filter(
+    slot => !occupiedVisitorSlots.includes(slot)
+  )
+
   const getVehicleIcon = (type?: string) => {
     if (type === '4-wheeler') return <Car className="h-4 w-4 mr-1 text-blue-500" />
     if (type === '2-wheeler') return <Bike className="h-4 w-4 mr-1 text-orange-500" />
@@ -298,7 +306,7 @@ export default function VisitorsPage() {
                       <Select required value={parkingSlot} onValueChange={setParkingSlot}>
                         <SelectTrigger><SelectValue placeholder="Select slot..." /></SelectTrigger>
                         <SelectContent className="max-h-[200px]">
-                          {VISITOR_PARKING_SLOTS.map(slot => (
+                          {availableVisitorSlots.map(slot => (
                             <SelectItem key={slot} value={slot}>{slot}</SelectItem>
                           ))}
                         </SelectContent>
