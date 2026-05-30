@@ -53,7 +53,7 @@ const TOWER_UNITS: Record<string, string[]> = {
   'Others': ['A']
 }
 
-const FLOORS = Array.from({length: 14}, (_, i) => i + 1)
+const FLOORS = Array.from({length: 15}, (_, i) => i)
 const UNIT_TYPES = ['1 BHK', '2 BHK', '3 BHK', '4 BHK', '5 BHK']
 
 export default function UnitsPage() {
