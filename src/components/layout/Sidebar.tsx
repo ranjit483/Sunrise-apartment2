@@ -56,6 +56,7 @@ const navItems: NavItem[] = [
   { title: 'Parking', href: '/parking', icon: Car, minClearance: 5, includeRoles: ['GUARD'] },
   { title: 'Reports', href: '/reports', icon: BarChart3, minClearance: 2 },
   { title: 'Profile', href: '/profile', icon: UserCheck },
+  { title: 'SLA Policy', href: '/sla', icon: FileText },
   { title: 'Settings', href: '/settings', icon: Settings },
 ]
 
