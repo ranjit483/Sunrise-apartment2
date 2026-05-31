@@ -329,7 +329,7 @@ export default function PaymentsPage() {
               <CardContent className="flex flex-col items-center">
                 <div className="border border-gray-200 p-2 rounded-xl bg-white shadow-sm mb-4 w-full max-w-[210px]">
                   <img 
-                    src="/fonepay-qr.jpg" 
+                    src="/fonepay-qr.jpg?v=5" 
                     alt="Fonepay QR Code Card" 
                     className="w-full h-auto rounded-lg"
                   />
@@ -638,7 +638,7 @@ export default function PaymentsPage() {
                   {/* High Quality Fonepay QR card image container */}
                   <div className="border border-gray-200 p-2.5 rounded-xl bg-white shadow-sm flex flex-col items-center">
                     <img 
-                      src="/fonepay-qr.jpg" 
+                      src="/fonepay-qr.jpg?v=5" 
                       alt="Fonepay QR Code Card" 
                       className="w-full max-w-[230px] h-auto rounded-lg border shadow-sm"
                     />
