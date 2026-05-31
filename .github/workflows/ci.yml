@@ -1,0 +1,38 @@
+name: Next.js CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: Run Lint
+        run: npm run lint
+
+      - name: Build Next.js Application
+        env:
+          # Next.js may require mock env variables for build validation in CI if firebase setup is verified at build-time
+          NEXT_PUBLIC_FIREBASE_API_KEY: "mock-key"
+          NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN: "mock-domain"
+          NEXT_PUBLIC_FIREBASE_PROJECT_ID: "mock-project"
+          NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET: "mock-bucket"
+          NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID: "mock-sender"
+          NEXT_PUBLIC_FIREBASE_APP_ID: "mock-app"
+        run: npm run build
