@@ -627,7 +627,7 @@ export default function ParkingPage() {
                     Create Parking Slot
                   </Button>
                 </DialogTrigger>
-                <DialogContent className="max-w-md rounded-2xl">
+                <DialogContent className="max-w-md max-h-[90vh] overflow-y-auto rounded-2xl">
                   <DialogHeader>
                     <DialogTitle className="text-xl font-bold">Create New Parking Slot</DialogTitle>
                     <DialogDescription>Add a physical vehicle bay to the society parking grid.</DialogDescription>
@@ -909,7 +909,7 @@ export default function ParkingPage() {
 
       {/* ASSIGN / MODIFY DIALOG MODAL */}
       <Dialog open={isAssignOpen} onOpenChange={setIsAssignOpen}>
-        <DialogContent className="max-w-md rounded-2xl">
+        <DialogContent className="max-w-md max-h-[90vh] overflow-y-auto rounded-2xl">
           <DialogHeader>
             <DialogTitle className="text-xl font-bold flex items-center gap-2">
               <Car className="h-5.5 w-5.5 text-indigo-600" />
