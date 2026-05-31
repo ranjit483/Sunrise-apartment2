@@ -1,127 +1,168 @@
+'use client'
+
 import { useState, useEffect } from 'react'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
-import { Bell, UsersRound, Car, ShieldCheck, ArrowRight } from 'lucide-react'
-import Link from 'next/link'
-import { collection, query, onSnapshot, where } from 'firebase/firestore'
+import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
+import { Users, Shield, LogOut, Car, UserCheck, Clock, UserX, Loader2 } from 'lucide-react'
 import { db } from '@/config/firebase'
+import { collection, onSnapshot, query, orderBy, where, doc, updateDoc } from 'firebase/firestore'
+import { Visitor } from '@/types/models'
 
 export function GuardView({ profile }: { profile: any }) {
-  const [openComplaints, setOpenComplaints] = useState(0)
+  const [visitors, setVisitors] = useState<Visitor[]>([])
+  const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    // We can only count complaints that the guard is allowed to see.
-    // However, since we don't have category-based filtering in firestore right now
-    // due to missing composite indexes, we'll fetch all open complaints and filter in memory.
-    const q = query(collection(db, 'complaints'), where('status', 'in', ['open', 'in_progress']))
+    const q = query(collection(db, 'visitors'), orderBy('createdAt', 'desc'))
     const unsubscribe = onSnapshot(q, (snapshot: any) => {
-      let count = 0;
-      const allowedCategories = ['Parking', 'Security', 'Emergency']
+      const vData: Visitor[] = []
       snapshot.forEach((doc: any) => {
-        const data = doc.data()
-        if (data.category && allowedCategories.includes(data.category)) {
-          count++
-        }
+        vData.push({ id: doc.id, ...doc.data() } as Visitor)
       })
-      setOpenComplaints(count)
+      setVisitors(vData)
+      setLoading(false)
+    }, (error: any) => {
+      console.error('Error fetching visitors for Guard:', error)
+      setLoading(false)
     })
+
     return () => unsubscribe()
   }, [])
+
+  const handleCheckOut = async (visitorId: string) => {
+    if (!confirm('Are you sure you want to check out this visitor?')) return
+    try {
+      const visitorRef = doc(db, 'visitors', visitorId)
+      await updateDoc(visitorRef, {
+        status: 'exited',
+        exitTime: new Date().toISOString()
+      })
+      alert('Visitor checked out successfully!')
+    } catch (error) {
+      console.error('Error checking out visitor:', error)
+      alert('Failed to check out visitor')
+    }
+  }
+
+  const activeVisitors = visitors.filter(v => v.status === 'entered')
 
   return (
     <div className="space-y-6">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h2 className="text-3xl font-bold flex items-center gap-2">
-            <ShieldCheck className="h-8 w-8 text-primary" />
-            Guard Dashboard
-          </h2>
-          <p className="text-muted-foreground mt-1">Welcome back, {profile.fullName}. Here is your security overview.</p>
-        </div>
-        <div className="flex gap-2">
-          <Link href="/visitors">
-            <button className="px-4 py-2 bg-green-400 hover:bg-green-500 text-green-950 font-medium rounded-md shadow-sm transition-colors">
-              Register Visitor
-            </button>
-          </Link>
-          <Link href="/visitors">
-            <button className="px-4 py-2 bg-white border border-gray-200 hover:bg-gray-50 text-blue-900 font-medium rounded-md shadow-sm transition-colors">
-              Log Delivery
-            </button>
-          </Link>
+          <div className="flex items-center gap-3">
+            <h2 className="text-3xl font-bold">Welcome, Officer {profile?.fullName?.split(' ')[0] || 'Guard'}!</h2>
+            <Badge variant="secondary" className="bg-[#95DBAE] text-[#1E293B] hover:bg-[#7BC98E] font-bold">
+              {profile?.role}
+            </Badge>
+          </div>
+          <p className="text-muted-foreground mt-1">Sunrise Apartment Gate Security & Visitor Monitoring console.</p>
         </div>
       </div>
 
       <div className="grid gap-4 md:grid-cols-3">
-        <Card className="bg-gradient-to-br from-blue-50 to-indigo-50 border-blue-100">
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium text-blue-800">Security & Emergency</CardTitle>
-            <Bell className="h-4 w-4 text-blue-600" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-blue-900">{openComplaints}</div>
-            <p className="text-xs text-blue-600 mt-1">Open complaints</p>
+        <Card className="border-green-100">
+          <CardContent className="p-6 flex flex-col items-center justify-center text-center">
+            <div className="p-3 bg-[#E8FFF3] rounded-full mb-3 text-[#007F3E]">
+              <Users className="h-6 w-6" />
+            </div>
+            <p className="text-3xl font-bold text-gray-800">{activeVisitors.length}</p>
+            <p className="text-sm font-semibold text-muted-foreground mt-0.5">Currently Inside Apartment</p>
           </CardContent>
         </Card>
 
-        <Card className="bg-gradient-to-br from-green-50 to-emerald-50 border-green-100">
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium text-green-800">Visitor Management</CardTitle>
-            <UsersRound className="h-4 w-4 text-green-600" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-green-900">Logbook</div>
-            <p className="text-xs text-green-600 mt-1">Track entries & exits</p>
+        <Card>
+          <CardContent className="p-6 flex flex-col items-center justify-center text-center">
+            <div className="p-3 bg-indigo-50 rounded-full mb-3 text-indigo-500">
+              <Car className="h-6 w-6" />
+            </div>
+            <p className="text-3xl font-bold text-gray-800">
+              {activeVisitors.filter(v => v.vehicleType !== 'pedestrian').length}
+            </p>
+            <p className="text-sm font-semibold text-muted-foreground mt-0.5">Vehicles inside Parking</p>
           </CardContent>
         </Card>
 
-        <Card className="bg-gradient-to-br from-orange-50 to-amber-50 border-orange-100">
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium text-orange-800">Parking Control</CardTitle>
-            <Car className="h-4 w-4 text-orange-600" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-orange-900">Active</div>
-            <p className="text-xs text-orange-600 mt-1">Manage visitor parking</p>
+        <Card>
+          <CardContent className="p-6 flex flex-col items-center justify-center text-center">
+            <div className="p-3 bg-emerald-50 rounded-full mb-3 text-emerald-600">
+              <UserCheck className="h-6 w-6" />
+            </div>
+            <p className="text-3xl font-bold text-gray-800">
+              {visitors.filter(v => v.status === 'exited').length}
+            </p>
+            <p className="text-sm font-semibold text-muted-foreground mt-0.5">Total Exits Logged Today</p>
           </CardContent>
         </Card>
       </div>
 
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 pt-4">
-        <Link href="/visitors" className="block group">
-          <Card className="h-full hover:shadow-md transition-all border-l-4 border-l-green-500 hover:border-l-green-600">
-            <CardHeader>
-              <CardTitle className="flex items-center justify-between text-lg group-hover:text-green-700 transition-colors">
-                Visitor Logs
-                <ArrowRight className="h-5 w-5 opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all" />
-              </CardTitle>
-              <CardDescription>Register new visitors, track entry/exit times, and verify host units.</CardDescription>
-            </CardHeader>
-          </Card>
-        </Link>
-
-        <Link href="/parking" className="block group">
-          <Card className="h-full hover:shadow-md transition-all border-l-4 border-l-orange-500 hover:border-l-orange-600">
-            <CardHeader>
-              <CardTitle className="flex items-center justify-between text-lg group-hover:text-orange-700 transition-colors">
-                Parking Allocations
-                <ArrowRight className="h-5 w-5 opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all" />
-              </CardTitle>
-              <CardDescription>View assigned slots and manage temporary visitor parking spaces.</CardDescription>
-            </CardHeader>
-          </Card>
-        </Link>
-
-        <Link href="/complaints" className="block group">
-          <Card className="h-full hover:shadow-md transition-all border-l-4 border-l-blue-500 hover:border-l-blue-600">
-            <CardHeader>
-              <CardTitle className="flex items-center justify-between text-lg group-hover:text-blue-700 transition-colors">
-                Security Incidents
-                <ArrowRight className="h-5 w-5 opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all" />
-              </CardTitle>
-              <CardDescription>Review and respond to parking disputes, security alerts, and emergencies.</CardDescription>
-            </CardHeader>
-          </Card>
-        </Link>
+      <div className="grid gap-6 md:grid-cols-2">
+        <Card className="md:col-span-2">
+          <CardHeader>
+            <CardTitle>Active Visitors Currently Inside</CardTitle>
+            <CardDescription>Gate registry checkouts and vehicle slots.</CardDescription>
+          </CardHeader>
+          <CardContent>
+            {loading ? (
+              <div className="flex justify-center py-6"><Loader2 className="h-6 w-6 animate-spin text-muted-foreground" /></div>
+            ) : activeVisitors.length === 0 ? (
+              <p className="text-center py-6 text-sm text-muted-foreground">No active visitors currently registered inside Sunrise Apartment.</p>
+            ) : (
+              <div className="overflow-x-auto">
+                <table className="w-full text-sm border-collapse text-left">
+                  <thead>
+                    <tr className="border-b">
+                      <th className="pb-3 font-semibold">Visitor Name</th>
+                      <th className="pb-3 font-semibold">Contact</th>
+                      <th className="pb-3 font-semibold">Host / Unit</th>
+                      <th className="pb-3 font-semibold">Vehicle & Plate</th>
+                      <th className="pb-3 font-semibold">Parking slot</th>
+                      <th className="pb-3 font-semibold">Entry Time</th>
+                      <th className="pb-3 font-semibold">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {activeVisitors.map((vis) => (
+                      <tr key={vis.id} className="border-b hover:bg-gray-50/50">
+                        <td className="py-3 font-semibold">{vis.name}</td>
+                        <td className="py-3">{vis.phone}</td>
+                        <td className="py-3">{vis.unitId}</td>
+                        <td className="py-3">
+                          {vis.vehicleType === 'pedestrian' ? (
+                            <Badge variant="outline">Pedestrian</Badge>
+                          ) : (
+                            <div className="flex flex-col">
+                              <Badge className="bg-[#95DBAE] text-[#1E293B] w-max font-semibold text-[10px]">
+                                {vis.vehicleTypeDetail || vis.vehicleType}
+                              </Badge>
+                              {vis.licensePlate && <span className="text-xs text-gray-500 font-mono mt-0.5">{vis.province} {vis.licensePlate}</span>}
+                            </div>
+                          )}
+                        </td>
+                        <td className="py-3 font-semibold text-indigo-700">{vis.parkingSlot || 'N/A'}</td>
+                        <td className="py-3 text-xs text-gray-600">
+                          {new Date(vis.entryTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                        </td>
+                        <td className="py-3">
+                          <Button 
+                            variant="outline" 
+                            size="sm" 
+                            onClick={() => handleCheckOut(vis.id)}
+                            className="h-8 text-xs border-red-200 text-red-700 bg-red-50/30 hover:bg-red-50"
+                          >
+                            <LogOut className="h-3 w-3 mr-1.5" />
+                            Log Checkout
+                          </Button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </CardContent>
+        </Card>
       </div>
     </div>
   )
