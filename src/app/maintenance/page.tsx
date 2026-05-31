@@ -687,10 +687,22 @@ export default function MaintenancePage() {
                     </div>
                     <div>
                       <p className="text-xs font-bold text-gray-400 uppercase">Assigned Service Tech</p>
-                      <p className="font-semibold text-indigo-700 mt-0.5 flex items-center gap-1">
-                        <User className="h-3 w-3" />
-                        {currentTicket.assignedTo || 'Waiting Assignment'}
-                      </p>
+                      <div className="flex items-center gap-1 mt-0.5">
+                        <p className="font-semibold text-indigo-700 flex items-center gap-1">
+                          <User className="h-3 w-3" />
+                          {currentTicket.assignedTo || 'Waiting Assignment'}
+                        </p>
+                        {isAdminOrManager && (currentTicket.status === 'open' || currentTicket.status === 'in_progress') && (
+                          <button 
+                            type="button"
+                            onClick={() => setIsAssignOpen(true)} 
+                            className="text-[10px] bg-slate-100 hover:bg-indigo-50 text-indigo-600 px-1.5 py-0.5 rounded border border-indigo-100 font-bold ml-1"
+                            title="Re-assign technician"
+                          >
+                            Change
+                          </button>
+                        )}
+                      </div>
                     </div>
                   </div>
 
@@ -785,16 +797,16 @@ export default function MaintenancePage() {
                   {/* Action workflows based on roles */}
                   <div className="pt-2 space-y-2">
                     
-                    {/* 1. Admin Triage & Assignment */}
-                    {isAdminOrManager && currentTicket.status === 'open' && (
+                     {/* 1. Admin Triage & Assignment */}
+                    {isAdminOrManager && (currentTicket.status === 'open' || currentTicket.status === 'in_progress') && (
                       <Dialog open={isAssignOpen} onOpenChange={setIsAssignOpen}>
                         <DialogTrigger asChild>
                           <Button className="w-full bg-indigo-600 text-white hover:bg-indigo-700 font-bold shadow flex items-center justify-center gap-2">
                             <Activity className="h-4 w-4" />
-                            Dispatch Specialized Staff
+                            {currentTicket.status === 'open' ? 'Dispatch Specialized Staff' : 'Re-assign / Change Staff'}
                           </Button>
                         </DialogTrigger>
-                        <DialogContent className="max-w-md rounded-xl border-indigo-50">
+                        <DialogContent className="max-w-md max-h-[90vh] overflow-y-auto rounded-xl border-indigo-50">
                           <DialogHeader>
                             <DialogTitle className="font-bold flex items-center gap-2">
                               <Sparkles className="h-5 w-5 text-indigo-600" />
