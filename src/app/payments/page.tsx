@@ -2,15 +2,15 @@
 
 import { useState, useEffect } from 'react'
 import { DashboardLayout } from '@/components/layout/DashboardLayout'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { db } from '@/config/firebase'
-import { collection, onSnapshot, query, orderBy, where, doc, writeBatch, getDoc, getDocs } from 'firebase/firestore'
+import { collection, onSnapshot, query, where, doc, writeBatch, getDoc } from 'firebase/firestore'
 import { Payment, Invoice } from '@/types/models'
-import { Loader2, DollarSign, Eye, Printer, FileText } from 'lucide-react'
+import { Loader2, DollarSign, Eye, Printer, FileText, QrCode, CheckCircle2, AlertCircle } from 'lucide-react'
 import { useAuth } from '@/context/AuthContext'
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog'
 import { numberToWords } from '@/lib/utils'
 
 // Approximation for 2026 AD -> 2083 BS Nepalese date
@@ -88,27 +88,36 @@ export default function PaymentsPage() {
   const [payments, setPayments] = useState<Payment[]>([])
   const [pendingInvoices, setPendingInvoices] = useState<Invoice[]>([])
   const [loading, setLoading] = useState(true)
-  const [isPaying, setIsPaying] = useState<string | null>(null)
+  const [isPaying, setIsPaying] = useState(false)
 
   // Dialog and receipt print states
   const [activeReceipt, setActiveReceipt] = useState<Payment | null>(null)
   const [receiptInvoice, setReceiptInvoice] = useState<Invoice | null>(null)
   const [isReceiptModalOpen, setIsReceiptModalOpen] = useState(false)
 
+  // Invoice viewing & direct payment wizard states
+  const [viewingInvoice, setViewingInvoice] = useState<Invoice | null>(null)
+  const [isInvoiceModalOpen, setIsInvoiceModalOpen] = useState(false)
+  const [isPayStepOpen, setIsPayStepOpen] = useState(false)
+  const [paymentMethod, setPaymentMethod] = useState<'online' | 'qr'>('online')
+  const [qrTransactionId, setQrTransactionId] = useState('')
+
   useEffect(() => {
     if (!profile?.role) return;
     
     const isResident = profile.role === 'RESIDENT' || profile.role === 'TENANT'
 
-    // Fetch payments
-    let q = query(collection(db, 'payments'), orderBy('createdAt', 'desc'))
+    // Fetch payments without index-dependent orderBy to prevent empty history lists
+    let q = query(collection(db, 'payments'))
     if (isResident && user?.uid) {
-      q = query(collection(db, 'payments'), where('tenantId', '==', user.uid), orderBy('createdAt', 'desc'))
+      q = query(collection(db, 'payments'), where('tenantId', '==', user.uid))
     }
     
     const unsubscribePayments = onSnapshot(q, (snapshot: any) => {
       const pData: Payment[] = []
       snapshot.forEach((doc: any) => pData.push(doc.data() as Payment))
+      // Sort in JavaScript to guarantee it works without composite indexes
+      pData.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
       setPayments(pData)
       setLoading(false)
     }, (error: any) => {
@@ -116,7 +125,7 @@ export default function PaymentsPage() {
       setLoading(false)
     })
 
-    // Fetch pending invoices for calculating pending totals
+    // Fetch pending invoices
     let unsubscribeInvoices = () => {}
     if (isResident && user?.uid) {
       const invQ = query(collection(db, 'invoices'), where('tenantId', '==', user.uid))
@@ -150,34 +159,41 @@ export default function PaymentsPage() {
     }
   }, [profile, user])
 
-  const handlePayInvoice = async (invoice: Invoice) => {
-    if (!confirm('Proceed to pay this invoice?')) return
-    setIsPaying(invoice.id)
+  const handlePayConfirm = async () => {
+    if (!viewingInvoice) return
+    if (paymentMethod === 'qr' && !qrTransactionId.trim()) {
+      alert('Please enter the Fonepay Transaction ID to confirm your payment.')
+      return
+    }
+    
+    setIsPaying(true)
     try {
       const batch = writeBatch(db)
       
-      // Create payment record
       const paymentRef = doc(collection(db, 'payments'))
-      const totalAmount = invoice.amount + (invoice.electricityAmount || 0) + (invoice.utilityAmount || 0) + (invoice.waterAmount || 0) + (invoice.otherAmount || 0)
+      const totalAmount = viewingInvoice.amount + (viewingInvoice.electricityAmount || 0) + (viewingInvoice.utilityAmount || 0) + (viewingInvoice.waterAmount || 0) + (viewingInvoice.otherAmount || 0)
+      
+      const generatedTrxId = 'TRX-' + Math.random().toString(36).substring(2, 10).toUpperCase()
+      const transactionId = paymentMethod === 'qr' ? qrTransactionId.trim() : generatedTrxId
       
       const newPayment: Payment = {
         id: paymentRef.id,
-        invoiceId: invoice.id,
-        tenantId: invoice.tenantId,
+        invoiceId: viewingInvoice.id,
+        tenantId: viewingInvoice.tenantId || user?.uid || '',
         amount: totalAmount,
-        method: 'online',
-        transactionId: 'TRX-' + Math.random().toString(36).substring(2, 10).toUpperCase(),
+        method: paymentMethod === 'qr' ? 'qr' : 'online',
+        transactionId: transactionId,
         status: 'completed',
         paidAt: new Date().toISOString(),
         createdAt: new Date().toISOString(),
         receiptNo: 'No.: ' + Math.floor(1000 + Math.random() * 9000),
-        receivedFor: `Monthly Bill - ${invoice.month}`
+        receivedFor: `Monthly Bill - ${viewingInvoice.month}`
       }
 
       batch.set(paymentRef, newPayment)
 
       // Update invoice status
-      const invoiceRef = doc(db, 'invoices', invoice.id)
+      const invoiceRef = doc(db, 'invoices', viewingInvoice.id)
       batch.update(invoiceRef, {
         status: 'paid',
         updatedAt: new Date().toISOString()
@@ -185,15 +201,20 @@ export default function PaymentsPage() {
 
       await batch.commit()
       
-      // Set to view/print receipt
-      setReceiptInvoice(invoice)
+      // Close step & details dialogs
+      setIsPayStepOpen(false)
+      setIsInvoiceModalOpen(false)
+      setQrTransactionId('')
+      
+      // Show official printable receipt
+      setReceiptInvoice(viewingInvoice)
       setActiveReceipt(newPayment)
       setIsReceiptModalOpen(true)
     } catch (error: any) {
-      console.error('Error processing payment:', error)
-      alert('Payment failed: ' + error.message)
+      console.error('Error confirming payment:', error)
+      alert('Payment confirmation failed: ' + error.message)
     } finally {
-      setIsPaying(null)
+      setIsPaying(false)
     }
   }
 
@@ -204,7 +225,6 @@ export default function PaymentsPage() {
       if (invSnap.exists()) {
         setReceiptInvoice(invSnap.data() as Invoice)
       } else {
-        // Mock fallback if invoice was deleted
         setReceiptInvoice({
           id: payment.invoiceId,
           unitId: 'N/A',
@@ -262,38 +282,66 @@ export default function PaymentsPage() {
         </div>
 
         {isResident && pendingInvoices.length > 0 && (
-          <Card className="border-red-200">
-            <CardHeader><CardTitle className="text-red-600">Pending Invoices</CardTitle></CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                {pendingInvoices.map((inv) => {
-                  const total = inv.amount + (inv.electricityAmount || 0) + (inv.utilityAmount || 0) + (inv.waterAmount || 0) + (inv.otherAmount || 0)
-                  return (
-                    <div key={inv.id} className="flex flex-col sm:flex-row sm:items-center justify-between p-4 border rounded-lg bg-red-50/50 gap-4">
-                      <div>
-                        <p className="font-semibold">Invoice for {inv.month}</p>
-                        <p className="text-sm text-muted-foreground">Due Date: {inv.dueDate}</p>
-                      </div>
-                      <div className="flex items-center gap-4">
-                        <div className="text-right">
-                          <p className="font-bold text-lg text-indigo-700">₨ {total.toLocaleString()}</p>
-                          <Badge variant="warning" className="uppercase font-semibold text-xs px-2 py-0.5 rounded-full">{inv.status}</Badge>
+          <div className="grid gap-6 md:grid-cols-3 items-start">
+            <Card className="border-red-200 md:col-span-2 shadow-sm">
+              <CardHeader><CardTitle className="text-red-600 flex items-center gap-2">Pending Invoices</CardTitle></CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  {pendingInvoices.map((inv) => {
+                    const total = inv.amount + (inv.electricityAmount || 0) + (inv.utilityAmount || 0) + (inv.waterAmount || 0) + (inv.otherAmount || 0)
+                    return (
+                      <div key={inv.id} className="flex flex-col sm:flex-row sm:items-center justify-between p-4 border rounded-lg bg-red-50/50 gap-4">
+                        <div>
+                          <p className="font-semibold">Invoice for {inv.month}</p>
+                          <p className="text-sm text-muted-foreground">Due Date: {inv.dueDate}</p>
                         </div>
-                        <Button 
-                          onClick={() => handlePayInvoice(inv)} 
-                          disabled={isPaying === inv.id} 
-                          className="bg-[#95DBAE] text-[#1E293B] hover:bg-[#7BC98E] font-semibold"
-                        >
-                          {isPaying === inv.id ? <Loader2 className="h-4 w-4 animate-spin" /> : <DollarSign className="h-4 w-4 mr-2" />}
-                          Pay Online
-                        </Button>
+                        <div className="flex items-center gap-4">
+                          <div className="text-right">
+                            <p className="font-bold text-lg text-indigo-700">₨ {total.toLocaleString()}</p>
+                            <Badge variant="warning" className="uppercase font-semibold text-xs px-2 py-0.5 rounded-full">{inv.status}</Badge>
+                          </div>
+                          <Button 
+                            onClick={() => {
+                              setViewingInvoice(inv)
+                              setIsInvoiceModalOpen(true)
+                            }} 
+                            className="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold flex items-center gap-2"
+                          >
+                            <Eye className="h-4 w-4" />
+                            View & Pay Invoice
+                          </Button>
+                        </div>
                       </div>
-                    </div>
-                  )
-                })}
-              </div>
-            </CardContent>
-          </Card>
+                    )
+                  })}
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Quick Fonepay Scan Card on Payments page itself */}
+            <Card className="border-emerald-200 shadow-sm">
+              <CardHeader className="pb-3 text-center">
+                <CardTitle className="text-emerald-700 text-sm font-extrabold tracking-wide uppercase flex items-center justify-center gap-1.5">
+                  <QrCode className="h-4 w-4 text-[#007F3E]" />
+                  Quick Scan To Pay
+                </CardTitle>
+                <CardDescription className="text-xs text-muted-foreground">Sunrise Apartment Welfare Society</CardDescription>
+              </CardHeader>
+              <CardContent className="flex flex-col items-center">
+                <div className="border border-gray-200 p-2 rounded-xl bg-white shadow-sm mb-4 w-full max-w-[210px]">
+                  <img 
+                    src="/fonepay-qr.jpg" 
+                    alt="Fonepay QR Code Card" 
+                    className="w-full h-auto rounded-lg"
+                  />
+                </div>
+                <div className="text-center text-[10px] text-gray-500 font-semibold space-y-1">
+                  <p className="font-bold text-[#007F3E]">Kathmandu/Lalitpur MP</p>
+                  <p>Terminal ID: 2222020001358874</p>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
         )}
 
         <Card>
@@ -410,6 +458,280 @@ export default function PaymentsPage() {
         )}
       </div>
 
+      {/* BILL DETAILS MODAL */}
+      <Dialog open={isInvoiceModalOpen} onOpenChange={setIsInvoiceModalOpen}>
+        <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto font-sans p-6 text-black no-print">
+          <DialogHeader className="border-b pb-2">
+            <DialogTitle>Invoice Details Statement</DialogTitle>
+            <DialogDescription>Detailed monthly invoice sheet and breakdown.</DialogDescription>
+          </DialogHeader>
+
+          {viewingInvoice && (
+            <div className="space-y-4 pt-2">
+              <div className="bg-white p-6 border rounded-md shadow-sm relative leading-relaxed text-xs">
+                <div className="border-b pb-3 mb-4 text-center">
+                  <h1 className="text-lg font-black tracking-tight text-gray-900">SUNRISE APARTMENT WELFARE SOCIETY</h1>
+                  <p className="text-[10px] font-semibold text-gray-600">Nakkhu-13, Lalitpur, Phone: 01-5185110</p>
+                  <div className="inline-block border border-black px-2 py-0.5 rounded-sm bg-gray-50 text-[9px] font-bold mt-1 tracking-widest uppercase text-gray-800">
+                    MONTHLY BILL SHEET STATEMENT
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-2 mb-4 text-xs font-semibold px-1">
+                  <div><strong>Invoice Number:</strong> <span className="font-mono">{viewingInvoice.id.substring(0, 8).toUpperCase()}</span></div>
+                  <div className="text-right"><strong>Billing period:</strong> <span className="uppercase">{viewingInvoice.month}</span></div>
+                  <div><strong>Owner/Tenant:</strong> {viewingInvoice.tenantName || 'Resident'}</div>
+                  <div className="text-right"><strong>Unit No:</strong> {viewingInvoice.unitNumber || 'N/A'}</div>
+                  <div><strong>Status:</strong> <span className="uppercase text-red-600 font-extrabold">{viewingInvoice.status}</span></div>
+                  <div className="text-right"><strong>Due Date:</strong> {viewingInvoice.dueDate}</div>
+                </div>
+
+                <table className="w-full text-xs border-collapse border border-black mb-5">
+                  <thead>
+                    <tr className="bg-gray-100 font-bold border-b border-black text-[10px] uppercase text-gray-950">
+                      <th className="border border-black p-2 text-center w-10">S.N.</th>
+                      <th className="border border-black p-2 text-left">Particulars & Service Details</th>
+                      <th className="border border-black p-2 text-right w-32">Amount (₨)</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr className="border-b border-black">
+                      <td className="border border-black p-2 text-center">1.</td>
+                      <td className="border border-black p-2">
+                        <div><strong>Electricity Charge Including Usage Pool</strong></div>
+                        {viewingInvoice.electricityReading ? (
+                          <span className="text-[10px] text-gray-600">Current Reading: {viewingInvoice.electricityReading} units (Rate: Rs. 16.80/unit)</span>
+                        ) : (
+                          <span className="text-[10px] text-gray-600">Meter usage and society power backup</span>
+                        )}
+                      </td>
+                      <td className="border border-black p-2 text-right font-medium">₨ {(viewingInvoice.electricityAmount || 0).toLocaleString()}</td>
+                    </tr>
+                    <tr className="border-b border-black">
+                      <td className="border border-black p-2 text-center">2.</td>
+                      <td className="border border-black p-2">
+                        <div><strong>Backup (Generator / DG meter flat fee)</strong></div>
+                        <span className="text-[10px] text-gray-600">Diesel generator standby charge</span>
+                      </td>
+                      <td className="border border-black p-2 text-right font-medium">₨ 500</td>
+                    </tr>
+                    <tr className="border-b border-black">
+                      <td className="border border-black p-2 text-center">3.</td>
+                      <td className="border border-black p-2">
+                        <div><strong>Diesel Cost Sharing Standby pool</strong></div>
+                        <span className="text-[10px] text-gray-600">Diesel standby maintenance pool sharing</span>
+                      </td>
+                      <td className="border border-black p-2 text-right font-medium">₨ 850</td>
+                    </tr>
+                    <tr className="border-b border-black">
+                      <td className="border border-black p-2 text-center">4.</td>
+                      <td className="border border-black p-2">
+                        <div><strong>Monthly Service Charge per Sq Ft</strong></div>
+                        <span className="text-[10px] text-gray-600">Sunrise welfare operations rate (Rs 1.75 per Sq Ft)</span>
+                      </td>
+                      <td className="border border-black p-2 text-right font-medium">₨ {(viewingInvoice.utilityAmount || 0).toLocaleString()}</td>
+                    </tr>
+                    <tr className="border-b border-black">
+                      <td className="border border-black p-2 text-center">5.</td>
+                      <td className="border border-black p-2">
+                        <div><strong>Water Supply & Society Maintenance</strong></div>
+                        <span className="text-[10px] text-gray-600">Fixed monthly supply & cleaning pool fee</span>
+                      </td>
+                      <td className="border border-black p-2 text-right font-medium">₨ {(viewingInvoice.waterAmount || 0).toLocaleString()}</td>
+                    </tr>
+                    <tr className="border-b border-black">
+                      <td className="border border-black p-2 text-center">6.</td>
+                      <td className="border border-black p-2">
+                        <div><strong>Apartment Structure Insurance Contribution</strong></div>
+                        <span className="text-[10px] text-gray-600">Welfare pool contribution (Rs 6.20 per Sq Ft)</span>
+                      </td>
+                      <td className="border border-black p-2 text-right font-medium">₨ {(viewingInvoice.otherAmount || 0).toLocaleString()}</td>
+                    </tr>
+                    <tr className="border-b border-black">
+                      <td className="border border-black p-2 text-center">7.</td>
+                      <td className="border border-black p-2">
+                        <div><strong>Delay Charge on Structural Insurance contribution</strong></div>
+                        <span className="text-[10px] text-gray-600">Late penalty fee on insurance pool</span>
+                      </td>
+                      <td className="border border-black p-2 text-right font-medium">₨ 0.00</td>
+                    </tr>
+                    <tr className="border-b border-black">
+                      <td className="border border-black p-2 text-center">8.</td>
+                      <td className="border border-black p-2">
+                        <div><strong>Previous Pending Outstanding Due</strong></div>
+                        <span className="text-[10px] text-gray-600">Brought forward balance from previous cycles</span>
+                      </td>
+                      <td className="border border-black p-2 text-right font-medium">₨ 0.00</td>
+                    </tr>
+                    <tr className="border-b border-black">
+                      <td className="border border-black p-2 text-center">9.</td>
+                      <td className="border border-black p-2">
+                        <div><strong>Society Delay / Late Penalty Surcharges</strong></div>
+                        <span className="text-[10px] text-gray-600">Applied delay penalty</span>
+                      </td>
+                      <td className="border border-black p-2 text-right font-medium">₨ 0.00</td>
+                    </tr>
+                    {viewingInvoice.amount > 0 && (
+                      <tr className="border-b border-black">
+                        <td className="border border-black p-2 text-center">10.</td>
+                        <td className="border border-black p-2">
+                          <div><strong>Basic Unit Rent</strong></div>
+                          <span className="text-[10px] text-gray-600">Apartment basic rent amount</span>
+                        </td>
+                        <td className="border border-black p-2 text-right font-medium">₨ {viewingInvoice.amount.toLocaleString()}</td>
+                      </tr>
+                    )}
+                    <tr className="bg-gray-100 font-extrabold text-[13px] border-t border-black text-gray-950">
+                      <td colSpan={2} className="border border-black p-2 text-right uppercase tracking-wider">Grand Total:</td>
+                      <td className="border border-black p-2 text-right font-black">
+                        ₨ {(viewingInvoice.amount + (viewingInvoice.electricityAmount || 0) + (viewingInvoice.utilityAmount || 0) + (viewingInvoice.waterAmount || 0) + (viewingInvoice.otherAmount || 0)).toLocaleString()}
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+
+                <div className="border border-black p-3 rounded-sm bg-gray-50 text-[11px] mb-5">
+                  <strong className="text-[9px] uppercase text-gray-600 block mb-0.5">Amount in Words:</strong>
+                  <div className="font-bold text-gray-900 text-xs">
+                    {numberToWords(viewingInvoice.amount + (viewingInvoice.electricityAmount || 0) + (viewingInvoice.utilityAmount || 0) + (viewingInvoice.waterAmount || 0) + (viewingInvoice.otherAmount || 0))}
+                  </div>
+                </div>
+
+                {/* Interactive Payment Choice Block */}
+                {viewingInvoice.status !== 'paid' && (
+                  <div className="bg-indigo-50 border border-indigo-100 rounded-xl p-4 text-center space-y-3 mt-6">
+                    <p className="text-xs text-indigo-900 font-bold flex items-center justify-center gap-1.5">
+                      <AlertCircle className="h-4 w-4 text-indigo-700" />
+                      Download/View Completed. Select your secure payment method below:
+                    </p>
+                    <div className="flex flex-wrap justify-center gap-3">
+                      <Button
+                        onClick={() => {
+                          setPaymentMethod('online')
+                          setIsPayStepOpen(true)
+                        }}
+                        className="bg-indigo-600 hover:bg-indigo-700 text-white font-bold px-4 py-2 text-xs rounded-lg flex items-center gap-2"
+                      >
+                        <DollarSign className="h-4.5 w-4.5" />
+                        Proceed to Online Payment
+                      </Button>
+                      <Button
+                        onClick={() => {
+                          setPaymentMethod('qr')
+                          setIsPayStepOpen(true)
+                        }}
+                        className="bg-[#007F3E] hover:bg-[#00602F] text-white font-bold px-4 py-2 text-xs rounded-lg flex items-center gap-2"
+                      >
+                        <QrCode className="h-4.5 w-4.5" />
+                        Pay via Fonepay QR Code
+                      </Button>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
+
+      {/* PAYMENT TRANSACTION STEP DIALOG */}
+      <Dialog open={isPayStepOpen} onOpenChange={setIsPayStepOpen}>
+        <DialogContent className="max-w-md font-sans p-6 text-black no-print">
+          <DialogHeader className="border-b pb-2">
+            <DialogTitle>
+              {paymentMethod === 'qr' ? 'Fonepay QR Scan & Pay' : 'Secure Online Payment Portal'}
+            </DialogTitle>
+            <DialogDescription>
+              {paymentMethod === 'qr' 
+                ? 'Scan the society welfare QR code card below.' 
+                : 'Simulate instant debit card or mobile wallet payment.'
+              }
+            </DialogDescription>
+          </DialogHeader>
+
+          {viewingInvoice && (
+            <div className="space-y-4 pt-3 text-xs leading-relaxed">
+              <div className="bg-gray-50 border rounded-lg p-3 text-center">
+                <span className="text-[10px] text-gray-500 uppercase font-bold block">Grand Total Due</span>
+                <strong className="text-xl font-mono text-[#007F3E]">
+                  ₨ {(viewingInvoice.amount + (viewingInvoice.electricityAmount || 0) + (viewingInvoice.utilityAmount || 0) + (viewingInvoice.waterAmount || 0) + (viewingInvoice.otherAmount || 0)).toLocaleString()}.00
+                </strong>
+                <span className="text-[10px] text-gray-400 block mt-0.5">Billing month: {viewingInvoice.month}</span>
+              </div>
+
+              {paymentMethod === 'qr' ? (
+                <div className="space-y-4">
+                  {/* Embedded Authentic Fonepay QR Card from Public files */}
+                  <div className="border border-gray-200 p-2.5 rounded-xl bg-white shadow-sm flex flex-col items-center">
+                    <img 
+                      src="/fonepay-qr.jpg" 
+                      alt="Fonepay QR Code Card" 
+                      className="w-full max-w-[240px] h-auto rounded-lg border shadow-inner"
+                    />
+                    <div className="text-center text-[10px] text-gray-500 font-bold mt-2.5 space-y-0.5">
+                      <p className="text-[#007F3E] text-xs">Kathmandu/Lalitpur MP</p>
+                      <p className="font-mono text-gray-600">Terminal ID: 2222020001358874</p>
+                    </div>
+                  </div>
+
+                  <div className="bg-emerald-50/60 border border-emerald-100 rounded-lg p-3.5 space-y-2 text-emerald-900">
+                    <p className="font-bold flex items-center gap-1">
+                      <CheckCircle2 className="h-4 w-4 text-emerald-700" />
+                      Payment Steps:
+                    </p>
+                    <ol className="list-decimal pl-4 space-y-1 text-[10.5px]">
+                      <li>Open your Bank app or digital wallet (eSewa, Fonepay, Khalti).</li>
+                      <li>Scan the QR code card above or save it to gallery to load.</li>
+                      <li>Initiate payment of <strong>₨ {(viewingInvoice.amount + (viewingInvoice.electricityAmount || 0) + (viewingInvoice.utilityAmount || 0) + (viewingInvoice.waterAmount || 0) + (viewingInvoice.otherAmount || 0)).toLocaleString()}</strong>.</li>
+                    </ol>
+                  </div>
+
+                  <div className="space-y-2 pt-1">
+                    <label className="text-[10.5px] font-bold text-gray-700 block">Fonepay Transaction ID *</label>
+                    <input 
+                      type="text" 
+                      placeholder="e.g. FPN-9824892A" 
+                      value={qrTransactionId}
+                      onChange={(e) => setQrTransactionId(e.target.value)}
+                      className="flex h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-sm shadow-sm transition-colors placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring font-mono font-bold uppercase"
+                    />
+                  </div>
+                </div>
+              ) : (
+                <div className="space-y-4 py-3">
+                  <div className="bg-blue-50 border border-blue-100 rounded-lg p-4 text-center space-y-2">
+                    <p className="text-[11px] text-blue-900 font-semibold">
+                      This represents an integrated eSewa, Khalti, or ConnectIPS online gateway portal.
+                    </p>
+                    <p className="text-[10px] text-blue-700">
+                      Funds will be securely debited from your linked bank account.
+                    </p>
+                  </div>
+                </div>
+              )}
+
+              <div className="flex gap-3 pt-3">
+                <Button
+                  onClick={() => setIsPayStepOpen(false)}
+                  variant="outline"
+                  className="flex-1 font-bold text-xs"
+                >
+                  Cancel
+                </Button>
+                <Button
+                  onClick={handlePayConfirm}
+                  disabled={isPaying}
+                  className="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs flex items-center justify-center gap-1.5"
+                >
+                  {isPaying ? <Loader2 className="h-4 w-4 animate-spin" /> : <DollarSign className="h-4 w-4" />}
+                  {paymentMethod === 'qr' ? 'Confirm QR Payment' : 'Complete Online Payment'}
+                </Button>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
+
       {/* PAYMENT RECEIPTS SLIP MODAL */}
       <Dialog open={isReceiptModalOpen} onOpenChange={setIsReceiptModalOpen}>
         <DialogContent className="max-w-2xl max-h-[85vh] overflow-y-auto no-print">
@@ -440,8 +762,8 @@ export default function PaymentsPage() {
 
               <div className="border border-black p-4 rounded-sm bg-gray-50/50 space-y-3 text-xs text-gray-900 relative overflow-hidden leading-relaxed">
                 <div>
-                  Received with thanks from Mr./Mrs./Ms. <strong className="underline px-1 text-gray-950 font-bold">{receiptInvoice.tenantName}</strong>, 
-                  Unit No. <strong className="underline px-1 text-gray-950 font-bold">{receiptInvoice.unitNumber}</strong>, a total sum of 
+                  Received with thanks from Mr./Mrs./Ms. <strong className="underline px-1 text-gray-950 font-bold">{receiptInvoice.tenantName || 'Resident'}</strong>, 
+                  Unit No. <strong className="underline px-1 text-gray-950 font-bold">{receiptInvoice.unitNumber || 'N/A'}</strong>, a total sum of 
                   Rupees <strong className="underline px-1 text-gray-950 font-bold text-xs">{numberToWords(activeReceipt.amount).replace(' Rupees Only', '')}</strong> 
                   Only, on account of <strong className="underline px-1 text-gray-950">{activeReceipt.receivedFor || 'Monthly Invoices'}</strong> 
                   for the billing period of <strong className="underline px-1 font-bold">{receiptInvoice.month}</strong>.
