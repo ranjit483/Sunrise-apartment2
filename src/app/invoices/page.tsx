@@ -19,6 +19,7 @@ const statusColors: Record<string, string> = {
   draft: 'bg-gray-100 text-gray-800',
   paid: 'bg-green-100 text-green-800',
   pending: 'bg-yellow-100 text-yellow-800',
+  partial: 'bg-blue-100 text-blue-800',
   overdue: 'bg-red-100 text-red-800',
 }
 
@@ -140,6 +141,8 @@ export default function InvoicesPage() {
   const [paymentMethod, setPaymentMethod] = useState<'cash' | 'cheque' | 'qr'>('cash')
   const [bankName, setBankName] = useState('')
   const [chequeNumber, setChequeNumber] = useState('')
+  const [receiveAmount, setReceiveAmount] = useState('')
+  const [chequeAmount, setChequeAmount] = useState('')
   const [isPaying, setIsPaying] = useState(false)
 
   // Document viewing states
@@ -309,6 +312,9 @@ export default function InvoicesPage() {
     setPaymentMethod('cash')
     setBankName('')
     setChequeNumber('')
+    const totalAmount = invoice.amount + (invoice.electricityAmount || 0) + (invoice.utilityAmount || 0) + (invoice.waterAmount || 0) + (invoice.otherAmount || 0) - (invoice.paidAmount || 0)
+    setReceiveAmount(totalAmount.toString())
+    setChequeAmount(totalAmount.toString())
     setIsReceiveModalOpen(true)
   }
 
@@ -323,23 +329,43 @@ export default function InvoicesPage() {
     try {
       const batch = writeBatch(db)
       const paymentRef = doc(collection(db, 'payments'))
-      const totalAmount = payingInvoice.amount + (payingInvoice.electricityAmount || 0) + (payingInvoice.utilityAmount || 0) + (payingInvoice.waterAmount || 0) + (payingInvoice.otherAmount || 0)
+      
+      const invoiceTotal = payingInvoice.amount + (payingInvoice.electricityAmount || 0) + (payingInvoice.utilityAmount || 0) + (payingInvoice.waterAmount || 0) + (payingInvoice.otherAmount || 0)
+      const prevPaid = payingInvoice.paidAmount || 0
+      const remainingTotal = invoiceTotal - prevPaid
+
+      const isCheque = paymentMethod === 'cheque'
+      const inputAmountStr = isCheque ? chequeAmount : receiveAmount
+      const parsedAmount = parseFloat(inputAmountStr)
+      const paymentAmount = isNaN(parsedAmount) ? 0 : parsedAmount
+
+      if (paymentAmount <= 0) {
+        alert('Please enter a valid payment amount.')
+        setIsPaying(false)
+        return
+      }
+
+      if (paymentAmount > remainingTotal) {
+        alert('Payment amount cannot be greater than the remaining balance.')
+        setIsPaying(false)
+        return
+      }
       
       const newPayment: Payment = {
         id: paymentRef.id,
         invoiceId: payingInvoice.id,
         tenantId: payingInvoice.tenantId,
-        amount: totalAmount,
+        amount: paymentAmount,
         method: paymentMethod === 'cash' ? 'cash' : paymentMethod === 'cheque' ? 'cheque' : 'qr',
         transactionId: paymentMethod === 'qr' ? 'FON-QR-' + Math.random().toString(36).substring(2, 10).toUpperCase() : 'REC-' + Math.random().toString(36).substring(2, 10).toUpperCase(),
-        status: 'completed',
+        status: isCheque ? 'pending_clearance' : 'completed',
         paidAt: new Date().toISOString(),
         createdAt: new Date().toISOString(),
         receiptNo: 'No.: ' + Math.floor(1000 + Math.random() * 9000),
         receivedFor: `Monthly Bill - ${payingInvoice.month}`
       }
 
-      if (paymentMethod === 'cheque') {
+      if (isCheque) {
         newPayment.bankName = bankName
         newPayment.chequeNumber = chequeNumber
       }
@@ -347,10 +373,17 @@ export default function InvoicesPage() {
       batch.set(paymentRef, newPayment)
 
       const ref = doc(db, 'invoices', payingInvoice.id)
-      batch.update(ref, {
-        status: 'paid',
-        updatedAt: new Date().toISOString()
-      })
+      
+      if (!isCheque) {
+        const newPaidAmount = prevPaid + paymentAmount
+        const newStatus = newPaidAmount >= invoiceTotal ? 'paid' : 'partial'
+        
+        batch.update(ref, {
+          paidAmount: newPaidAmount,
+          status: newStatus,
+          updatedAt: new Date().toISOString()
+        })
+      }
 
       await batch.commit()
       
@@ -553,7 +586,14 @@ export default function InvoicesPage() {
                           <td className="py-3">₨ {(inv.utilityAmount || 0).toLocaleString()}</td>
                           <td className="py-3">₨ {(inv.waterAmount || 0).toLocaleString()}</td>
                           <td className="py-3">₨ {(inv.otherAmount || 0).toLocaleString()}</td>
-                          <td className="py-3 font-semibold text-indigo-700">₨ {total.toLocaleString()}</td>
+                          <td className="py-3 font-semibold text-indigo-700">
+                            ₨ {total.toLocaleString()}
+                            {inv.paidAmount ? (
+                              <div className="text-[10px] text-gray-500 font-normal">
+                                Paid: ₨ {inv.paidAmount.toLocaleString()}
+                              </div>
+                            ) : null}
+                          </td>
                           <td className="py-3">
                             <Badge variant="outline" className={`${statusColors[inv.status] || ''} font-semibold uppercase text-xs px-2 py-0.5 rounded-full`}>
                               {inv.status}
@@ -583,7 +623,7 @@ export default function InvoicesPage() {
                                 </Button>
                               )}
 
-                              {inv.status === 'pending' && canManageInvoices && (
+                              {(inv.status === 'pending' || inv.status === 'partial') && canManageInvoices && (
                                 <Button 
                                   variant="outline" 
                                   size="sm" 
@@ -924,10 +964,45 @@ export default function InvoicesPage() {
                 <p><strong>Resident Name:</strong> {formatTenantName(payingInvoice.tenantName, payingInvoice.tenantId)}</p>
                 <p><strong>Unit / Apartment:</strong> {payingInvoice.unitNumber}</p>
                 <p><strong>For Cycle Month:</strong> {payingInvoice.month}</p>
-                <p className="text-base text-indigo-700 pt-1 border-t mt-1.5 flex justify-between font-bold">
-                  <span>Grand Total Receivable:</span>
-                  <span>₨ {(payingInvoice.amount + (payingInvoice.electricityAmount || 0) + (payingInvoice.utilityAmount || 0) + (payingInvoice.waterAmount || 0) + (payingInvoice.otherAmount || 0)).toLocaleString()}</span>
-                </p>
+                <div className="pt-2 mt-2 border-t space-y-2">
+                  <div className="flex justify-between items-center text-base text-indigo-700 font-bold">
+                    <span>Grand Total Receivable:</span>
+                    <span>₨ {(payingInvoice.amount + (payingInvoice.electricityAmount || 0) + (payingInvoice.utilityAmount || 0) + (payingInvoice.waterAmount || 0) + (payingInvoice.otherAmount || 0) - (payingInvoice.paidAmount || 0)).toLocaleString()}</span>
+                  </div>
+                  
+                  <div className="flex justify-between items-center bg-white p-2 rounded border border-indigo-100">
+                    <Label className="text-sm font-semibold">
+                      {paymentMethod === 'cheque' ? 'Cheque Amount:' : 'Total Pay Amount:'}
+                    </Label>
+                    <div className="flex items-center gap-1 w-1/2">
+                      <span className="font-semibold text-gray-500">₨</span>
+                      <Input 
+                        type="number"
+                        className="h-8 text-right font-bold"
+                        value={paymentMethod === 'cheque' ? chequeAmount : receiveAmount}
+                        onChange={e => paymentMethod === 'cheque' ? setChequeAmount(e.target.value) : setReceiveAmount(e.target.value)}
+                      />
+                    </div>
+                  </div>
+
+                  {(() => {
+                    const invoiceTotal = payingInvoice.amount + (payingInvoice.electricityAmount || 0) + (payingInvoice.utilityAmount || 0) + (payingInvoice.waterAmount || 0) + (payingInvoice.otherAmount || 0)
+                    const prevPaid = payingInvoice.paidAmount || 0
+                    const remainingTotal = invoiceTotal - prevPaid
+                    const parsedAmount = parseFloat(paymentMethod === 'cheque' ? chequeAmount : receiveAmount)
+                    const currentPayment = isNaN(parsedAmount) ? 0 : parsedAmount
+                    const newRemaining = remainingTotal - currentPayment
+
+                    return (
+                      <div className="text-[11px] text-gray-500 font-medium px-1 flex justify-between">
+                        <span>Calculate: ₨ {remainingTotal.toLocaleString()} - ₨ {currentPayment.toLocaleString()}</span>
+                        <span className={newRemaining > 0 ? "text-amber-600 font-bold" : "text-green-600 font-bold"}>
+                          = Remaining: ₨ {newRemaining.toLocaleString()}
+                        </span>
+                      </div>
+                    )
+                  })()}
+                </div>
               </div>
 
               <div className="space-y-2">

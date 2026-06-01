@@ -37,8 +37,9 @@ export interface Invoice {
   utilityAmount?: number
   waterAmount?: number
   otherAmount?: number
+  paidAmount?: number
   dueDate: string
-  status: 'draft' | 'pending' | 'paid' | 'overdue'
+  status: 'draft' | 'pending' | 'partial' | 'paid' | 'overdue'
   createdAt: string
   updatedAt: string
 }
@@ -50,7 +51,7 @@ export interface Payment {
   amount: number
   method: 'manual' | 'cash' | 'cheque' | 'qr' | string
   transactionId: string
-  status: 'completed' | 'pending' | 'failed' | string
+  status: 'completed' | 'pending' | 'pending_clearance' | 'failed' | string
   paidAt?: string
   createdAt: string
   chequeNumber?: string
