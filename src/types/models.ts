@@ -144,9 +144,31 @@ export interface ChartOfAccount {
   code: string
   name: string
   type: string
+  parentCode?: string
+  description?: string
+  status: 'active' | 'inactive'
   isSystemLocked?: boolean
-  createdAt?: string
+  createdAt: string
+  updatedAt?: string
 }
+
+export interface ElectricityReading {
+  id: string
+  unitId: string
+  tenantId: string
+  previousReading: number
+  currentReading: number
+  totalConsumed: number
+  pricePerUnit: number
+  totalBill: number
+  readingDate: string
+  status: 'pending_verification' | 'approved' | 'rejected'
+  photoUrl?: string
+  month?: string
+  createdAt: string
+  updatedAt: string
+}
+
 
 export interface SystemSettings {
   apartmentName: string
@@ -156,6 +178,7 @@ export interface SystemSettings {
   lateFeePercent: number
   autoGenerateInvoices: boolean
   sendEmailReminders: boolean
+  electricityPricePerUnit?: number
 }
 
 export interface UserSettings {

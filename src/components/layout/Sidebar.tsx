@@ -22,6 +22,7 @@ import {
   UserPlus,
   Wallet,
   BookOpen,
+  Zap,
 } from 'lucide-react'
 import { useState } from 'react'
 import { useAuth } from '@/context/AuthContext'
@@ -48,6 +49,7 @@ const navItems: NavItem[] = [
   { title: 'Resident/Tenant Ledger', href: '/accounts/ledger', icon: BookOpen, minClearance: 3, excludeRoles: ['RESIDENT', 'TENANT', 'GUARD', 'OFFICE_ASSISTANT'] },
   { title: 'Invoices', href: '/invoices', icon: FileText, minClearance: 4, excludeRoles: ['RESIDENT', 'TENANT'] },
   { title: 'Payments', href: '/payments', icon: CreditCard, minClearance: 4 },
+  { title: 'Electricity', href: '/electricity', icon: Zap },
   { title: 'Expenses', href: '/expenses', icon: CreditCard, minClearance: 3, excludeRoles: ['OFFICE_ASSISTANT'] },
   { title: 'Maintenance', href: '/maintenance', icon: Wrench, excludeRoles: ['GUARD'] },
   { title: 'Staff', href: '/staff', icon: UserCheck, minClearance: 3 },

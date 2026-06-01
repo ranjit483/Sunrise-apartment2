@@ -22,6 +22,7 @@ const defaultSystemSettings: SystemSettings = {
   lateFeePercent: 2,
   autoGenerateInvoices: true,
   sendEmailReminders: true,
+  electricityPricePerUnit: 15,
 }
 
 const defaultUserSettings: UserSettings = {
@@ -211,6 +212,11 @@ export default function SettingsPage() {
                   <div className="flex items-center justify-between">
                     <Label>Auto-generate Invoices</Label>
                     <Switch checked={globalSettings.autoGenerateInvoices} onCheckedChange={(c) => handleChangeGlobal('autoGenerateInvoices', c)} />
+                  </div>
+                  <div className="space-y-2 pt-2 border-t mt-2">
+                    <Label>Electricity Price Per Unit (Rs.)</Label>
+                    <Input value={globalSettings.electricityPricePerUnit || ''} onChange={(e) => handleChangeGlobal('electricityPricePerUnit', parseFloat(e.target.value) || 0)} type="number" />
+                    <p className="text-xs text-muted-foreground">This rate is used to calculate the monthly electricity bills based on meter readings.</p>
                   </div>
                   <div className="flex items-center justify-between">
                     <Label>Send Email Reminders</Label>
