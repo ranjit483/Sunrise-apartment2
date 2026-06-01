@@ -632,7 +632,7 @@ export default function PaymentsPage() {
                   {/* High Quality Fonepay QR card image container */}
                   <div className="border border-gray-200 p-2.5 rounded-xl bg-white shadow-sm flex flex-col items-center">
                     <img 
-                      src="/fonepay-qr.jpg?v=5" 
+                      src="/fonepay-qr.jpg?v=6" 
                       alt="Fonepay QR Code Card" 
                       className="w-full max-w-[230px] h-auto rounded-lg border shadow-sm"
                     />
