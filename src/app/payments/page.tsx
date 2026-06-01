@@ -601,13 +601,7 @@ export default function PaymentsPage() {
                         Download/View Completed. Select your secure payment method below:
                       </p>
                       <div className="flex flex-wrap justify-center gap-3">
-                        <Button
-                          onClick={() => setCheckoutStep('online')}
-                          className="bg-indigo-600 hover:bg-indigo-700 text-white font-bold px-4 py-2 text-xs rounded-lg flex items-center gap-2"
-                        >
-                          <DollarSign className="h-4.5 w-4.5" />
-                          Proceed to Online Payment
-                        </Button>
+
                         <Button
                           onClick={() => setCheckoutStep('qr')}
                           className="bg-[#007F3E] hover:bg-[#00602F] text-white font-bold px-4 py-2 text-xs rounded-lg flex items-center gap-2"
