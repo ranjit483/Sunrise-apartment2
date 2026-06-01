@@ -103,7 +103,7 @@ export default function InvoicesPage() {
       try {
         const snap = await getDocs(collection(db, 'users'))
         const map: Record<string, string> = {}
-        snap.forEach(doc => {
+        snap.forEach((doc: any) => {
           const data = doc.data()
           if (data.name) {
             map[data.uid || doc.id] = data.name
