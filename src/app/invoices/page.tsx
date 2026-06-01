@@ -969,30 +969,7 @@ export default function InvoicesPage() {
                     </div>
 
                     <div className="bg-white p-2.5 rounded-lg mb-2">
-                      <svg width="120" height="120" viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg" className="mx-auto">
-                        <rect x="0" y="0" width="30" height="30" fill="black"/>
-                        <rect x="5" y="5" width="20" height="20" fill="white"/>
-                        <rect x="10" y="10" width="10" height="10" fill="black"/>
-                        
-                        <rect x="90" y="0" width="30" height="30" fill="black"/>
-                        <rect x="95" y="5" width="20" height="20" fill="white"/>
-                        <rect x="100" y="10" width="10" height="10" fill="black"/>
-                        
-                        <rect x="0" y="90" width="30" height="30" fill="black"/>
-                        <rect x="5" y="95" width="20" height="20" fill="white"/>
-                        <rect x="10" y="100" width="10" height="10" fill="black"/>
-                        
-                        <rect x="40" y="10" width="8" height="20" fill="black"/>
-                        <rect x="60" y="5" width="15" height="8" fill="black"/>
-                        <rect x="50" y="45" width="20" height="20" fill="black"/>
-                        <rect x="15" y="45" width="12" height="12" fill="black"/>
-                        <rect x="80" y="45" width="18" height="18" fill="black"/>
-                        <rect x="90" y="90" width="20" height="20" fill="black"/>
-                        <rect x="55" y="85" width="20" height="12" fill="black"/>
-                        
-                        <circle cx="60" cy="60" r="10" fill="#E11D48"/>
-                        <polygon points="56,60 60,56 64,60 60,64" fill="white"/>
-                      </svg>
+                      <img src="/plain-qr.jpg?v=1" alt="Fonepay QR Code" className="w-[120px] h-[120px] mx-auto object-contain" />
                     </div>
 
                     <div className="text-[8px] text-green-100 flex flex-col items-center">
