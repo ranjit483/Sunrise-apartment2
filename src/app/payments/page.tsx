@@ -98,6 +98,12 @@ export default function PaymentsPage() {
   // Single-Modal checkout wizard states
   const [viewingInvoice, setViewingInvoice] = useState<Invoice | null>(null)
   const [isInvoiceModalOpen, setIsInvoiceModalOpen] = useState(false)
+  const [usersMap, setUsersMap] = useState<Record<string, string>>({})
+
+  const formatTenantName = (name: string | null | undefined, tenantId?: string) => {
+    if (tenantId && usersMap[tenantId]) return usersMap[tenantId]
+    return name || 'Unknown'
+  }
   const [checkoutStep, setCheckoutStep] = useState<'statement' | 'online' | 'qr'>('statement')
   const [qrTransactionId, setQrTransactionId] = useState('')
 
@@ -124,6 +130,24 @@ export default function PaymentsPage() {
       setLoading(false)
     })
 
+    const fetchUsers = async () => {
+      try {
+        const snap = await getDocs(collection(db, 'users'))
+        const map: Record<string, string> = {}
+        snap.forEach((doc: any) => {
+          const data = doc.data()
+          const nameToUse = data.fullName || data.name
+          if (nameToUse) {
+            map[data.uid || doc.id] = nameToUse
+          }
+        })
+        setUsersMap(map)
+      } catch (err) {
+        console.error('Error fetching users:', err)
+      }
+    }
+    fetchUsers()
+
     // Fetch pending invoices
     let unsubscribeInvoices = () => {}
     if (isResident && user?.uid) {
@@ -132,7 +156,7 @@ export default function PaymentsPage() {
         const iData: Invoice[] = []
         snapshot.forEach((doc: any) => {
           const inv = { id: doc.id, ...doc.data() } as Invoice
-          if (inv.status === 'pending' || inv.status === 'overdue') {
+          if (inv.status === 'pending' || inv.status === 'partial' || inv.status === 'overdue') {
             iData.push(inv)
           }
         })
@@ -144,7 +168,7 @@ export default function PaymentsPage() {
         const iData: Invoice[] = []
         snapshot.forEach((doc: any) => {
           const inv = { id: doc.id, ...doc.data() } as Invoice
-          if (inv.status === 'pending' || inv.status === 'overdue') {
+          if (inv.status === 'pending' || inv.status === 'partial' || inv.status === 'overdue') {
             iData.push(inv)
           }
         })
@@ -260,7 +284,7 @@ export default function PaymentsPage() {
     return d.getMonth() === currentMonth && d.getFullYear() === currentYear
   }).reduce((acc, p) => acc + p.amount, 0)
 
-  const pendingTotal = pendingInvoices.reduce((acc, i) => acc + i.amount + (i.electricityAmount || 0) + (i.utilityAmount || 0) + (i.waterAmount || 0) + (i.otherAmount || 0), 0)
+  const pendingTotal = pendingInvoices.reduce((acc, i) => acc + i.amount + (i.electricityAmount || 0) + (i.utilityAmount || 0) + (i.waterAmount || 0) + (i.otherAmount || 0) - (i.paidAmount || 0), 0)
   const transactionsCount = payments.length
 
   return (
@@ -296,7 +320,8 @@ export default function PaymentsPage() {
                         <div className="flex items-center gap-4">
                           <div className="text-right">
                             <p className="font-bold text-lg text-indigo-700">₨ {total.toLocaleString()}</p>
-                            <Badge variant="warning" className="uppercase font-semibold text-xs px-2 py-0.5 rounded-full">{inv.status}</Badge>
+                            {inv.paidAmount ? <p className="text-xs text-muted-foreground font-medium mb-1">Paid: ₨{inv.paidAmount.toLocaleString()}</p> : null}
+                            <Badge variant={inv.status === 'partial' ? 'warning' : inv.status === 'overdue' ? 'destructive' : 'warning'} className={`uppercase font-semibold text-xs px-2 py-0.5 rounded-full ${inv.status === 'partial' ? 'bg-blue-100 text-blue-800' : ''}`}>{inv.status}</Badge>
                           </div>
                           <Button 
                             onClick={() => {
@@ -419,7 +444,7 @@ export default function PaymentsPage() {
 
             <div className="border border-black p-4 rounded-sm bg-gray-50/50 space-y-3.5 text-xs text-gray-900 relative overflow-hidden leading-relaxed">
               <div>
-                Received with thanks from Mr./Mrs./Ms. <strong className="text-sm underline px-1 text-gray-950 font-bold">{receiptInvoice.tenantName}</strong>, 
+                Received with thanks from Mr./Mrs./Ms. <strong className="text-sm underline px-1 text-gray-950 font-bold">{formatTenantName(receiptInvoice.tenantName, receiptInvoice.tenantId)}</strong>, 
                 Unit No. <strong className="underline px-1 text-gray-950 font-bold">{receiptInvoice.unitNumber}</strong>, a total sum of 
                 Rupees <strong className="underline px-1 text-gray-950 font-bold text-sm">{numberToWords(activeReceipt.amount).replace(' Rupees Only', '')}</strong> 
                 Only, on account of <strong className="underline px-1 text-gray-950">{activeReceipt.receivedFor || 'Monthly Invoices'}</strong> 
@@ -624,7 +649,7 @@ export default function PaymentsPage() {
                   <div className="bg-gray-50 border rounded-lg p-3 text-center">
                     <span className="text-[9px] text-gray-500 uppercase font-bold block">Grand Total Due</span>
                     <strong className="text-lg font-mono text-[#007F3E]">
-                      ₨ {(viewingInvoice.amount + (viewingInvoice.electricityAmount || 0) + (viewingInvoice.utilityAmount || 0) + (viewingInvoice.waterAmount || 0) + (viewingInvoice.otherAmount || 0)).toLocaleString()}.00
+                      ₨ {(viewingInvoice.amount + (viewingInvoice.electricityAmount || 0) + (viewingInvoice.utilityAmount || 0) + (viewingInvoice.waterAmount || 0) + (viewingInvoice.otherAmount || 0) - (viewingInvoice.paidAmount || 0)).toLocaleString()}.00
                     </strong>
                     <span className="text-[9px] text-gray-400 block mt-0.5">Billing Period: {viewingInvoice.month}</span>
                   </div>
@@ -650,7 +675,7 @@ export default function PaymentsPage() {
                     <ol className="list-decimal pl-4 space-y-0.5 text-[10px]">
                       <li>Open your mobile banking app or digital wallet (eSewa, Fonepay, Khalti).</li>
                       <li>Scan the QR code card above or upload from your gallery.</li>
-                      <li>Initiate payment of <strong>₨ {(viewingInvoice.amount + (viewingInvoice.electricityAmount || 0) + (viewingInvoice.utilityAmount || 0) + (viewingInvoice.waterAmount || 0) + (viewingInvoice.otherAmount || 0)).toLocaleString()}</strong>.</li>
+                      <li>Initiate payment of <strong>₨ {(viewingInvoice.amount + (viewingInvoice.electricityAmount || 0) + (viewingInvoice.utilityAmount || 0) + (viewingInvoice.waterAmount || 0) + (viewingInvoice.otherAmount || 0) - (viewingInvoice.paidAmount || 0)).toLocaleString()}</strong>.</li>
                     </ol>
                   </div>
 
@@ -762,7 +787,7 @@ export default function PaymentsPage() {
 
               <div className="border border-black p-4 rounded-sm bg-gray-50/50 space-y-3 text-xs text-gray-900 relative overflow-hidden leading-relaxed">
                 <div>
-                  Received with thanks from Mr./Mrs./Ms. <strong className="underline px-1 text-gray-950 font-bold">{receiptInvoice.tenantName || 'Resident'}</strong>, 
+                  Received with thanks from Mr./Mrs./Ms. <strong className="underline px-1 text-gray-950 font-bold">{formatTenantName(receiptInvoice.tenantName, receiptInvoice.tenantId)}</strong>, 
                   Unit No. <strong className="underline px-1 text-gray-950 font-bold">{receiptInvoice.unitNumber || 'N/A'}</strong>, a total sum of 
                   Rupees <strong className="underline px-1 text-gray-950 font-bold text-xs">{numberToWords(activeReceipt.amount).replace(' Rupees Only', '')}</strong> 
                   Only, on account of <strong className="underline px-1 text-gray-950">{activeReceipt.receivedFor || 'Monthly Invoices'}</strong> 

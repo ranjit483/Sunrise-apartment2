@@ -54,8 +54,8 @@ export function TenantView({ profile }: { profile: any }) {
     }
   }, [profile?.uid, profile?.buildingId, profile?.unitNumber, profile?.fullName])
 
-  const pendingInvoices = invoices.filter(i => i.status === 'pending' || i.status === 'overdue')
-  const totalBalance = pendingInvoices.reduce((acc, i) => acc + i.amount + (i.electricityAmount || 0) + (i.utilityAmount || 0) + (i.waterAmount || 0) + (i.otherAmount || 0), 0)
+  const pendingInvoices = invoices.filter(i => i.status === 'pending' || i.status === 'partial' || i.status === 'overdue')
+  const totalBalance = pendingInvoices.reduce((acc, i) => acc + i.amount + (i.electricityAmount || 0) + (i.utilityAmount || 0) + (i.waterAmount || 0) + (i.otherAmount || 0) - (i.paidAmount || 0), 0)
   
   const activeTickets = tickets.filter(t => t.status === 'open' || t.status === 'in_progress').length
   const activeLease = leases.find(l => l.status === 'active')
@@ -273,7 +273,8 @@ export function TenantView({ profile }: { profile: any }) {
                     <div className="flex items-center gap-4">
                       <div className="text-right">
                         <p className="font-medium">₨{(invoice.amount + (invoice.electricityAmount || 0) + (invoice.utilityAmount || 0) + (invoice.waterAmount || 0) + (invoice.otherAmount || 0)).toLocaleString()}</p>
-                        <Badge variant={invoice.status === 'paid' ? 'success' : invoice.status === 'pending' ? 'warning' : 'destructive'}>{invoice.status.toUpperCase()}</Badge>
+                        {invoice.paidAmount ? <p className="text-xs text-muted-foreground font-medium mb-1">Paid: ₨{invoice.paidAmount.toLocaleString()}</p> : null}
+                        <Badge variant={invoice.status === 'paid' ? 'success' : (invoice.status === 'pending' || invoice.status === 'partial') ? 'warning' : 'destructive'}>{invoice.status.toUpperCase()}</Badge>
                       </div>
                       <Link href="/payments">
                         <Button variant="ghost" size="icon" title="View & Pay in Payments"><Download className="h-4 w-4" /></Button>
