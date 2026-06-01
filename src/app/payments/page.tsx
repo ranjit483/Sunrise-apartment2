@@ -106,6 +106,7 @@ export default function PaymentsPage() {
   }
   const [checkoutStep, setCheckoutStep] = useState<'statement' | 'online' | 'qr'>('statement')
   const [qrTransactionId, setQrTransactionId] = useState('')
+  const [payAmount, setPayAmount] = useState('')
 
   useEffect(() => {
     if (!profile?.role) return;
@@ -188,13 +189,26 @@ export default function PaymentsPage() {
       alert('Please enter the Fonepay Transaction ID to confirm your payment.')
       return
     }
+
+    const invoiceTotal = viewingInvoice.amount + (viewingInvoice.electricityAmount || 0) + (viewingInvoice.utilityAmount || 0) + (viewingInvoice.waterAmount || 0) + (viewingInvoice.otherAmount || 0)
+    const prevPaid = viewingInvoice.paidAmount || 0
+    const remainingTotal = invoiceTotal - prevPaid
+    const parsedAmount = parseFloat(payAmount)
+
+    if (isNaN(parsedAmount) || parsedAmount <= 0) {
+      alert('Please enter a valid payment amount.')
+      return
+    }
+    if (parsedAmount > remainingTotal) {
+      alert(`Amount cannot exceed the remaining balance of Rs. ${remainingTotal.toLocaleString()}`)
+      return
+    }
     
     setIsPaying(true)
     try {
       const batch = writeBatch(db)
       
       const paymentRef = doc(collection(db, 'payments'))
-      const totalAmount = viewingInvoice.amount + (viewingInvoice.electricityAmount || 0) + (viewingInvoice.utilityAmount || 0) + (viewingInvoice.waterAmount || 0) + (viewingInvoice.otherAmount || 0)
       
       const generatedTrxId = 'TRX-' + Math.random().toString(36).substring(2, 10).toUpperCase()
       const transactionId = checkoutStep === 'qr' ? qrTransactionId.trim() : generatedTrxId
@@ -203,7 +217,7 @@ export default function PaymentsPage() {
         id: paymentRef.id,
         invoiceId: viewingInvoice.id,
         tenantId: viewingInvoice.tenantId || user?.uid || '',
-        amount: totalAmount,
+        amount: parsedAmount,
         method: checkoutStep === 'qr' ? 'qr' : 'online',
         transactionId: transactionId,
         status: 'completed',
@@ -215,10 +229,15 @@ export default function PaymentsPage() {
 
       batch.set(paymentRef, newPayment)
 
+      const newPaidAmount = prevPaid + parsedAmount
+      const newRemaining = invoiceTotal - newPaidAmount
+      const newStatus = newRemaining <= 0 ? 'paid' : 'partial'
+
       // Update invoice status
       const invoiceRef = doc(db, 'invoices', viewingInvoice.id)
       batch.update(invoiceRef, {
-        status: 'paid',
+        paidAmount: newPaidAmount,
+        status: newStatus,
         updatedAt: new Date().toISOString()
       })
 
@@ -328,6 +347,8 @@ export default function PaymentsPage() {
                               setViewingInvoice(inv)
                               setCheckoutStep('statement')
                               setIsInvoiceModalOpen(true)
+                              const rem = total - (inv.paidAmount || 0)
+                              setPayAmount(rem.toString())
                             }} 
                             className="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold flex items-center gap-2"
                           >
@@ -675,19 +696,31 @@ export default function PaymentsPage() {
                     <ol className="list-decimal pl-4 space-y-0.5 text-[10px]">
                       <li>Open your mobile banking app or digital wallet (eSewa, Fonepay, Khalti).</li>
                       <li>Scan the QR code card above or upload from your gallery.</li>
-                      <li>Initiate payment of <strong>₨ {(viewingInvoice.amount + (viewingInvoice.electricityAmount || 0) + (viewingInvoice.utilityAmount || 0) + (viewingInvoice.waterAmount || 0) + (viewingInvoice.otherAmount || 0) - (viewingInvoice.paidAmount || 0)).toLocaleString()}</strong>.</li>
+                      <li>Initiate payment for your desired amount.</li>
                     </ol>
                   </div>
 
-                  <div className="space-y-1.5">
-                    <label className="text-[10px] font-bold text-gray-700 block">Fonepay Transaction ID *</label>
-                    <input 
-                      type="text" 
-                      placeholder="e.g. FPN-9824892A" 
-                      value={qrTransactionId}
-                      onChange={(e) => setQrTransactionId(e.target.value)}
-                      className="flex h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-sm shadow-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring font-mono font-bold uppercase"
-                    />
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-1.5">
+                      <label className="text-[10px] font-bold text-gray-700 block">Pay Amount (Rs.) *</label>
+                      <input 
+                        type="number"
+                        placeholder="e.g. 5000" 
+                        value={payAmount}
+                        onChange={(e) => setPayAmount(e.target.value)}
+                        className="flex h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-sm shadow-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring font-mono font-bold"
+                      />
+                    </div>
+                    <div className="space-y-1.5">
+                      <label className="text-[10px] font-bold text-gray-700 block">Fonepay Transaction ID *</label>
+                      <input 
+                        type="text" 
+                        placeholder="e.g. FPN-9824892A" 
+                        value={qrTransactionId}
+                        onChange={(e) => setQrTransactionId(e.target.value)}
+                        className="flex h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-sm shadow-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring font-mono font-bold uppercase"
+                      />
+                    </div>
                   </div>
 
                   <div className="flex gap-3 pt-3 border-t">
@@ -719,9 +752,20 @@ export default function PaymentsPage() {
                   <div className="bg-gray-50 border rounded-lg p-3 text-center">
                     <span className="text-[9px] text-gray-500 uppercase font-bold block">Grand Total Due</span>
                     <strong className="text-lg font-mono text-indigo-700">
-                      ₨ {(viewingInvoice.amount + (viewingInvoice.electricityAmount || 0) + (viewingInvoice.utilityAmount || 0) + (viewingInvoice.waterAmount || 0) + (viewingInvoice.otherAmount || 0)).toLocaleString()}.00
+                      ₨ {(viewingInvoice.amount + (viewingInvoice.electricityAmount || 0) + (viewingInvoice.utilityAmount || 0) + (viewingInvoice.waterAmount || 0) + (viewingInvoice.otherAmount || 0) - (viewingInvoice.paidAmount || 0)).toLocaleString()}.00
                     </strong>
                     <span className="text-[9px] text-gray-400 block mt-0.5">Billing Period: {viewingInvoice.month}</span>
+                  </div>
+
+                  <div className="space-y-1.5">
+                    <label className="text-[10px] font-bold text-gray-700 block">Pay Amount (Rs.) *</label>
+                    <input 
+                      type="number"
+                      placeholder="e.g. 5000" 
+                      value={payAmount}
+                      onChange={(e) => setPayAmount(e.target.value)}
+                      className="flex h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-sm shadow-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring font-mono font-bold"
+                    />
                   </div>
 
                   <div className="bg-blue-50 border border-blue-100 rounded-lg p-4 text-center space-y-2">
