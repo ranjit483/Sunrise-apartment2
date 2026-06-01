@@ -8,7 +8,7 @@ import { Label } from '@/components/ui/label'
 import { useAuth } from '@/context/AuthContext'
 import { db } from '@/config/firebase'
 import { collection, query, where, orderBy, getDocs, doc, setDoc, limit, onSnapshot, getDoc } from 'firebase/firestore'
-import { ElectricityReading, Unit, Settings, SystemSettings } from '@/types/models'
+import { ElectricityReading, Unit, SystemSettings } from '@/types/models'
 import { Loader2, Zap, Upload, Clock, CheckCircle2, XCircle } from 'lucide-react'
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts'
 // Assuming we don't have Firebase storage set up yet based on the open questions, 
@@ -76,7 +76,7 @@ export default function ResidentElectricityView() {
 
     const unsubscribe = onSnapshot(q, (snapshot: any) => {
       const data: ElectricityReading[] = []
-      snapshot.forEach(doc => {
+      snapshot.forEach((doc: any) => {
         data.push(doc.data() as ElectricityReading)
       })
       setReadings(data)

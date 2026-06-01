@@ -25,7 +25,7 @@ export default function AdminElectricityView() {
 
     const unsubscribe = onSnapshot(q, (snapshot: any) => {
       const data: ElectricityReading[] = []
-      snapshot.forEach(doc => {
+      snapshot.forEach((doc: any) => {
         data.push(doc.data() as ElectricityReading)
       })
       setReadings(data)
