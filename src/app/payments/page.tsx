@@ -6,7 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { db } from '@/config/firebase'
-import { collection, onSnapshot, query, where, doc, writeBatch, getDoc } from 'firebase/firestore'
+import { collection, onSnapshot, query, where, doc, writeBatch, getDoc, getDocs } from 'firebase/firestore'
 import { Payment, Invoice } from '@/types/models'
 import { Loader2, DollarSign, Eye, Printer, FileText, QrCode, CheckCircle2, AlertCircle } from 'lucide-react'
 import { useAuth } from '@/context/AuthContext'
