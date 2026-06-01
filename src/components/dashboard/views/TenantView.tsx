@@ -21,7 +21,8 @@ export function TenantView({ profile }: { profile: any }) {
     if (!profile?.uid) return;
 
     const unsubInvoices = onSnapshot(query(collection(db, 'invoices'), where('tenantId', '==', profile.uid)), (snap: any) => {
-      setInvoices(snap.docs.map((d: any) => ({ id: d.id, ...d.data() } as Invoice)))
+      const allInvoices = snap.docs.map((d: any) => ({ id: d.id, ...d.data() } as Invoice))
+      setInvoices(allInvoices.filter((i: Invoice) => i.status !== 'draft'))
     })
     
     const unsubTickets = onSnapshot(query(collection(db, 'maintenance'), where('reportedBy', '==', profile.uid)), (snap: any) => {

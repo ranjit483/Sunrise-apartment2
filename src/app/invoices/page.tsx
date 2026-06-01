@@ -105,8 +105,9 @@ export default function InvoicesPage() {
         const map: Record<string, string> = {}
         snap.forEach((doc: any) => {
           const data = doc.data()
-          if (data.name) {
-            map[data.uid || doc.id] = data.name
+          const nameToUse = data.fullName || data.name
+          if (nameToUse) {
+            map[data.uid || doc.id] = nameToUse
           }
         })
         setUsersMap(map)
