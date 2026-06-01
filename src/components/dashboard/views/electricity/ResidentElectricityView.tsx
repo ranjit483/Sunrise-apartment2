@@ -74,7 +74,7 @@ export default function ResidentElectricityView() {
       orderBy('readingDate', 'desc')
     )
 
-    const unsubscribe = onSnapshot(q, (snapshot) => {
+    const unsubscribe = onSnapshot(q, (snapshot: any) => {
       const data: ElectricityReading[] = []
       snapshot.forEach(doc => {
         data.push(doc.data() as ElectricityReading)
