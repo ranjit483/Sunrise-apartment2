@@ -92,6 +92,15 @@ function getNepaliDate(dateStr: string | Date): { bs: string, ad: string } {
   }
 }
 
+const formatTenantName = (name: string | null | undefined) => {
+  if (!name) return 'Unknown'
+  if (name.includes('@')) {
+    const prefix = name.split('@')[0]
+    return prefix.charAt(0).toUpperCase() + prefix.slice(1)
+  }
+  return name
+}
+
 export default function InvoicesPage() {
   const { profile } = useAuth()
   const [invoices, setInvoices] = useState<Invoice[]>([])
@@ -499,7 +508,7 @@ export default function InvoicesPage() {
                     <tr className="border-b">
                       <th className="pb-3 text-left">Invoice ID</th>
                       <th className="pb-3 text-left">Unit</th>
-                      <th className="pb-3 text-left">Tenant</th>
+                      <th className="pb-3 text-left">Resident/Tenant</th>
                       <th className="pb-3 text-left">Month</th>
                       <th className="pb-3 text-left">Due Date</th>
                       <th className="pb-3 text-left">Rent</th>
@@ -519,7 +528,7 @@ export default function InvoicesPage() {
                         <tr key={inv.id} className="border-b hover:bg-gray-50/50">
                           <td className="py-3 font-medium">{inv.id.substring(0, 8)}...</td>
                           <td className="py-3 font-semibold text-gray-700">{inv.unitNumber || (inv.unitId !== 'N/A' ? inv.unitId.substring(0,8) + '...' : 'N/A')}</td>
-                          <td className="py-3">{inv.tenantName || 'Unknown'}</td>
+                          <td className="py-3">{formatTenantName(inv.tenantName)}</td>
                           <td className="py-3">{inv.month}</td>
                           <td className="py-3">{inv.dueDate}</td>
                           <td className="py-3">₨ {inv.amount.toLocaleString()}</td>
@@ -608,7 +617,7 @@ export default function InvoicesPage() {
             <div className="grid grid-cols-2 gap-y-2 text-sm mb-6 border border-black p-4 rounded-sm bg-gray-50">
               <div><strong>Unit Number:</strong> {viewingInvoice.unitNumber}</div>
               <div className="text-right"><strong>Invoice No:</strong> {viewingInvoice.id.substring(0, 10).toUpperCase()}</div>
-              <div><strong>Owner/Tenant:</strong> {viewingInvoice.tenantName}</div>
+              <div><strong>Owner/Tenant:</strong> {formatTenantName(viewingInvoice.tenantName)}</div>
               <div className="text-right"><strong>Date (AD):</strong> {getNepaliDate(viewingInvoice.createdAt).ad}</div>
               <div><strong>Billing Month:</strong> <span className="uppercase font-bold">{viewingInvoice.month}</span></div>
               <div className="text-right"><strong>Date (BS):</strong> {getNepaliDate(viewingInvoice.createdAt).bs.split(' (')[0]}</div>
@@ -758,7 +767,7 @@ export default function InvoicesPage() {
 
             <div className="border border-black p-4 rounded-sm bg-gray-50/50 space-y-3.5 text-xs text-gray-900 relative overflow-hidden leading-relaxed">
               <div>
-                Received with thanks from Mr./Mrs./Ms. <strong className="text-sm underline px-1 text-gray-950 font-bold">{receiptInvoice.tenantName}</strong>, 
+                Received with thanks from Mr./Mrs./Ms. <strong className="text-sm underline px-1 text-gray-950 font-bold">{formatTenantName(receiptInvoice.tenantName)}</strong>, 
                 Unit No. <strong className="underline px-1 text-gray-950 font-bold">{receiptInvoice.unitNumber}</strong>, a total sum of 
                 Rupees <strong className="underline px-1 text-gray-950 font-bold text-sm">{numberToWords(activeReceipt.amount).replace(' Rupees Only', '')}</strong> 
                 Only, on account of <strong className="underline px-1 text-gray-950">{activeReceipt.receivedFor || 'Monthly Invoices'}</strong> 
@@ -807,7 +816,7 @@ export default function InvoicesPage() {
             <div className="space-y-4 pt-4">
               <div className="bg-gray-50 p-3 rounded-md text-sm mb-2 border">
                 <p><strong>Unit:</strong> {editingInvoice.unitNumber || editingInvoice.unitId}</p>
-                <p><strong>Tenant:</strong> {editingInvoice.tenantName || editingInvoice.tenantId}</p>
+                <p><strong>Tenant:</strong> {formatTenantName(editingInvoice.tenantName || editingInvoice.tenantId)}</p>
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
@@ -895,7 +904,7 @@ export default function InvoicesPage() {
           {payingInvoice && (
             <div className="space-y-4 pt-3">
               <div className="bg-gray-50 border p-3.5 rounded-lg space-y-1 text-sm">
-                <p><strong>Resident Name:</strong> {payingInvoice.tenantName}</p>
+                <p><strong>Resident Name:</strong> {formatTenantName(payingInvoice.tenantName)}</p>
                 <p><strong>Unit / Apartment:</strong> {payingInvoice.unitNumber}</p>
                 <p><strong>For Cycle Month:</strong> {payingInvoice.month}</p>
                 <p className="text-base text-indigo-700 pt-1 border-t mt-1.5 flex justify-between font-bold">
@@ -1024,7 +1033,7 @@ export default function InvoicesPage() {
               <div className="grid grid-cols-2 gap-y-1.5 text-xs mb-5 border p-3 rounded-md bg-gray-50">
                 <div><strong>Unit Number:</strong> {viewingInvoice.unitNumber}</div>
                 <div className="text-right"><strong>Invoice No:</strong> {viewingInvoice.id.substring(0, 10).toUpperCase()}</div>
-                <div><strong>Owner/Tenant:</strong> {viewingInvoice.tenantName}</div>
+                <div><strong>Owner/Tenant:</strong> {formatTenantName(viewingInvoice.tenantName)}</div>
                 <div className="text-right"><strong>Date (AD):</strong> {getNepaliDate(viewingInvoice.createdAt).ad}</div>
                 <div><strong>Billing Month:</strong> <span className="uppercase font-bold">{viewingInvoice.month}</span></div>
                 <div className="text-right"><strong>Date (BS):</strong> {getNepaliDate(viewingInvoice.createdAt).bs.split(' (')[0]}</div>
@@ -1236,7 +1245,7 @@ export default function InvoicesPage() {
 
               <div className="border border-black p-4 rounded-sm bg-gray-50/50 space-y-3 text-xs text-gray-900 relative overflow-hidden leading-relaxed">
                 <div>
-                  Received with thanks from Mr./Mrs./Ms. <strong className="underline px-1 text-gray-950 font-bold">{receiptInvoice.tenantName}</strong>, 
+                  Received with thanks from Mr./Mrs./Ms. <strong className="underline px-1 text-gray-950 font-bold">{formatTenantName(receiptInvoice.tenantName)}</strong>, 
                   Unit No. <strong className="underline px-1 text-gray-950 font-bold">{receiptInvoice.unitNumber}</strong>, a total sum of 
                   Rupees <strong className="underline px-1 text-gray-950 font-bold text-xs">{numberToWords(activeReceipt.amount).replace(' Rupees Only', '')}</strong> 
                   Only, on account of <strong className="underline px-1 text-gray-950">{activeReceipt.receivedFor || 'Monthly Invoices'}</strong> 
