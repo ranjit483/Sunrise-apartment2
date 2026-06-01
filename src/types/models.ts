@@ -144,12 +144,8 @@ export interface ChartOfAccount {
   code: string
   name: string
   type: string
-  parentCode?: string
-  description?: string
-  status: 'active' | 'inactive'
   isSystemLocked?: boolean
-  createdAt: string
-  updatedAt?: string
+  createdAt?: string
 }
 
 export interface ElectricityReading {
