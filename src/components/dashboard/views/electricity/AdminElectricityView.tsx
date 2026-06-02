@@ -299,7 +299,7 @@ export default function AdminElectricityView() {
               <TableHeader>
                 <TableRow>
                   <TableHead>Date</TableHead>
-                  <TableHead>Tenant ID</TableHead>
+                  <TableHead>Resident/Tenant ID</TableHead>
                   <TableHead>Readings (Prev → Curr)</TableHead>
                   <TableHead>Consumed</TableHead>
                   <TableHead>Total Bill</TableHead>
@@ -315,10 +315,12 @@ export default function AdminElectricityView() {
                     </TableCell>
                   </TableRow>
                 ) : (
-                  filteredReadings.map((reading) => (
+                  filteredReadings.map((reading) => {
+                    const rUnit = units.find(u => u.id === reading.unitId);
+                    return (
                     <TableRow key={reading.id}>
                       <TableCell>{new Date(reading.readingDate).toLocaleDateString()}</TableCell>
-                      <TableCell className="font-mono text-xs">{reading.tenantId.substring(0, 8)}...</TableCell>
+                      <TableCell className="font-medium text-blue-700">{rUnit ? rUnit.unitNumber : 'Unknown'}</TableCell>
                       <TableCell>
                         {reading.previousReading} → <strong>{reading.currentReading}</strong>
                       </TableCell>
@@ -364,7 +366,8 @@ export default function AdminElectricityView() {
                         )}
                       </TableCell>
                     </TableRow>
-                  ))
+                    );
+                  })
                 )}
               </TableBody>
             </Table>
