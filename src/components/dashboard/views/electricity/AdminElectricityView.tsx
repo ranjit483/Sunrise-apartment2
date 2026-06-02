@@ -368,7 +368,10 @@ export default function AdminElectricityView() {
                 ) : (
                   filteredReadings.map((reading) => {
                     const rUnit = units.find(u => u.id === reading.unitId);
-                    const rUser = users.find(u => u.uid === reading.tenantId || u.id === reading.tenantId);
+                    const rUser = users.find(u => 
+                      (reading.tenantId && (u.uid === reading.tenantId || u.id === reading.tenantId)) || 
+                      (rUnit && u.unitNumber === rUnit.unitNumber)
+                    );
                     const tenantName = rUser?.fullName || rUnit?.tenantName || 'Unknown Tenant';
                     return (
                     <TableRow key={reading.id}>
