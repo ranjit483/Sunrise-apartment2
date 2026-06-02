@@ -216,6 +216,21 @@ export default function InvoicesPage() {
         }
       })
 
+      // Convert "June 2026" to "2026-06" format for querying readings
+      const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+      const [mName, yyyy] = invoiceMonth.split(' ');
+      const mm = String(monthNames.indexOf(mName) + 1).padStart(2, '0');
+      const targetMonthStr = `${yyyy}-${mm}`; 
+
+      // Fetch electricity readings for the target month
+      const readingsSnap = await getDocs(query(collection(db, 'electricity_readings'), where('month', '==', targetMonthStr), where('status', '==', 'approved')));
+      const readingsByUnit: Record<string, any> = {};
+      readingsSnap.forEach((doc: any) => {
+        const data = doc.data();
+        // If multiple, just keep the latest or accumulate. Usually one per month.
+        readingsByUnit[data.unitId] = data;
+      });
+
       const batch = writeBatch(db)
       let count = 0
       
@@ -223,17 +238,21 @@ export default function InvoicesPage() {
         const unitNumberKey = user.unitNumber ? user.unitNumber.toLowerCase().trim() : ''
         const matchingUnit = unitsByNumber[unitNumberKey]
         
+        const readingData = matchingUnit ? readingsByUnit[matchingUnit.id] : null;
+        const eReading = readingData ? readingData.currentReading : 0;
+        const eAmount = readingData ? readingData.totalBill : 0;
+
         const invoiceRef = doc(collection(db, 'invoices'))
         batch.set(invoiceRef, {
           id: invoiceRef.id,
           unitId: matchingUnit ? matchingUnit.id : 'N/A',
           tenantId: user.uid || user.id,
           unitNumber: matchingUnit ? matchingUnit.unitNumber : (user.unitNumber || 'N/A'),
-          tenantName: user.name || user.email || 'Unknown',
+          tenantName: user.name || user.email || user.fullName || 'Unknown',
           month: invoiceMonth,
           amount: matchingUnit ? (matchingUnit.rent || 0) : 0,
-          electricityReading: 0,
-          electricityAmount: 0,
+          electricityReading: eReading,
+          electricityAmount: eAmount,
           utilityAmount: 0,
           waterAmount: 0,
           otherAmount: 0,

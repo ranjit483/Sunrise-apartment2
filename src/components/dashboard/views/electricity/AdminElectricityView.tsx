@@ -9,14 +9,15 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog'
 import { db } from '@/config/firebase'
-import { collection, query, orderBy, onSnapshot, doc, updateDoc, writeBatch, getDocs, getDoc, setDoc, where } from 'firebase/firestore'
+import { collection, query, orderBy, onSnapshot, doc, updateDoc, writeBatch, getDocs, getDoc } from 'firebase/firestore'
 import { ElectricityReading, Invoice, Unit, SystemSettings } from '@/types/models'
-import { Loader2, CheckCircle2, XCircle, Clock, Zap, Edit2 } from 'lucide-react'
+import { Loader2, CheckCircle2, XCircle, Clock, Zap, Edit2, Search } from 'lucide-react'
 
 export default function AdminElectricityView() {
   const [readings, setReadings] = useState<ElectricityReading[]>([])
   const [loading, setLoading] = useState(true)
   const [filter, setFilter] = useState('all')
+  const [searchQuery, setSearchQuery] = useState('')
 
   const [units, setUnits] = useState<Unit[]>([])
   const [users, setUsers] = useState<any[]>([])
@@ -145,11 +146,8 @@ export default function AdminElectricityView() {
       const total = consumed * pricePerUnit
       const monthStr = new Date().toISOString().substring(0, 7)
 
-      const batch = writeBatch(db)
-
-      const newRef = doc(collection(db, 'electricity_readings'))
       const reading: ElectricityReading = {
-        id: newRef.id,
+        id: doc(collection(db, 'electricity_readings')).id,
         unitId: unitObj.id,
         tenantId: unitObj.tenantId || '',
         previousReading,
@@ -158,37 +156,16 @@ export default function AdminElectricityView() {
         pricePerUnit,
         totalBill: total,
         readingDate: new Date().toISOString(),
-        status: 'approved', // Auto approve since admin is doing it
+        status: 'approved',
         photoUrl: '',
         month: monthStr,
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString()
       }
-      batch.set(newRef, reading)
+      
+      await writeBatch(db).set(doc(db, 'electricity_readings', reading.id), reading).commit()
 
-      // Auto generate invoice
-      const invoiceRef = doc(collection(db, 'invoices'))
-      const invoice: Invoice = {
-        id: invoiceRef.id,
-        unitId: unitObj.id,
-        tenantId: unitObj.tenantId || '',
-        month: monthStr,
-        amount: 0,
-        electricityReading: currentVal,
-        electricityAmount: total,
-        utilityAmount: 0,
-        waterAmount: 0,
-        otherAmount: 0,
-        paidAmount: 0,
-        dueDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
-        status: 'pending',
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString()
-      }
-      batch.set(invoiceRef, invoice)
-
-      await batch.commit()
-      alert("Reading recorded and invoice generated successfully.")
+      alert("Reading recorded successfully.")
       setCurrentReadingInput('')
       setSelectedUnit('')
     } catch (error: any) {
@@ -254,7 +231,25 @@ export default function AdminElectricityView() {
     }
   }
 
-  const filteredReadings = readings.filter(r => filter === 'all' || r.status === filter)
+  const filteredReadings = readings.filter(r => {
+    if (filter !== 'all' && r.status !== filter) return false
+    
+    if (searchQuery.trim() !== '') {
+      const q = searchQuery.toLowerCase().trim()
+      const rUnit = units.find(u => u.id === r.unitId);
+      const rUser = users.find(u => 
+        (r.tenantId && (u.uid === r.tenantId || u.id === r.tenantId)) || 
+        (rUnit && u.unitNumber === rUnit.unitNumber)
+      );
+      const tenantName = rUser?.fullName || rUnit?.tenantName || 'Unknown Tenant';
+      const unitNumber = rUnit?.unitNumber || '';
+      
+      if (!tenantName.toLowerCase().includes(q) && !unitNumber.toLowerCase().includes(q)) {
+        return false;
+      }
+    }
+    return true;
+  })
 
   if (loading) {
     return <div className="flex justify-center p-8"><Loader2 className="h-8 w-8 animate-spin" /></div>
@@ -330,18 +325,29 @@ export default function AdminElectricityView() {
             <CardTitle>Meter Readings Management</CardTitle>
             <CardDescription>Review and approve resident submissions</CardDescription>
           </div>
-          <div className="w-[180px]">
-            <Select value={filter} onValueChange={setFilter}>
-              <SelectTrigger>
-                <SelectValue placeholder="Filter by status" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Statuses</SelectItem>
-                <SelectItem value="pending_verification">Pending Verification</SelectItem>
-                <SelectItem value="approved">Approved</SelectItem>
-                <SelectItem value="rejected">Rejected</SelectItem>
-              </SelectContent>
-            </Select>
+          <div className="flex gap-2">
+            <div className="relative">
+              <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+              <Input
+                placeholder="Search tenant or unit..."
+                className="pl-9 w-[220px]"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+              />
+            </div>
+            <div className="w-[180px]">
+              <Select value={filter} onValueChange={setFilter}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Filter by status" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Statuses</SelectItem>
+                  <SelectItem value="pending_verification">Pending Verification</SelectItem>
+                  <SelectItem value="approved">Approved</SelectItem>
+                  <SelectItem value="rejected">Rejected</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
           </div>
         </CardHeader>
         <CardContent>
