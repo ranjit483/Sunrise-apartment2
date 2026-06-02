@@ -29,6 +29,10 @@ export default function AdminElectricityView() {
         const uSnap = await getDocs(collection(db, 'units'))
         const uData: Unit[] = []
         uSnap.forEach((doc: any) => uData.push({ id: doc.id, ...doc.data() } as Unit))
+        
+        // Sort units alphanumerically (e.g. A-1, A-2, A-10)
+        uData.sort((a, b) => a.unitNumber.localeCompare(b.unitNumber, undefined, { numeric: true, sensitivity: 'base' }))
+        
         setUnits(uData)
 
         const sSnap = await getDoc(doc(db, 'settings', 'general'))
