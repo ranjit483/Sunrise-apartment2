@@ -28,6 +28,7 @@ interface LedgerEntry {
   credit: number
   balance: number
   status: string
+  timestamp: string
 }
 
 export default function TenantLedgerPage() {
@@ -101,6 +102,7 @@ export default function TenantLedgerPage() {
         rawEntries.push({
           id: inv.id,
           date: inv.createdAt ? inv.createdAt.split('T')[0] : inv.month + '-01',
+          timestamp: inv.createdAt || inv.month + '-01T00:00:00Z',
           type: 'invoice',
           description: `Invoice for ${inv.month} (${inv.unitNumber || 'Unit'})`,
           debit: inv.amount,
@@ -117,6 +119,7 @@ export default function TenantLedgerPage() {
         rawEntries.push({
           id: pay.id,
           date: pay.paidAt ? pay.paidAt.split('T')[0] : (pay.createdAt ? pay.createdAt.split('T')[0] : ''),
+          timestamp: pay.paidAt || pay.createdAt || '2000-01-01T00:00:00Z',
           type: 'payment',
           description: `Payment via ${pay.method} (Ref: ${pay.transactionId || 'N/A'})`,
           debit: 0,
@@ -126,8 +129,16 @@ export default function TenantLedgerPage() {
       }
     })
 
-    // Sort chronologically
-    rawEntries.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
+    // Sort chronologically by exact timestamp, invoices before payments if exact same time
+    rawEntries.sort((a, b) => {
+      const timeA = new Date(a.timestamp).getTime()
+      const timeB = new Date(b.timestamp).getTime()
+      if (timeA !== timeB) return timeA - timeB
+      
+      if (a.type === 'invoice' && b.type === 'payment') return -1
+      if (a.type === 'payment' && b.type === 'invoice') return 1
+      return 0
+    })
 
     // Calculate running balance
     let currentBalance = 0
