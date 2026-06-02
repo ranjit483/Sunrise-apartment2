@@ -168,62 +168,6 @@ export default function ResidentElectricityView() {
       <div className="space-y-6">
         <Card>
           <CardHeader>
-            <CardTitle>Submit Meter Reading</CardTitle>
-            <CardDescription>Enter your current electricity meter reading</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <form onSubmit={handleSubmitReading} className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label>Previous Reading</Label>
-                  <Input value={previousReading} disabled className="bg-muted" />
-                </div>
-                <div className="space-y-2">
-                  <Label>Current Reading *</Label>
-                  <Input 
-                    type="number" 
-                    required 
-                    value={currentReadingInput}
-                    onChange={(e) => setCurrentReadingInput(e.target.value)}
-                    placeholder="e.g. 1540"
-                  />
-                </div>
-              </div>
-
-              <div className="bg-blue-50 p-3 rounded-lg border border-blue-100">
-                <p className="text-sm text-blue-800 flex justify-between">
-                  <span>Consumption:</span>
-                  <strong>{currentReadingInput && !isNaN(parseFloat(currentReadingInput)) ? Math.max(0, parseFloat(currentReadingInput) - previousReading) : 0} Units</strong>
-                </p>
-                <p className="text-sm text-blue-800 flex justify-between mt-1">
-                  <span>Est. Bill (at Rs. {pricePerUnit}/unit):</span>
-                  <strong>Rs. {currentReadingInput && !isNaN(parseFloat(currentReadingInput)) ? (Math.max(0, parseFloat(currentReadingInput) - previousReading) * pricePerUnit).toLocaleString() : 0}</strong>
-                </p>
-              </div>
-
-              <div className="space-y-2">
-                <Label>Photo Proof (Optional URL for now)</Label>
-                <div className="flex gap-2">
-                  <Input 
-                    type="url"
-                    placeholder="Paste image URL here" 
-                    value={photoUrl}
-                    onChange={e => setPhotoUrl(e.target.value)}
-                  />
-                </div>
-                <p className="text-xs text-muted-foreground">Upload feature integration pending storage setup.</p>
-              </div>
-
-              <Button type="submit" className="w-full" disabled={isSubmitting}>
-                {isSubmitting ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <Zap className="h-4 w-4 mr-2" />}
-                Submit Reading
-              </Button>
-            </form>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
             <CardTitle>Usage Trends</CardTitle>
             <CardDescription>Your electricity consumption over time</CardDescription>
           </CardHeader>

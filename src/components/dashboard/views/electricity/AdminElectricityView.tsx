@@ -8,8 +8,8 @@ import { Label } from '@/components/ui/label'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { db } from '@/config/firebase'
-import { collection, query, orderBy, onSnapshot, doc, updateDoc, writeBatch } from 'firebase/firestore'
-import { ElectricityReading, Invoice } from '@/types/models'
+import { collection, query, orderBy, onSnapshot, doc, updateDoc, writeBatch, getDocs, getDoc, setDoc, where } from 'firebase/firestore'
+import { ElectricityReading, Invoice, Unit, SystemSettings } from '@/types/models'
 import { Loader2, CheckCircle2, XCircle, Clock, Zap } from 'lucide-react'
 
 export default function AdminElectricityView() {
@@ -17,7 +17,31 @@ export default function AdminElectricityView() {
   const [loading, setLoading] = useState(true)
   const [filter, setFilter] = useState('all')
 
+  const [units, setUnits] = useState<Unit[]>([])
+  const [selectedUnit, setSelectedUnit] = useState<string>('')
+  const [pricePerUnit, setPricePerUnit] = useState(15)
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [currentReadingInput, setCurrentReadingInput] = useState('')
+
   useEffect(() => {
+    const fetchUnitsAndSettings = async () => {
+      try {
+        const uSnap = await getDocs(collection(db, 'units'))
+        const uData: Unit[] = []
+        uSnap.forEach((doc: any) => uData.push({ id: doc.id, ...doc.data() } as Unit))
+        setUnits(uData)
+
+        const sSnap = await getDoc(doc(db, 'settings', 'general'))
+        if (sSnap.exists()) {
+          const s = sSnap.data() as SystemSettings
+          if (s.electricityPricePerUnit) setPricePerUnit(s.electricityPricePerUnit)
+        }
+      } catch (e) {
+        console.error(e)
+      }
+    }
+    fetchUnitsAndSettings()
+
     const q = query(
       collection(db, 'electricity_readings'),
       orderBy('readingDate', 'desc')
@@ -26,7 +50,7 @@ export default function AdminElectricityView() {
     const unsubscribe = onSnapshot(q, (snapshot: any) => {
       const data: ElectricityReading[] = []
       snapshot.forEach((doc: any) => {
-        data.push(doc.data() as ElectricityReading)
+        data.push({ id: doc.id, ...doc.data() } as ElectricityReading)
       })
       setReadings(data)
       setLoading(false)
@@ -34,6 +58,92 @@ export default function AdminElectricityView() {
 
     return () => unsubscribe()
   }, [])
+
+  // Calculate previous reading dynamically based on selected unit
+  const previousReading = selectedUnit 
+    ? readings.find(r => r.unitId === selectedUnit && r.status !== 'rejected')?.currentReading || 0
+    : 0
+
+  const handleRecordReading = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!selectedUnit) {
+      alert("Please select a unit")
+      return
+    }
+
+    const currentVal = parseFloat(currentReadingInput)
+    if (isNaN(currentVal)) {
+      alert("Please enter a valid number")
+      return
+    }
+
+    if (currentVal < previousReading) {
+      alert(`Current reading (${currentVal}) cannot be less than previous reading (${previousReading}).`)
+      return
+    }
+
+    const unitObj = units.find(u => u.id === selectedUnit)
+    if (!unitObj) return
+
+    setIsSubmitting(true)
+    try {
+      const consumed = currentVal - previousReading
+      const total = consumed * pricePerUnit
+      const monthStr = new Date().toISOString().substring(0, 7)
+
+      const batch = writeBatch(db)
+
+      const newRef = doc(collection(db, 'electricity_readings'))
+      const reading: ElectricityReading = {
+        id: newRef.id,
+        unitId: unitObj.id,
+        tenantId: unitObj.tenantId || '',
+        previousReading,
+        currentReading: currentVal,
+        totalConsumed: consumed,
+        pricePerUnit,
+        totalBill: total,
+        readingDate: new Date().toISOString(),
+        status: 'approved', // Auto approve since admin is doing it
+        photoUrl: '',
+        month: monthStr,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      }
+      batch.set(newRef, reading)
+
+      // Auto generate invoice
+      const invoiceRef = doc(collection(db, 'invoices'))
+      const invoice: Invoice = {
+        id: invoiceRef.id,
+        unitId: unitObj.id,
+        tenantId: unitObj.tenantId || '',
+        month: monthStr,
+        amount: 0,
+        electricityReading: currentVal,
+        electricityAmount: total,
+        utilityAmount: 0,
+        waterAmount: 0,
+        otherAmount: 0,
+        paidAmount: 0,
+        dueDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
+        status: 'pending',
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      }
+      batch.set(invoiceRef, invoice)
+
+      await batch.commit()
+      alert("Reading recorded and invoice generated successfully.")
+      setCurrentReadingInput('')
+      setSelectedUnit('')
+    } catch (error: any) {
+      console.error(error)
+      alert("Error recording reading: " + error.message)
+    } finally {
+      setIsSubmitting(false)
+    }
+  }
 
   const handleApprove = async (reading: ElectricityReading) => {
     if (!confirm("Are you sure you want to approve this reading?")) return
@@ -98,6 +208,67 @@ export default function AdminElectricityView() {
 
   return (
     <div className="space-y-6">
+      <Card>
+        <CardHeader>
+          <CardTitle>Record Meter Reading</CardTitle>
+          <CardDescription>Enter the current electricity meter reading for a unit</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <form onSubmit={handleRecordReading} className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="space-y-2">
+                <Label>Select Unit</Label>
+                <Select value={selectedUnit} onValueChange={setSelectedUnit}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select a unit" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {units.map(u => (
+                      <SelectItem key={u.id} value={u.id}>
+                        {u.unitNumber} {u.tenantName ? `(${u.tenantName})` : ''}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-2">
+                <Label>Previous Reading</Label>
+                <Input value={selectedUnit ? previousReading : '-'} disabled className="bg-muted" />
+              </div>
+              <div className="space-y-2">
+                <Label>Current Reading *</Label>
+                <Input 
+                  type="number" 
+                  required 
+                  value={currentReadingInput}
+                  onChange={(e) => setCurrentReadingInput(e.target.value)}
+                  placeholder="e.g. 1540"
+                  disabled={!selectedUnit}
+                />
+              </div>
+            </div>
+
+            {selectedUnit && currentReadingInput && !isNaN(parseFloat(currentReadingInput)) && (
+              <div className="bg-blue-50 p-3 rounded-lg border border-blue-100 flex gap-6">
+                <p className="text-sm text-blue-800">
+                  <span>Consumption: </span>
+                  <strong>{Math.max(0, parseFloat(currentReadingInput) - previousReading)} Units</strong>
+                </p>
+                <p className="text-sm text-blue-800">
+                  <span>Est. Bill (at Rs. {pricePerUnit}/unit): </span>
+                  <strong>Rs. {(Math.max(0, parseFloat(currentReadingInput) - previousReading) * pricePerUnit).toLocaleString()}</strong>
+                </p>
+              </div>
+            )}
+
+            <Button type="submit" className="w-full md:w-auto" disabled={isSubmitting || !selectedUnit}>
+              {isSubmitting ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <Zap className="h-4 w-4 mr-2" />}
+              Submit Reading & Auto-Approve
+            </Button>
+          </form>
+        </CardContent>
+      </Card>
+
       <Card>
         <CardHeader className="flex flex-row items-center justify-between pb-2">
           <div>
