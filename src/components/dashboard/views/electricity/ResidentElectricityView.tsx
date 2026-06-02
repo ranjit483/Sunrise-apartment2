@@ -32,20 +32,30 @@ export default function ResidentElectricityView() {
 
     const fetchUnitAndSettings = async () => {
       try {
-        // Fetch Unit
-        const q = query(collection(db, 'units'), where('tenantId', '==', user.uid))
-        const snapshot = await getDocs(q)
-        if (!snapshot.empty) {
-          const unitData = snapshot.docs[0].data() as Unit
-          setUnit(unitData)
-        } else if (profile?.unitNumber) {
-          // Fallback if tenantId isn't exact but unitNumber exists
-          const q2 = query(collection(db, 'units'), where('unitNumber', '==', profile.unitNumber))
+        let foundUnit: Unit | null = null
+
+        // 1. Try matching tenantId
+        const q1 = query(collection(db, 'units'), where('tenantId', '==', user.uid))
+        const snap1 = await getDocs(q1)
+        if (!snap1.empty) {
+          foundUnit = snap1.docs[0].data() as Unit
+        } else {
+          // 2. Try matching ownerId (for RESIDENT role)
+          const q2 = query(collection(db, 'units'), where('ownerId', '==', user.uid))
           const snap2 = await getDocs(q2)
           if (!snap2.empty) {
-             setUnit(snap2.docs[0].data() as Unit)
+            foundUnit = snap2.docs[0].data() as Unit
+          } else if (profile?.unitNumber) {
+            // 3. Fallback matching unitNumber string
+            const q3 = query(collection(db, 'units'), where('unitNumber', '==', profile.unitNumber))
+            const snap3 = await getDocs(q3)
+            if (!snap3.empty) {
+              foundUnit = snap3.docs[0].data() as Unit
+            }
           }
         }
+
+        setUnit(foundUnit)
 
         // Fetch settings
         const settingsRef = doc(db, 'settings', 'general')
@@ -63,16 +73,23 @@ export default function ResidentElectricityView() {
   }, [user, profile])
 
   useEffect(() => {
-    if (!unit) {
-      if (loading) setLoading(false)
-      return
-    }
+    if (!user) return
 
-    const q = query(
-      collection(db, 'electricity_readings'), 
-      where('unitId', '==', unit.id),
-      orderBy('readingDate', 'desc')
-    )
+    // If we have a unit, fetch by unitId. Otherwise fallback to tenantId matching user.uid
+    let q;
+    if (unit) {
+      q = query(
+        collection(db, 'electricity_readings'), 
+        where('unitId', '==', unit.id),
+        orderBy('readingDate', 'desc')
+      )
+    } else {
+      q = query(
+        collection(db, 'electricity_readings'), 
+        where('tenantId', '==', user.uid),
+        orderBy('readingDate', 'desc')
+      )
+    }
 
     const unsubscribe = onSnapshot(q, (snapshot: any) => {
       const data: ElectricityReading[] = []
@@ -88,7 +105,7 @@ export default function ResidentElectricityView() {
     })
 
     return () => unsubscribe()
-  }, [unit])
+  }, [unit, user])
 
   const handleSubmitReading = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -153,7 +170,7 @@ export default function ResidentElectricityView() {
     return <div className="flex justify-center p-8"><Loader2 className="h-8 w-8 animate-spin" /></div>
   }
 
-  if (!unit) {
+  if (!unit && readings.length === 0) {
     return (
       <Card>
         <CardContent className="p-8 text-center text-muted-foreground">
