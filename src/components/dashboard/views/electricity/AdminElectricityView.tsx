@@ -7,10 +7,11 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog'
 import { db } from '@/config/firebase'
 import { collection, query, orderBy, onSnapshot, doc, updateDoc, writeBatch, getDocs, getDoc, setDoc, where } from 'firebase/firestore'
 import { ElectricityReading, Invoice, Unit, SystemSettings } from '@/types/models'
-import { Loader2, CheckCircle2, XCircle, Clock, Zap } from 'lucide-react'
+import { Loader2, CheckCircle2, XCircle, Clock, Zap, Edit2 } from 'lucide-react'
 
 export default function AdminElectricityView() {
   const [readings, setReadings] = useState<ElectricityReading[]>([])
@@ -22,6 +23,49 @@ export default function AdminElectricityView() {
   const [pricePerUnit, setPricePerUnit] = useState(15)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [currentReadingInput, setCurrentReadingInput] = useState('')
+
+  // Edit State
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false)
+  const [editingReading, setEditingReading] = useState<ElectricityReading | null>(null)
+  const [editPrev, setEditPrev] = useState('')
+  const [editCurr, setEditCurr] = useState('')
+
+  const handleEditClick = (reading: ElectricityReading) => {
+    setEditingReading(reading)
+    setEditPrev(reading.previousReading.toString())
+    setEditCurr(reading.currentReading.toString())
+    setIsEditModalOpen(true)
+  }
+
+  const handleSaveEdit = async () => {
+    if (!editingReading) return
+    const prev = parseFloat(editPrev)
+    const curr = parseFloat(editCurr)
+    if (isNaN(prev) || isNaN(curr)) {
+      alert("Please enter valid numbers.")
+      return
+    }
+    if (curr < prev) {
+      alert("Current reading cannot be less than previous.")
+      return
+    }
+    
+    try {
+      const consumed = curr - prev
+      const total = consumed * editingReading.pricePerUnit
+      await updateDoc(doc(db, 'electricity_readings', editingReading.id), {
+        previousReading: prev,
+        currentReading: curr,
+        totalConsumed: consumed,
+        totalBill: total
+      })
+      setIsEditModalOpen(false)
+      setEditingReading(null)
+    } catch (e) {
+      console.error(e)
+      alert("Failed to update reading")
+    }
+  }
 
   useEffect(() => {
     const fetchUnitsAndSettings = async () => {
@@ -211,6 +255,7 @@ export default function AdminElectricityView() {
   }
 
   return (
+    <>
     <div className="space-y-6">
       <Card>
         <CardHeader>
@@ -320,7 +365,12 @@ export default function AdminElectricityView() {
                     return (
                     <TableRow key={reading.id}>
                       <TableCell>{new Date(reading.readingDate).toLocaleDateString()}</TableCell>
-                      <TableCell className="font-medium text-blue-700">{rUnit ? rUnit.unitNumber : 'Unknown'}</TableCell>
+                      <TableCell>
+                        <div className="flex flex-col">
+                          <span className="font-medium text-gray-900">{rUnit?.tenantName || 'Unknown Tenant'}</span>
+                          <span className="text-xs text-muted-foreground">{rUnit ? rUnit.unitNumber : 'Unknown Unit'}</span>
+                        </div>
+                      </TableCell>
                       <TableCell>
                         {reading.previousReading} → <strong>{reading.currentReading}</strong>
                       </TableCell>
@@ -338,7 +388,16 @@ export default function AdminElectricityView() {
                           {reading.status.replace('_', ' ')}
                         </div>
                       </TableCell>
-                      <TableCell className="text-right space-x-2">
+                      <TableCell className="text-right space-x-2 whitespace-nowrap">
+                        <Button 
+                          size="sm" 
+                          variant="outline" 
+                          className="mr-2"
+                          onClick={() => handleEditClick(reading)}
+                        >
+                          <Edit2 className="h-3 w-3 mr-1" />
+                          Edit
+                        </Button>
                         {reading.status === 'pending_verification' && (
                           <>
                             <Button 
@@ -375,5 +434,36 @@ export default function AdminElectricityView() {
         </CardContent>
       </Card>
     </div>
+
+      <Dialog open={isEditModalOpen} onOpenChange={setIsEditModalOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Edit Meter Reading</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <Label>Previous Reading</Label>
+              <Input 
+                type="number" 
+                value={editPrev} 
+                onChange={e => setEditPrev(e.target.value)} 
+              />
+            </div>
+            <div className="space-y-2">
+              <Label>Current Reading</Label>
+              <Input 
+                type="number" 
+                value={editCurr} 
+                onChange={e => setEditCurr(e.target.value)} 
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsEditModalOpen(false)}>Cancel</Button>
+            <Button onClick={handleSaveEdit}>Save Changes</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </>
   )
 }
