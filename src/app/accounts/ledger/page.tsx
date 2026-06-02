@@ -140,8 +140,7 @@ export default function TenantLedgerPage() {
       }
     })
 
-    // Reverse so newest is on top (optional, but standard for ledgers is oldest top or newest top. We'll do newest top)
-    finalEntries.reverse()
+    // finalEntries.reverse()
 
     setEntries(finalEntries)
     setTotalBilled(billed)
