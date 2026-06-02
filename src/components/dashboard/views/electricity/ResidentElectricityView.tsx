@@ -75,7 +75,6 @@ export default function ResidentElectricityView() {
   useEffect(() => {
     if (!user) return
 
-    // If we have a unit, fetch by unitId. Otherwise fallback to tenantId matching user.uid
     let q;
     if (unit) {
       q = query(
@@ -86,8 +85,8 @@ export default function ResidentElectricityView() {
     } else {
       q = query(
         collection(db, 'electricity_readings'), 
-        where('tenantId', '==', user.uid),
-        orderBy('readingDate', 'desc')
+        where('tenantId', '==', user.uid)
+        // Removed orderBy to prevent Firestore missing composite index error
       )
     }
 
@@ -96,11 +95,18 @@ export default function ResidentElectricityView() {
       snapshot.forEach((doc: any) => {
         data.push(doc.data() as ElectricityReading)
       })
+      
+      // Sort in memory (descending by readingDate)
+      data.sort((a, b) => new Date(b.readingDate).getTime() - new Date(a.readingDate).getTime())
+      
       setReadings(data)
       
       if (data.length > 0) {
         setPreviousReading(data[0].currentReading)
       }
+      setLoading(false)
+    }, (error: any) => {
+      console.error("Error fetching readings:", error)
       setLoading(false)
     })
 
