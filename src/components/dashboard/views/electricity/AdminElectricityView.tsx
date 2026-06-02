@@ -19,6 +19,7 @@ export default function AdminElectricityView() {
   const [filter, setFilter] = useState('all')
 
   const [units, setUnits] = useState<Unit[]>([])
+  const [users, setUsers] = useState<any[]>([])
   const [selectedUnit, setSelectedUnit] = useState<string>('')
   const [pricePerUnit, setPricePerUnit] = useState(15)
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -78,6 +79,11 @@ export default function AdminElectricityView() {
         uData.sort((a, b) => a.unitNumber.localeCompare(b.unitNumber, undefined, { numeric: true, sensitivity: 'base' }))
         
         setUnits(uData)
+
+        const userSnap = await getDocs(collection(db, 'users'))
+        const userData: any[] = []
+        userSnap.forEach((doc: any) => userData.push({ id: doc.id, ...doc.data() }))
+        setUsers(userData)
 
         const sSnap = await getDoc(doc(db, 'settings', 'general'))
         if (sSnap.exists()) {
@@ -362,12 +368,14 @@ export default function AdminElectricityView() {
                 ) : (
                   filteredReadings.map((reading) => {
                     const rUnit = units.find(u => u.id === reading.unitId);
+                    const rUser = users.find(u => u.uid === reading.tenantId || u.id === reading.tenantId);
+                    const tenantName = rUser?.fullName || rUnit?.tenantName || 'Unknown Tenant';
                     return (
                     <TableRow key={reading.id}>
                       <TableCell>{new Date(reading.readingDate).toLocaleDateString()}</TableCell>
                       <TableCell>
                         <div className="flex flex-col">
-                          <span className="font-medium text-gray-900">{rUnit?.tenantName || 'Unknown Tenant'}</span>
+                          <span className="font-medium text-gray-900">{tenantName}</span>
                           <span className="text-xs text-muted-foreground">{rUnit ? rUnit.unitNumber : 'Unknown Unit'}</span>
                         </div>
                       </TableCell>
