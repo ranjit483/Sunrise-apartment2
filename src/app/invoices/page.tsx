@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/button'
 import { db } from '@/config/firebase'
 import { collection, onSnapshot, query, orderBy, getDocs, doc, writeBatch, where, updateDoc } from 'firebase/firestore'
 import { Invoice, Unit, Payment } from '@/types/models'
-import { Loader2, Plus, Send, Edit2, CheckCircle2, Eye, Printer, FileText, Check, DollarSign } from 'lucide-react'
+import { Loader2, Plus, Send, Edit2, CheckCircle2, Eye, Printer, FileText, Check, DollarSign, Search } from 'lucide-react'
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -97,6 +97,7 @@ export default function InvoicesPage() {
   const { profile } = useAuth()
   const [invoices, setInvoices] = useState<Invoice[]>([])
   const [loading, setLoading] = useState(true)
+  const [searchQuery, setSearchQuery] = useState('')
   const [usersMap, setUsersMap] = useState<Record<string, string>>({})
 
   useEffect(() => {
@@ -466,6 +467,16 @@ export default function InvoicesPage() {
   const collectedAmount = invoices.filter(i => i.status === 'paid').reduce((acc, i) => acc + i.amount + (i.electricityAmount || 0) + (i.utilityAmount || 0) + (i.waterAmount || 0) + (i.otherAmount || 0), 0)
   const outstandingAmount = invoices.filter(i => i.status === 'pending' || i.status === 'overdue').reduce((acc, i) => acc + i.amount + (i.electricityAmount || 0) + (i.utilityAmount || 0) + (i.waterAmount || 0) + (i.otherAmount || 0), 0)
 
+  const filteredInvoices = invoices.filter(inv => {
+    if (!searchQuery) return true
+    const q = searchQuery.toLowerCase()
+    const tName = formatTenantName(inv.tenantName, inv.tenantId).toLowerCase()
+    const id = inv.id.toLowerCase()
+    const unit = (inv.unitNumber || inv.unitId).toLowerCase()
+    const month = inv.month.toLowerCase()
+    return tName.includes(q) || id.includes(q) || unit.includes(q) || month.includes(q)
+  })
+
   return (
     <DashboardLayout title="Invoices & Billing">
       <div className="space-y-6 no-print">
@@ -545,7 +556,18 @@ export default function InvoicesPage() {
         </div>
 
         <Card>
-          <CardHeader><CardTitle>All Invoices</CardTitle></CardHeader>
+          <CardHeader className="flex flex-row items-center justify-between">
+            <CardTitle>All Invoices</CardTitle>
+            <div className="relative w-64">
+              <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+              <Input
+                placeholder="Search invoices..."
+                className="pl-8 bg-white"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+              />
+            </div>
+          </CardHeader>
           <CardContent>
             {loading ? (
               <div className="flex justify-center py-8"><Loader2 className="h-8 w-8 animate-spin text-muted-foreground" /></div>
@@ -572,7 +594,7 @@ export default function InvoicesPage() {
                     </tr>
                   </thead>
                   <tbody>
-                    {invoices.map((inv) => {
+                    {filteredInvoices.map((inv) => {
                       const total = inv.amount + (inv.electricityAmount || 0) + (inv.utilityAmount || 0) + (inv.waterAmount || 0) + (inv.otherAmount || 0)
                       return (
                         <tr key={inv.id} className="border-b hover:bg-gray-50/50">
