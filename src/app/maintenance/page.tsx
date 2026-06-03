@@ -401,7 +401,7 @@ export default function MaintenancePage() {
                     </div>
 
                     {/* Conditional Structural Location Dropdown */}
-                    {scope === 'Common_Area' ? (
+                    {scope === 'Common_Area' && (
                       <div className="space-y-2">
                         <Label className="text-sm font-semibold">Location *</Label>
                         <Select required value={structuralLocation} onValueChange={setStructuralLocation}>
@@ -411,12 +411,13 @@ export default function MaintenancePage() {
                           </SelectContent>
                         </Select>
                       </div>
-                    ) : (
-                      <div className="space-y-2">
-                        <Label className="text-sm font-semibold">Unit Number</Label>
-                        <Input disabled value={profile?.unitNumber ? `${profile.buildingId || ''} - ${profile.unitNumber}` : 'General'} />
-                      </div>
                     )}
+
+                    {/* Unit Number */}
+                    <div className="space-y-2">
+                      <Label className="text-sm font-semibold">Unit Number</Label>
+                      <Input disabled value={profile?.unitNumber ? `${profile.buildingId || ''} - ${profile.unitNumber}` : 'General'} />
+                    </div>
                   </div>
 
                   {/* Title */}
