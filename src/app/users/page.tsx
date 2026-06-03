@@ -40,6 +40,7 @@ const roleColors: Record<string, string> = {
   OFFICE_STAFF: 'bg-cyan-100 text-cyan-800',
   GUARD: 'bg-red-100 text-red-800',
   ACCOUNTANT: 'bg-teal-100 text-teal-800',
+  RESIDENT: 'bg-amber-100 text-amber-800',
 }
 
 const roleLabels: Record<string, string> = {
@@ -52,6 +53,7 @@ const roleLabels: Record<string, string> = {
   PLUMBER: 'Plumber',
   GUARD: 'Guard',
   ACCOUNTANT: 'Accountant',
+  RESIDENT: 'Resident',
 }
 
 const TOWER_UNITS: Record<string, string[]> = {
@@ -213,7 +215,7 @@ export default function UsersPage() {
   });
 
   const activeUsers = filteredUsers.filter(u => u.status === 'approved')
-  const residents = filteredUsers.filter(u => u.role === 'OWNER')
+  const residents = filteredUsers.filter(u => u.role === 'OWNER' || u.role === 'RESIDENT')
   const tenants = filteredUsers.filter(u => u.role === 'TENANT')
   const staff = filteredUsers.filter(u => ['PLUMBER', 'GUARD', 'OFFICE_STAFF', 'MANAGER', 'ACCOUNTANT'].includes(u.role))
 
