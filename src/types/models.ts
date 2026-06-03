@@ -34,6 +34,8 @@ export interface Invoice {
   amount: number
   electricityReading?: number
   electricityAmount?: number
+  generatorReading?: number
+  generatorAmount?: number
   utilityAmount?: number
   waterAmount?: number
   otherAmount?: number
@@ -152,6 +154,7 @@ export interface ElectricityReading {
   id: string
   unitId: string
   tenantId: string
+  meterType?: 'city' | 'generator'
   previousReading: number
   currentReading: number
   totalConsumed: number
@@ -175,6 +178,7 @@ export interface SystemSettings {
   autoGenerateInvoices: boolean
   sendEmailReminders: boolean
   electricityPricePerUnit?: number
+  generatorPricePerUnit?: number
 }
 
 export interface UserSettings {

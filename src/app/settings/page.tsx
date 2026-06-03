@@ -23,6 +23,7 @@ const defaultSystemSettings: SystemSettings = {
   autoGenerateInvoices: true,
   sendEmailReminders: true,
   electricityPricePerUnit: 15,
+  generatorPricePerUnit: 25,
 }
 
 const defaultUserSettings: UserSettings = {
@@ -216,7 +217,12 @@ export default function SettingsPage() {
                   <div className="space-y-2 pt-2 border-t mt-2">
                     <Label>Electricity Price Per Unit (Rs.)</Label>
                     <Input value={globalSettings.electricityPricePerUnit || ''} onChange={(e) => handleChangeGlobal('electricityPricePerUnit', parseFloat(e.target.value) || 0)} type="number" />
-                    <p className="text-xs text-muted-foreground">This rate is used to calculate the monthly electricity bills based on meter readings.</p>
+                    <p className="text-xs text-muted-foreground">This rate is used to calculate the monthly City electricity bills based on meter readings.</p>
+                  </div>
+                  <div className="space-y-2 pt-2 border-t mt-2">
+                    <Label>Generator (DG) Price Per Unit (Rs.)</Label>
+                    <Input value={globalSettings.generatorPricePerUnit || ''} onChange={(e) => handleChangeGlobal('generatorPricePerUnit', parseFloat(e.target.value) || 0)} type="number" />
+                    <p className="text-xs text-muted-foreground">This rate is used to calculate the monthly Generator electricity bills based on meter readings.</p>
                   </div>
                   <div className="flex items-center justify-between">
                     <Label>Send Email Reminders</Label>

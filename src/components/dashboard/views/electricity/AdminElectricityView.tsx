@@ -22,7 +22,9 @@ export default function AdminElectricityView() {
   const [units, setUnits] = useState<Unit[]>([])
   const [users, setUsers] = useState<any[]>([])
   const [selectedUnit, setSelectedUnit] = useState<string>('')
-  const [pricePerUnit, setPricePerUnit] = useState(15)
+  const [meterType, setMeterType] = useState<'city' | 'generator'>('city')
+  const [cityPricePerUnit, setCityPricePerUnit] = useState(15)
+  const [generatorPricePerUnit, setGeneratorPricePerUnit] = useState(25)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [currentReadingInput, setCurrentReadingInput] = useState('')
 
@@ -89,7 +91,8 @@ export default function AdminElectricityView() {
         const sSnap = await getDoc(doc(db, 'settings', 'general'))
         if (sSnap.exists()) {
           const s = sSnap.data() as SystemSettings
-          if (s.electricityPricePerUnit) setPricePerUnit(s.electricityPricePerUnit)
+          if (s.electricityPricePerUnit) setCityPricePerUnit(s.electricityPricePerUnit)
+          if (s.generatorPricePerUnit) setGeneratorPricePerUnit(s.generatorPricePerUnit)
         }
       } catch (e) {
         console.error(e)
@@ -114,10 +117,12 @@ export default function AdminElectricityView() {
     return () => unsubscribe()
   }, [])
 
-  // Calculate previous reading dynamically based on selected unit
+  // Calculate previous reading dynamically based on selected unit AND meter type
   const previousReading = selectedUnit 
-    ? readings.find(r => r.unitId === selectedUnit && r.status !== 'rejected')?.currentReading || 0
+    ? readings.find(r => r.unitId === selectedUnit && r.status !== 'rejected' && (r.meterType || 'city') === meterType)?.currentReading || 0
     : 0
+    
+  const currentPricePerUnit = meterType === 'city' ? cityPricePerUnit : generatorPricePerUnit;
 
   const handleRecordReading = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -143,17 +148,18 @@ export default function AdminElectricityView() {
     setIsSubmitting(true)
     try {
       const consumed = currentVal - previousReading
-      const total = consumed * pricePerUnit
+      const total = consumed * currentPricePerUnit
       const monthStr = new Date().toISOString().substring(0, 7)
 
       const reading: ElectricityReading = {
         id: doc(collection(db, 'electricity_readings')).id,
         unitId: unitObj.id,
         tenantId: unitObj.tenantId || '',
+        meterType,
         previousReading,
         currentReading: currentVal,
         totalConsumed: consumed,
-        pricePerUnit,
+        pricePerUnit: currentPricePerUnit,
         totalBill: total,
         readingDate: new Date().toISOString(),
         status: 'approved',
@@ -282,6 +288,18 @@ export default function AdminElectricityView() {
                 </Select>
               </div>
               <div className="space-y-2">
+                <Label>Meter Type</Label>
+                <Select value={meterType} onValueChange={(v: 'city' | 'generator') => setMeterType(v)}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select meter type" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="city">City Electricity</SelectItem>
+                    <SelectItem value="generator">Generator (DG)</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-2">
                 <Label>Previous Reading</Label>
                 <Input value={selectedUnit ? previousReading : '-'} disabled className="bg-muted" />
               </div>
@@ -305,8 +323,8 @@ export default function AdminElectricityView() {
                   <strong>{Math.max(0, parseFloat(currentReadingInput) - previousReading)} Units</strong>
                 </p>
                 <p className="text-sm text-blue-800">
-                  <span>Est. Bill (at Rs. {pricePerUnit}/unit): </span>
-                  <strong>Rs. {(Math.max(0, parseFloat(currentReadingInput) - previousReading) * pricePerUnit).toLocaleString()}</strong>
+                  <span>Est. Bill (at Rs. {currentPricePerUnit}/unit): </span>
+                  <strong>Rs. {(Math.max(0, parseFloat(currentReadingInput) - previousReading) * currentPricePerUnit).toLocaleString()}</strong>
                 </p>
               </div>
             )}
@@ -357,6 +375,7 @@ export default function AdminElectricityView() {
                 <TableRow>
                   <TableHead>Date</TableHead>
                   <TableHead>Resident/Tenant ID</TableHead>
+                  <TableHead>Meter Type</TableHead>
                   <TableHead>Readings (Prev → Curr)</TableHead>
                   <TableHead>Consumed</TableHead>
                   <TableHead>Total Bill</TableHead>
@@ -386,6 +405,13 @@ export default function AdminElectricityView() {
                         <div className="flex flex-col">
                           <span className="font-medium text-gray-900">{tenantName}</span>
                           <span className="text-xs text-muted-foreground">{rUnit ? rUnit.unitNumber : 'Unknown Unit'}</span>
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <div className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold ${
+                          (!reading.meterType || reading.meterType === 'city') ? 'bg-blue-100 text-blue-800' : 'bg-orange-100 text-orange-800'
+                        }`}>
+                          {(!reading.meterType || reading.meterType === 'city') ? 'City' : 'DG'}
                         </div>
                       </TableCell>
                       <TableCell>

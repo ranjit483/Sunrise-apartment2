@@ -224,11 +224,15 @@ export default function InvoicesPage() {
 
       // Fetch electricity readings for the target month
       const readingsSnap = await getDocs(query(collection(db, 'electricity_readings'), where('month', '==', targetMonthStr), where('status', '==', 'approved')));
-      const readingsByUnit: Record<string, any> = {};
+      const readingsByUnit: Record<string, { city?: any, generator?: any }> = {};
       readingsSnap.forEach((doc: any) => {
         const data = doc.data();
-        // If multiple, just keep the latest or accumulate. Usually one per month.
-        readingsByUnit[data.unitId] = data;
+        if (!readingsByUnit[data.unitId]) readingsByUnit[data.unitId] = {};
+        
+        const mType = data.meterType || 'city';
+        // If multiple, just keep the latest. Usually one per month.
+        if (mType === 'city') readingsByUnit[data.unitId].city = data;
+        if (mType === 'generator') readingsByUnit[data.unitId].generator = data;
       });
 
       const batch = writeBatch(db)
@@ -239,8 +243,10 @@ export default function InvoicesPage() {
         const matchingUnit = unitsByNumber[unitNumberKey]
         
         const readingData = matchingUnit ? readingsByUnit[matchingUnit.id] : null;
-        const eReading = readingData ? readingData.currentReading : 0;
-        const eAmount = readingData ? readingData.totalBill : 0;
+        const eReading = readingData?.city ? readingData.city.currentReading : 0;
+        const eAmount = readingData?.city ? readingData.city.totalBill : 0;
+        const gReading = readingData?.generator ? readingData.generator.currentReading : 0;
+        const gAmount = readingData?.generator ? readingData.generator.totalBill : 0;
 
         const invoiceRef = doc(collection(db, 'invoices'))
         batch.set(invoiceRef, {
@@ -253,6 +259,8 @@ export default function InvoicesPage() {
           amount: matchingUnit ? (matchingUnit.rent || 0) : 0,
           electricityReading: eReading,
           electricityAmount: eAmount,
+          generatorReading: gReading,
+          generatorAmount: gAmount,
           utilityAmount: 0,
           waterAmount: 0,
           otherAmount: 0,
@@ -332,7 +340,7 @@ export default function InvoicesPage() {
     setPaymentMethod('cash')
     setBankName('')
     setChequeNumber('')
-    const totalAmount = invoice.amount + (invoice.electricityAmount || 0) + (invoice.utilityAmount || 0) + (invoice.waterAmount || 0) + (invoice.otherAmount || 0) - (invoice.paidAmount || 0)
+    const totalAmount = invoice.amount + (invoice.electricityAmount || 0) + (invoice.generatorAmount || 0) + (invoice.utilityAmount || 0) + (invoice.waterAmount || 0) + (invoice.otherAmount || 0) - (invoice.paidAmount || 0)
     setReceiveAmount(totalAmount.toString())
     setChequeAmount(totalAmount.toString())
     setIsReceiveModalOpen(true)
@@ -350,7 +358,7 @@ export default function InvoicesPage() {
       const batch = writeBatch(db)
       const paymentRef = doc(collection(db, 'payments'))
       
-      const invoiceTotal = payingInvoice.amount + (payingInvoice.electricityAmount || 0) + (payingInvoice.utilityAmount || 0) + (payingInvoice.waterAmount || 0) + (payingInvoice.otherAmount || 0)
+      const invoiceTotal = payingInvoice.amount + (payingInvoice.electricityAmount || 0) + (payingInvoice.generatorAmount || 0) + (payingInvoice.utilityAmount || 0) + (payingInvoice.waterAmount || 0) + (payingInvoice.otherAmount || 0)
       const prevPaid = payingInvoice.paidAmount || 0
       const remainingTotal = invoiceTotal - prevPaid
 
@@ -450,6 +458,8 @@ export default function InvoicesPage() {
         amount: Number(editingInvoice.amount),
         electricityReading: Number(editingInvoice.electricityReading || 0),
         electricityAmount: Number(editingInvoice.electricityAmount || 0),
+        generatorReading: Number(editingInvoice.generatorReading || 0),
+        generatorAmount: Number(editingInvoice.generatorAmount || 0),
         utilityAmount: Number(editingInvoice.utilityAmount || 0),
         waterAmount: Number(editingInvoice.waterAmount || 0),
         otherAmount: Number(editingInvoice.otherAmount || 0),
@@ -483,8 +493,8 @@ export default function InvoicesPage() {
   const draftCount = invoices.filter(i => i.status === 'draft').length
   const pendingCount = invoices.filter(i => i.status === 'pending').length
   const overdueCount = invoices.filter(i => i.status === 'overdue').length
-  const collectedAmount = invoices.filter(i => i.status === 'paid').reduce((acc, i) => acc + i.amount + (i.electricityAmount || 0) + (i.utilityAmount || 0) + (i.waterAmount || 0) + (i.otherAmount || 0), 0)
-  const outstandingAmount = invoices.filter(i => i.status === 'pending' || i.status === 'overdue').reduce((acc, i) => acc + i.amount + (i.electricityAmount || 0) + (i.utilityAmount || 0) + (i.waterAmount || 0) + (i.otherAmount || 0), 0)
+  const collectedAmount = invoices.filter(i => i.status === 'paid').reduce((acc, i) => acc + i.amount + (i.electricityAmount || 0) + (i.generatorAmount || 0) + (i.utilityAmount || 0) + (i.waterAmount || 0) + (i.otherAmount || 0), 0)
+  const outstandingAmount = invoices.filter(i => i.status === 'pending' || i.status === 'overdue').reduce((acc, i) => acc + i.amount + (i.electricityAmount || 0) + (i.generatorAmount || 0) + (i.utilityAmount || 0) + (i.waterAmount || 0) + (i.otherAmount || 0), 0)
 
   const filteredInvoices = invoices.filter(inv => {
     if (!searchQuery) return true
@@ -614,7 +624,7 @@ export default function InvoicesPage() {
                   </thead>
                   <tbody>
                     {filteredInvoices.map((inv) => {
-                      const total = inv.amount + (inv.electricityAmount || 0) + (inv.utilityAmount || 0) + (inv.waterAmount || 0) + (inv.otherAmount || 0)
+                      const total = inv.amount + (inv.electricityAmount || 0) + (inv.generatorAmount || 0) + (inv.utilityAmount || 0) + (inv.waterAmount || 0) + (inv.otherAmount || 0)
                       return (
                         <tr key={inv.id} className="border-b hover:bg-gray-50/50">
                           <td className="py-3 font-medium">{inv.id.substring(0, 8)}...</td>
@@ -623,7 +633,7 @@ export default function InvoicesPage() {
                           <td className="py-3">{inv.month}</td>
                           <td className="py-3">{inv.dueDate}</td>
                           <td className="py-3">₨ {inv.amount.toLocaleString()}</td>
-                          <td className="py-3">₨ {(inv.electricityAmount || 0).toLocaleString()}</td>
+                          <td className="py-3">₨ {((inv.electricityAmount || 0) + (inv.generatorAmount || 0)).toLocaleString()}</td>
                           <td className="py-3">₨ {(inv.utilityAmount || 0).toLocaleString()}</td>
                           <td className="py-3">₨ {(inv.waterAmount || 0).toLocaleString()}</td>
                           <td className="py-3">₨ {(inv.otherAmount || 0).toLocaleString()}</td>
@@ -742,7 +752,7 @@ export default function InvoicesPage() {
                       <span className="text-xs text-gray-600">Meter usage and society power backup</span>
                     )}
                   </td>
-                  <td className="border border-black p-2 text-right font-medium">₨ {(viewingInvoice.electricityAmount || 0).toLocaleString()}</td>
+                  <td className="border border-black p-2 text-right font-medium">₨ {((viewingInvoice.electricityAmount || 0) + (viewingInvoice.generatorAmount || 0)).toLocaleString()}</td>
                 </tr>
                 <tr className="border-b border-black">
                   <td className="border border-black p-2 text-center">2.</td>
@@ -821,7 +831,7 @@ export default function InvoicesPage() {
                 <tr className="bg-gray-100 font-extrabold text-base border-t border-black text-gray-950">
                   <td colSpan={2} className="border border-black p-2.5 text-right uppercase tracking-wider">Grand Total:</td>
                   <td className="border border-black p-2.5 text-right font-black">
-                    ₨ {(viewingInvoice.amount + (viewingInvoice.electricityAmount || 0) + (viewingInvoice.utilityAmount || 0) + (viewingInvoice.waterAmount || 0) + (viewingInvoice.otherAmount || 0)).toLocaleString()}
+                    ₨ {(viewingInvoice.amount + (viewingInvoice.electricityAmount || 0) + (viewingInvoice.generatorAmount || 0) + (viewingInvoice.utilityAmount || 0) + (viewingInvoice.waterAmount || 0) + (viewingInvoice.otherAmount || 0)).toLocaleString()}
                   </td>
                 </tr>
               </tbody>
@@ -830,7 +840,7 @@ export default function InvoicesPage() {
             <div className="border border-black p-3.5 rounded-sm bg-gray-50 mb-6 text-sm">
               <strong className="text-xs uppercase text-gray-600 block mb-1">Amount in Words:</strong>
               <div className="font-bold text-gray-900 text-[15px]">
-                {numberToWords(viewingInvoice.amount + (viewingInvoice.electricityAmount || 0) + (viewingInvoice.utilityAmount || 0) + (viewingInvoice.waterAmount || 0) + (viewingInvoice.otherAmount || 0))}
+                {numberToWords(viewingInvoice.amount + (viewingInvoice.electricityAmount || 0) + (viewingInvoice.generatorAmount || 0) + (viewingInvoice.utilityAmount || 0) + (viewingInvoice.waterAmount || 0) + (viewingInvoice.otherAmount || 0))}
               </div>
             </div>
 
@@ -951,6 +961,22 @@ export default function InvoicesPage() {
                     onChange={e => setEditingInvoice({...editingInvoice, electricityAmount: Number(e.target.value)})} 
                   />
                 </div>
+                <div className="space-y-2">
+                  <Label>Generator Reading (Units)</Label>
+                  <Input 
+                    type="number" 
+                    value={editingInvoice.generatorReading || 0} 
+                    onChange={e => setEditingInvoice({...editingInvoice, generatorReading: Number(e.target.value)})} 
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label>Generator Amount (₨)</Label>
+                  <Input 
+                    type="number" 
+                    value={editingInvoice.generatorAmount || 0} 
+                    onChange={e => setEditingInvoice({...editingInvoice, generatorAmount: Number(e.target.value)})} 
+                  />
+                </div>
               </div>
               <div className="grid grid-cols-3 gap-4">
                 <div className="space-y-2">
@@ -1008,7 +1034,7 @@ export default function InvoicesPage() {
                 <div className="pt-2 mt-2 border-t space-y-2">
                   <div className="flex justify-between items-center text-base text-indigo-700 font-bold">
                     <span>Grand Total Receivable:</span>
-                    <span>₨ {(payingInvoice.amount + (payingInvoice.electricityAmount || 0) + (payingInvoice.utilityAmount || 0) + (payingInvoice.waterAmount || 0) + (payingInvoice.otherAmount || 0) - (payingInvoice.paidAmount || 0)).toLocaleString()}</span>
+                    <span>₨ {(payingInvoice.amount + (payingInvoice.electricityAmount || 0) + (payingInvoice.generatorAmount || 0) + (payingInvoice.utilityAmount || 0) + (payingInvoice.waterAmount || 0) + (payingInvoice.otherAmount || 0) - (payingInvoice.paidAmount || 0)).toLocaleString()}</span>
                   </div>
                   
                   <div className="flex justify-between items-center bg-white p-2 rounded border border-indigo-100">
@@ -1027,7 +1053,7 @@ export default function InvoicesPage() {
                   </div>
 
                   {(() => {
-                    const invoiceTotal = payingInvoice.amount + (payingInvoice.electricityAmount || 0) + (payingInvoice.utilityAmount || 0) + (payingInvoice.waterAmount || 0) + (payingInvoice.otherAmount || 0)
+                    const invoiceTotal = payingInvoice.amount + (payingInvoice.electricityAmount || 0) + (payingInvoice.generatorAmount || 0) + (payingInvoice.utilityAmount || 0) + (payingInvoice.waterAmount || 0) + (payingInvoice.otherAmount || 0)
                     const prevPaid = payingInvoice.paidAmount || 0
                     const remainingTotal = invoiceTotal - prevPaid
                     const parsedAmount = parseFloat(paymentMethod === 'cheque' ? chequeAmount : receiveAmount)
@@ -1193,7 +1219,7 @@ export default function InvoicesPage() {
                         <span className="text-[10px] text-gray-600">Meter usage and society power backup</span>
                       )}
                     </td>
-                    <td className="border border-black p-2 text-right font-medium">₨ {(viewingInvoice.electricityAmount || 0).toLocaleString()}</td>
+                    <td className="border border-black p-2 text-right font-medium">₨ {((viewingInvoice.electricityAmount || 0) + (viewingInvoice.generatorAmount || 0)).toLocaleString()}</td>
                   </tr>
                   <tr className="border-b border-black">
                     <td className="border border-black p-2 text-center">2.</td>
@@ -1272,7 +1298,7 @@ export default function InvoicesPage() {
                   <tr className="bg-gray-100 font-extrabold text-[13px] border-t border-black text-gray-950">
                     <td colSpan={2} className="border border-black p-2 text-right uppercase tracking-wider">Grand Total:</td>
                     <td className="border border-black p-2 text-right font-black">
-                      ₨ {(viewingInvoice.amount + (viewingInvoice.electricityAmount || 0) + (viewingInvoice.utilityAmount || 0) + (viewingInvoice.waterAmount || 0) + (viewingInvoice.otherAmount || 0)).toLocaleString()}
+                      ₨ {(viewingInvoice.amount + (viewingInvoice.electricityAmount || 0) + (viewingInvoice.generatorAmount || 0) + (viewingInvoice.utilityAmount || 0) + (viewingInvoice.waterAmount || 0) + (viewingInvoice.otherAmount || 0)).toLocaleString()}
                     </td>
                   </tr>
                 </tbody>
@@ -1281,7 +1307,7 @@ export default function InvoicesPage() {
               <div className="border border-black p-3 rounded-sm bg-gray-50 mb-5 text-[11px]">
                 <strong className="text-[9px] uppercase text-gray-600 block mb-0.5">Amount in Words:</strong>
                 <div className="font-bold text-gray-900 text-xs">
-                  {numberToWords(viewingInvoice.amount + (viewingInvoice.electricityAmount || 0) + (viewingInvoice.utilityAmount || 0) + (viewingInvoice.waterAmount || 0) + (viewingInvoice.otherAmount || 0))}
+                  {numberToWords(viewingInvoice.amount + (viewingInvoice.electricityAmount || 0) + (viewingInvoice.generatorAmount || 0) + (viewingInvoice.utilityAmount || 0) + (viewingInvoice.waterAmount || 0) + (viewingInvoice.otherAmount || 0))}
                 </div>
               </div>
 
