@@ -109,6 +109,7 @@ export default function ComplaintsPage() {
       const newTicket: Omit<Complaint, 'id'> = {
         tenantId: profile.uid,
         tenantName: profile.fullName,
+        tenantUnit: profile.unitNumber ? `${profile.buildingId || ''} - ${profile.unitNumber}` : '',
         title,
         description,
         category,
@@ -362,7 +363,7 @@ export default function ComplaintsPage() {
                           <h4 className="font-bold text-gray-900 truncate">{c.title}</h4>
                           <p className="text-sm text-gray-500 line-clamp-1">{c.description}</p>
                           <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-gray-400 font-medium mt-1">
-                            <span className="flex items-center gap-1"><User className="h-3 w-3" /> Reported: {c.tenantName || 'Resident'}</span>
+                            <span className="flex items-center gap-1"><User className="h-3 w-3" /> Reported: {c.tenantName || 'Resident'} {c.tenantUnit ? `(Unit: ${c.tenantUnit})` : ''}</span>
                             <span className="flex items-center gap-1"><Calendar className="h-3 w-3" /> {new Date(c.createdAt).toLocaleDateString()}</span>
                           </div>
                         </div>
@@ -411,7 +412,10 @@ export default function ComplaintsPage() {
                     </div>
                     <div>
                       <p className="text-xs font-bold text-gray-400 uppercase">Reported By</p>
-                      <p className="font-semibold text-gray-800 mt-0.5">{activeComplaint.tenantName || 'Resident'}</p>
+                      <p className="font-semibold text-gray-800 mt-0.5">
+                        {activeComplaint.tenantName || 'Resident'}
+                        {activeComplaint.tenantUnit ? ` (Unit: ${activeComplaint.tenantUnit})` : ''}
+                      </p>
                     </div>
                     <div className="col-span-2">
                       <p className="text-xs font-bold text-gray-400 uppercase">Filing Date</p>

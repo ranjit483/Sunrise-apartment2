@@ -108,6 +108,7 @@ export interface Complaint {
   category?: string
   tenantId: string
   tenantName?: string
+  tenantUnit?: string
   status: 'open' | 'in_progress' | 'closed' | 'resolved'
   adminRemarks?: string
   createdAt: string
