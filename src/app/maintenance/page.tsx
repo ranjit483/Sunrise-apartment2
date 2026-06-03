@@ -36,13 +36,24 @@ const CATEGORIES_PRIVATE = ['Plumbing', 'Electrical', 'Carpentry & Masonry', 'Ap
 const CATEGORIES_COMMON = ['Civil Infrastructure', 'Utility Blocks', 'Safety & Security', 'Common Amenities']
 
 const COMMON_LOCATIONS = [
-  'Block A Elevator', 
-  'Block B Elevator', 
+  'Block A Elevator 1', 
+  'Block A Elevator 2', 
+  'Block B I Elevator 1',
+  'Block B I Elevator 2',
+  'Block B II Elevator 1',
+  'Block B II Elevator 2',
+  'Block A Lobby',
   'Block BI Lobby', 
   'Block BII Lobby', 
-  'Basement Parking B1', 
-  'Basement Parking B2', 
-  'Swimming Pool Block', 
+  'Basement 1 Parking', 
+  'Basement 2 Parking', 
+  'Block A Ground Floor Parking',
+  'Block B I Ground Floor Parking',
+  'Block B II Ground Floor Parking',
+  'Out Door Privert Parking',
+  'Visitor Parking',
+  'Society Garbage Area',
+  'Children Park',
   'Society Clubhouse Gym', 
   'Community Hall', 
   'Central Water Treatment Plant', 
@@ -350,7 +361,7 @@ export default function MaintenancePage() {
                   Raise New Request
                 </Button>
               </DialogTrigger>
-              <DialogContent className="max-w-lg rounded-xl shadow-2xl border-indigo-100">
+              <DialogContent className="max-w-lg rounded-xl shadow-2xl border-indigo-100 max-h-[90vh] overflow-y-auto">
                 <DialogHeader>
                   <DialogTitle className="text-2xl font-bold text-gray-900 flex items-center gap-2">
                     <Sparkles className="h-6 w-6 text-indigo-500" />
