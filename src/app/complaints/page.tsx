@@ -39,6 +39,7 @@ const COMPLAINT_CATEGORIES = ['Noise', 'Garbage/Cleaning', 'Security', 'Parking'
 export default function ComplaintsPage() {
   const { profile } = useAuth()
   const [complaints, setComplaints] = useState<Complaint[]>([])
+  const [usersMap, setUsersMap] = useState<Record<string, any>>({})
   const [loading, setLoading] = useState(true)
 
   // Modals state
@@ -95,6 +96,31 @@ export default function ComplaintsPage() {
 
     return () => unsubscribe()
   }, [profile])
+
+  useEffect(() => {
+    // Fetch users for resolving unit numbers for older complaints
+    const unsubUsers = onSnapshot(collection(db, 'users'), (snapshot: any) => {
+      const map: Record<string, any> = {}
+      snapshot.forEach((doc: any) => {
+        const data = doc.data()
+        map[doc.id] = data
+        if (data.fullName) {
+          map[data.fullName] = data
+        }
+      })
+      setUsersMap(map)
+    })
+    return () => unsubUsers()
+  }, [])
+
+  const getUnitDisplay = (c: Complaint) => {
+    if (c.tenantUnit) return `(Unit: ${c.tenantUnit})`
+    const user = usersMap[c.tenantId] || (c.tenantName && usersMap[c.tenantName])
+    if (user && user.unitNumber) {
+      return `(Unit: ${user.buildingId || ''} - ${user.unitNumber})`
+    }
+    return ''
+  }
 
   // Sync state if active complaint changes
   const activeComplaint = complaints.find(c => c.id === selectedComplaint?.id) || selectedComplaint
@@ -363,7 +389,7 @@ export default function ComplaintsPage() {
                           <h4 className="font-bold text-gray-900 truncate">{c.title}</h4>
                           <p className="text-sm text-gray-500 line-clamp-1">{c.description}</p>
                           <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-gray-400 font-medium mt-1">
-                            <span className="flex items-center gap-1"><User className="h-3 w-3" /> Reported: {c.tenantName || 'Resident'} {c.tenantUnit ? `(Unit: ${c.tenantUnit})` : ''}</span>
+                            <span className="flex items-center gap-1"><User className="h-3 w-3" /> Reported: {c.tenantName || 'Resident'} {getUnitDisplay(c)}</span>
                             <span className="flex items-center gap-1"><Calendar className="h-3 w-3" /> {new Date(c.createdAt).toLocaleDateString()}</span>
                           </div>
                         </div>
@@ -414,7 +440,7 @@ export default function ComplaintsPage() {
                       <p className="text-xs font-bold text-gray-400 uppercase">Reported By</p>
                       <p className="font-semibold text-gray-800 mt-0.5">
                         {activeComplaint.tenantName || 'Resident'}
-                        {activeComplaint.tenantUnit ? ` (Unit: ${activeComplaint.tenantUnit})` : ''}
+                        {getUnitDisplay(activeComplaint) ? ` ${getUnitDisplay(activeComplaint)}` : ''}
                       </p>
                     </div>
                     <div className="col-span-2">
