@@ -213,6 +213,7 @@ export default function UsersPage() {
   });
 
   const activeUsers = filteredUsers.filter(u => u.status === 'approved')
+  const residents = filteredUsers.filter(u => u.role === 'OWNER')
   const tenants = filteredUsers.filter(u => u.role === 'TENANT')
   const staff = filteredUsers.filter(u => ['PLUMBER', 'GUARD', 'OFFICE_STAFF', 'MANAGER', 'ACCOUNTANT'].includes(u.role))
 
@@ -254,9 +255,10 @@ export default function UsersPage() {
           )}
         </div>
 
-        <div className="grid gap-4 md:grid-cols-4">
+        <div className="grid gap-4 md:grid-cols-5">
           <Card><CardContent className="p-6"><p className="text-sm text-muted-foreground">Total Users</p><p className="text-2xl font-bold">{filteredUsers.length}</p></CardContent></Card>
           <Card><CardContent className="p-6"><p className="text-sm text-muted-foreground">Active Users</p><p className="text-2xl font-bold">{activeUsers.length}</p></CardContent></Card>
+          <Card><CardContent className="p-6"><p className="text-sm text-muted-foreground">Resident</p><p className="text-2xl font-bold">{residents.length}</p></CardContent></Card>
           <Card><CardContent className="p-6"><p className="text-sm text-muted-foreground">Tenants</p><p className="text-2xl font-bold">{tenants.length}</p></CardContent></Card>
           <Card><CardContent className="p-6"><p className="text-sm text-muted-foreground">Staff</p><p className="text-2xl font-bold">{staff.length}</p></CardContent></Card>
         </div>
