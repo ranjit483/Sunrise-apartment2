@@ -57,7 +57,8 @@ const COMMON_LOCATIONS = [
   'Society Clubhouse Gym', 
   'Community Hall', 
   'Central Water Treatment Plant', 
-  'Main Security Gate Boom Barrier'
+  'Main Security Gate Boom Barrier',
+  'Other'
 ]
 
 const DEFAULT_STAFF = [
@@ -361,7 +362,7 @@ export default function MaintenancePage() {
                   Raise New Request
                 </Button>
               </DialogTrigger>
-              <DialogContent className="max-w-lg rounded-xl shadow-2xl border-indigo-100 max-h-[90vh] overflow-y-auto">
+              <DialogContent className="max-w-lg rounded-xl shadow-2xl border-indigo-100 max-h-[90vh] flex flex-col">
                 <DialogHeader>
                   <DialogTitle className="text-2xl font-bold text-gray-900 flex items-center gap-2">
                     <Sparkles className="h-6 w-6 text-indigo-500" />
@@ -371,7 +372,8 @@ export default function MaintenancePage() {
                     Fill in details about the issue. Our management team will triage and dispatch a specialized technician immediately.
                   </DialogDescription>
                 </DialogHeader>
-                <form onSubmit={handleSubmitRequest} className="space-y-4 pt-2">
+                <div className="overflow-y-auto p-1 -mx-1">
+                  <form onSubmit={handleSubmitRequest} className="space-y-4 pt-2">
                   
                   {/* Scope Selector */}
                   <div className="space-y-2">
@@ -493,16 +495,16 @@ export default function MaintenancePage() {
 
                   <div className="flex justify-end gap-3 pt-3">
                     <Button type="button" variant="outline" onClick={() => setIsNewRequestOpen(false)}>Cancel</Button>
-                    <Button type="submit" disabled={isSubmitting} className="bg-indigo-600 hover:bg-indigo-700 text-white">
-                      {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                      Submit Request
+                    <Button type="submit" disabled={isSubmitting} className="bg-indigo-600 hover:bg-indigo-700 text-white min-w-[140px]">
+                      {isSubmitting ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Submit Request'}
                     </Button>
                   </div>
                 </form>
-              </DialogContent>
-            </Dialog>
-          )}
-        </div>
+              </div>
+            </DialogContent>
+          </Dialog>
+        )}
+      </div>
 
         {/* Dashboard Metric summary cards */}
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
