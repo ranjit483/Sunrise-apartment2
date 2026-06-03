@@ -747,20 +747,20 @@ export default function InvoicesPage() {
                   <td className="border border-black p-2">
                     <div><strong>Electricity Charge Including Usage Pool</strong></div>
                     {viewingInvoice.electricityReading ? (
-                      <span className="text-xs text-gray-600">Current Reading: {viewingInvoice.electricityReading} units (Rate: Rs. 16.80/unit)</span>
+                      <span className="text-xs text-gray-600">Current Reading: {viewingInvoice.electricityReading} units</span>
                     ) : (
-                      <span className="text-xs text-gray-600">Meter usage and society power backup</span>
+                      <span className="text-xs text-gray-600">Meter usage</span>
                     )}
                   </td>
-                  <td className="border border-black p-2 text-right font-medium">₨ {((viewingInvoice.electricityAmount || 0) + (viewingInvoice.generatorAmount || 0)).toLocaleString()}</td>
+                  <td className="border border-black p-2 text-right font-medium">₨ {(viewingInvoice.electricityAmount || 0).toLocaleString()}</td>
                 </tr>
                 <tr className="border-b border-black">
                   <td className="border border-black p-2 text-center">2.</td>
                   <td className="border border-black p-2">
                     <div><strong>Backup (Generator / DG meter flat fee)</strong></div>
-                    <span className="text-xs text-gray-600">Diesel generator standby charge</span>
+                    <span className="text-xs text-gray-600">{viewingInvoice.generatorReading || 0} Units</span>
                   </td>
-                  <td className="border border-black p-2 text-right font-medium">₨ 500</td>
+                  <td className="border border-black p-2 text-right font-medium">₨ {(viewingInvoice.generatorAmount || 0).toLocaleString()}</td>
                 </tr>
                 <tr className="border-b border-black">
                   <td className="border border-black p-2 text-center">3.</td>
@@ -1214,20 +1214,20 @@ export default function InvoicesPage() {
                     <td className="border border-black p-2">
                       <div><strong>Electricity Charge Including Usage Pool</strong></div>
                       {viewingInvoice.electricityReading ? (
-                        <span className="text-[10px] text-gray-600">Current Reading: {viewingInvoice.electricityReading} units (Rate: Rs. 16.80/unit)</span>
+                        <span className="text-[10px] text-gray-600">Current Reading: {viewingInvoice.electricityReading} units</span>
                       ) : (
-                        <span className="text-[10px] text-gray-600">Meter usage and society power backup</span>
+                        <span className="text-[10px] text-gray-600">Meter usage</span>
                       )}
                     </td>
-                    <td className="border border-black p-2 text-right font-medium">₨ {((viewingInvoice.electricityAmount || 0) + (viewingInvoice.generatorAmount || 0)).toLocaleString()}</td>
+                    <td className="border border-black p-2 text-right font-medium">₨ {(viewingInvoice.electricityAmount || 0).toLocaleString()}</td>
                   </tr>
                   <tr className="border-b border-black">
                     <td className="border border-black p-2 text-center">2.</td>
                     <td className="border border-black p-2">
                       <div><strong>Backup (Generator / DG meter flat fee)</strong></div>
-                      <span className="text-[10px] text-gray-600">Diesel generator standby charge</span>
+                      <span className="text-[10px] text-gray-600">{viewingInvoice.generatorReading || 0} Units</span>
                     </td>
-                    <td className="border border-black p-2 text-right font-medium">₨ 500</td>
+                    <td className="border border-black p-2 text-right font-medium">₨ {(viewingInvoice.generatorAmount || 0).toLocaleString()}</td>
                   </tr>
                   <tr className="border-b border-black">
                     <td className="border border-black p-2 text-center">3.</td>
