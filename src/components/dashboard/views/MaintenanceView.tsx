@@ -22,7 +22,7 @@ export function MaintenanceView({ profile }: { profile: any }) {
     const unsub = onSnapshot(query(collection(db, 'maintenance'), orderBy('createdAt', 'desc')), (snap: any) => {
       const allTickets = snap.docs.map((d: any) => ({ id: d.id, ...d.data() } as MaintenanceTicket))
       // Filter to only show tasks assigned to the currently logged in user
-      const userTickets = allTickets.filter(t => t.assignedTo === profile?.fullName)
+      const userTickets = allTickets.filter((t: MaintenanceTicket) => t.assignedTo === profile?.fullName)
       setTickets(userTickets)
     })
 
