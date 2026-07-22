@@ -80,11 +80,15 @@ export default function UnitsPage() {
   const [editingUnit, setEditingUnit] = useState<Unit | null>(null)
 
   useEffect(() => {
-    const unsubUnits = onSnapshot(query(collection(db, 'units'), orderBy('unitNumber')), (snapshot: any) => {
+    // Remove orderBy('unitNumber') from the query to avoid double sorting and let the client do natural sort
+    const unsubUnits = onSnapshot(query(collection(db, 'units')), (snapshot: any) => {
       const uData: Unit[] = []
       snapshot.forEach((doc: any) => {
         uData.push(doc.data() as Unit)
       })
+      // Sort naturally: A-1, A-2, A-10
+      uData.sort((a, b) => a.unitNumber.localeCompare(b.unitNumber, undefined, { numeric: true, sensitivity: 'base' }))
+      
       setUnits(uData)
       setLoading(false)
     }, (error: any) => {
