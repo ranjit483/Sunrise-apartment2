@@ -1,7 +1,7 @@
 'use client'
 
-import { useState } from 'react'
 import { useAuth } from '@/context/AuthContext'
+import { useTheme } from 'next-themes'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
 import Link from 'next/link'
@@ -24,7 +24,7 @@ interface NavbarProps {
 
 export function Navbar({ title, setMobileOpen }: NavbarProps) {
   const { user, profile, signOut } = useAuth()
-  const [darkMode, setDarkMode] = useState(false)
+  const { theme, setTheme } = useTheme()
 
   return (
     <header className="sticky top-0 z-30 flex h-16 items-center justify-between border-b bg-background px-4 md:px-6">
@@ -44,9 +44,9 @@ export function Navbar({ title, setMobileOpen }: NavbarProps) {
         <Button
           variant="ghost"
           size="icon"
-          onClick={() => setDarkMode(!darkMode)}
+          onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
         >
-          {darkMode ? (
+          {theme === 'dark' ? (
             <Sun className="h-5 w-5" />
           ) : (
             <Moon className="h-5 w-5" />
