@@ -6,9 +6,9 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { db } from '@/config/firebase'
-import { collection, onSnapshot, query, orderBy, doc, setDoc, deleteDoc } from 'firebase/firestore'
+import { collection, onSnapshot, query, orderBy, doc, setDoc, deleteDoc, updateDoc } from 'firebase/firestore'
 import { Building } from '@/types/models'
-import { Loader2, Trash2 } from 'lucide-react'
+import { Loader2, Trash2, Edit2 } from 'lucide-react'
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -21,9 +21,11 @@ export default function BuildingsPage() {
   const [loading, setLoading] = useState(true)
   
   const [isAddModalOpen, setIsAddModalOpen] = useState(false)
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false)
+  const [editingBuilding, setEditingBuilding] = useState<Building | null>(null)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [deleting, setDeleting] = useState<string | null>(null)
-  const { isAuthorized } = useRBAC()
+  const { isAuthorized, role } = useRBAC()
   
   const [newBuilding, setNewBuilding] = useState({
     name: '',
@@ -101,6 +103,32 @@ export default function BuildingsPage() {
       alert('Failed to delete building: ' + error.message)
     } finally {
       setDeleting(null)
+    }
+  }
+
+  const handleUpdateBuilding = async () => {
+    if (!editingBuilding || !editingBuilding.name || !editingBuilding.address) {
+      alert('Please fill in all required fields.')
+      return
+    }
+    
+    setIsSubmitting(true)
+    try {
+      await updateDoc(doc(db, 'buildings', editingBuilding.id), {
+        name: editingBuilding.name,
+        address: editingBuilding.address,
+        totalFloors: Number(editingBuilding.totalFloors),
+        totalUnits: Number(editingBuilding.totalUnits),
+        status: editingBuilding.status,
+        updatedAt: new Date().toISOString()
+      })
+      setIsEditModalOpen(false)
+      setEditingBuilding(null)
+    } catch (error: any) {
+      console.error('Error updating building:', error)
+      alert('Failed to update building: ' + error.message)
+    } finally {
+      setIsSubmitting(false)
     }
   }
 
@@ -214,11 +242,21 @@ export default function BuildingsPage() {
                           {deleting === b.id ? (
                             <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
                           ) : (
-                            isAuthorized('delete_records') && (
-                              <Button variant="ghost" size="sm" onClick={() => handleDeleteBuilding(b.id)}>
-                                <Trash2 className="h-4 w-4 text-red-500" />
-                              </Button>
-                            )
+                            <div className="flex gap-2">
+                              {role === 'SUPER_ADMIN' && (
+                                <Button variant="ghost" size="sm" onClick={() => {
+                                  setEditingBuilding(b)
+                                  setIsEditModalOpen(true)
+                                }}>
+                                  <Edit2 className="h-4 w-4 text-blue-500" />
+                                </Button>
+                              )}
+                              {isAuthorized('delete_records') && (
+                                <Button variant="ghost" size="sm" onClick={() => handleDeleteBuilding(b.id)}>
+                                  <Trash2 className="h-4 w-4 text-red-500" />
+                                </Button>
+                              )}
+                            </div>
                           )}
                         </td>
                       )}
@@ -230,6 +268,58 @@ export default function BuildingsPage() {
           </CardContent>
         </Card>
       </div>
+
+      {/* Edit Building Modal */}
+      {role === 'SUPER_ADMIN' && (
+        <Dialog open={isEditModalOpen} onOpenChange={setIsEditModalOpen}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Edit Building</DialogTitle>
+              <DialogDescription>Modify building details.</DialogDescription>
+            </DialogHeader>
+            {editingBuilding && (
+              <div className="space-y-4 pt-4">
+                <div className="space-y-2">
+                  <Label>Building Name</Label>
+                  <Input value={editingBuilding.name} onChange={e => setEditingBuilding({...editingBuilding, name: e.target.value})} />
+                </div>
+                <div className="space-y-2">
+                  <Label>Address</Label>
+                  <Input value={editingBuilding.address} onChange={e => setEditingBuilding({...editingBuilding, address: e.target.value})} />
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label>Total Floors</Label>
+                    <Input type="number" min="1" value={editingBuilding.totalFloors} onChange={e => setEditingBuilding({...editingBuilding, totalFloors: Number(e.target.value)})} />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Total Units</Label>
+                    <Input type="number" min="1" value={editingBuilding.totalUnits} onChange={e => setEditingBuilding({...editingBuilding, totalUnits: Number(e.target.value)})} />
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <Label>Status</Label>
+                  <Select value={editingBuilding.status} onValueChange={(v: any) => setEditingBuilding({...editingBuilding, status: v})}>
+                    <SelectTrigger><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="active">Active</SelectItem>
+                      <SelectItem value="maintenance">Maintenance</SelectItem>
+                      <SelectItem value="inactive">Inactive</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="flex justify-end gap-3 pt-4">
+                  <Button variant="outline" onClick={() => { setIsEditModalOpen(false); setEditingBuilding(null); }} disabled={isSubmitting}>Cancel</Button>
+                  <Button onClick={handleUpdateBuilding} disabled={isSubmitting}>
+                    {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                    Save Changes
+                  </Button>
+                </div>
+              </div>
+            )}
+          </DialogContent>
+        </Dialog>
+      )}
     </DashboardLayout>
   )
 }
