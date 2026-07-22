@@ -99,7 +99,7 @@ export function Sidebar({ collapsed, setCollapsed, mobileOpen, setMobileOpen }: 
       )}
       <aside
         className={cn(
-          'fixed left-0 top-0 z-40 h-screen bg-white border-r transition-all duration-300 lg:translate-x-0',
+          'fixed left-0 top-0 z-40 h-screen bg-background border-r transition-all duration-300 lg:translate-x-0',
           collapsed ? 'w-20' : 'w-64',
           mobileOpen ? 'translate-x-0' : '-translate-x-full'
         )}

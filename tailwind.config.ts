@@ -29,20 +29,20 @@ const config: Config = {
           foreground: '#FFFFFF',
         },
         muted: {
-          DEFAULT: '#F1F5F9',
-          foreground: '#64748B',
+          DEFAULT: 'hsl(var(--muted))',
+          foreground: 'hsl(var(--muted-foreground))',
         },
         accent: {
-          DEFAULT: '#F8FAFC',
-          foreground: '#0F172A',
+          DEFAULT: 'hsl(var(--accent))',
+          foreground: 'hsl(var(--accent-foreground))',
         },
         popover: {
-          DEFAULT: '#FFFFFF',
-          foreground: '#0F172A',
+          DEFAULT: 'hsl(var(--popover))',
+          foreground: 'hsl(var(--popover-foreground))',
         },
         card: {
-          DEFAULT: '#FFFFFF',
-          foreground: '#0F172A',
+          DEFAULT: 'hsl(var(--card))',
+          foreground: 'hsl(var(--card-foreground))',
         },
         success: '#10B981',
         warning: '#F59E0B',
