@@ -39,57 +39,13 @@ function LandingContent() {
   const { user, profile, loading } = useAuth()
   const [authModalOpen, setAuthModalOpen] = useState(false)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
-  const [checkingSetup, setCheckingSetup] = useState(true)
-
   useEffect(() => {
-    // Check if Super Admin exists
-    const checkSuperAdmin = async () => {
-      try {
-        // Fallback timeout in case Firestore hangs indefinitely
-        const timeout = new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), 5000))
-        const fetchPromise = async () => {
-          const usersCollection = collection(db, 'users')
-          const snapshot = await getDocs(usersCollection)
-          let hasSuperAdmin = false
-          snapshot.forEach((doc: any) => {
-            if (doc.data().role === 'SUPER_ADMIN' && doc.data().status === 'approved') {
-              hasSuperAdmin = true
-            }
-          })
-          return hasSuperAdmin
-        }
-        
-        const hasSuperAdmin = await Promise.race([fetchPromise(), timeout])
-
-        if (!hasSuperAdmin && !user) {
-          router.push('/setup')
-        }
-      } catch (err) {
-        console.error('Error checking Super Admin:', err)
-      } finally {
-        setCheckingSetup(false)
-      }
-    }
-
-    checkSuperAdmin()
-  }, [user, router])
-
-  useEffect(() => {
-    if (!loading && !checkingSetup) {
+    if (!loading) {
       if (user) {
         router.push('/dashboard')
       }
     }
-  }, [user, loading, router, checkingSetup])
-
-  if (checkingSetup) {
-    return (
-      <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mb-4"></div>
-        <p className="text-gray-500 font-medium">Checking system setup...</p>
-      </div>
-    )
-  }
+  }, [user, loading, router])
 
   if (loading) {
     return (
