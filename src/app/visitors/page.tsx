@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import React, { useState, useEffect, useMemo } from 'react'
 import { DashboardLayout } from '@/components/layout/DashboardLayout'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
@@ -11,6 +11,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
 import { db } from '@/config/firebase'
 import { collection, onSnapshot, query, orderBy, addDoc, updateDoc, doc } from 'firebase/firestore'
+import { useAuth } from '@/context/AuthContext'
 import { Visitor } from '@/types/models'
 import { Loader2, Car, User, LogOut, Bike } from 'lucide-react'
 
@@ -51,6 +52,7 @@ const VISITOR_PARKING_SLOTS = Array.from({ length: 30 }, (_, i) => `VP-${(i + 1)
 const VEHICLE_DETAIL_TYPES = ['Car', 'SUV', 'Van', 'Bike', 'Scooter', 'Other']
 
 export default function VisitorsPage() {
+  const { profile } = useAuth()
   const [visitors, setVisitors] = useState<Visitor[]>([])
   const [loading, setLoading] = useState(true)
 
@@ -150,10 +152,21 @@ export default function VisitorsPage() {
     }
   }
 
-  const currentlyInside = visitors.filter(v => v.status === 'entered').length
-  const pendingApproval = visitors.filter(v => v.status === 'waiting').length
+  const filteredVisitors = React.useMemo(() => {
+    if (!profile) return []
+    const isResident = ['OWNER', 'RESIDENT', 'TENANT'].includes(profile.role)
+    if (!isResident) return visitors
+    
+    if (profile.unitNumber) {
+      return visitors.filter(v => v.unitId.endsWith(`/ ${profile.unitNumber}`) || v.unitId === profile.unitNumber)
+    }
+    return visitors
+  }, [visitors, profile])
 
-  const occupiedVisitorSlots = visitors
+  const currentlyInside = filteredVisitors.filter(v => v.status === 'entered').length
+  const pendingApproval = filteredVisitors.filter(v => v.status === 'waiting').length
+
+  const occupiedVisitorSlots = filteredVisitors
     .filter(v => v.status === 'entered' && v.parkingSlot)
     .map(v => v.parkingSlot)
 
@@ -328,9 +341,9 @@ export default function VisitorsPage() {
         </div>
 
         <div className="grid gap-4 md:grid-cols-4">
-          <Card><CardContent className="p-6"><p className="text-sm text-muted-foreground">Today's Total</p><p className="text-2xl font-bold">{visitors.length}</p></CardContent></Card>
+          <Card><CardContent className="p-6"><p className="text-sm text-muted-foreground">Today's Total</p><p className="text-2xl font-bold">{filteredVisitors.length}</p></CardContent></Card>
           <Card><CardContent className="p-6"><p className="text-sm text-muted-foreground">Currently Inside</p><p className="text-2xl font-bold text-green-600">{currentlyInside}</p></CardContent></Card>
-          <Card><CardContent className="p-6"><p className="text-sm text-muted-foreground">This Week</p><p className="text-2xl font-bold">{visitors.length}</p></CardContent></Card>
+          <Card><CardContent className="p-6"><p className="text-sm text-muted-foreground">This Week</p><p className="text-2xl font-bold">{filteredVisitors.length}</p></CardContent></Card>
           <Card><CardContent className="p-6"><p className="text-sm text-muted-foreground">Pending Approval</p><p className="text-2xl font-bold text-yellow-600">{pendingApproval}</p></CardContent></Card>
         </div>
 
@@ -341,7 +354,7 @@ export default function VisitorsPage() {
           <CardContent>
             {loading ? (
               <div className="flex justify-center py-8"><Loader2 className="h-8 w-8 animate-spin text-muted-foreground" /></div>
-            ) : visitors.length === 0 ? (
+            ) : filteredVisitors.length === 0 ? (
               <div className="text-center py-8 text-muted-foreground">No visitors logged yet. Click "Register Visitor" to start.</div>
             ) : (
               <div className="overflow-x-auto overflow-y-hidden">
@@ -358,7 +371,7 @@ export default function VisitorsPage() {
                     </tr>
                   </thead>
                   <tbody>
-                    {visitors.map((v) => (
+                    {filteredVisitors.map((v) => (
                       <tr key={v.id} className="border-b hover:bg-gray-50">
                         <td className="py-3">
                           <p className="font-medium">{v.name}</p>
