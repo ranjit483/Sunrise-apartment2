@@ -61,6 +61,8 @@ export default function VisitorsPage() {
   // Modal State
   const [isRegisterModalOpen, setIsRegisterModalOpen] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [checkInVisitor, setCheckInVisitor] = useState<Visitor | null>(null)
+  const [checkInParkingSlot, setCheckInParkingSlot] = useState('')
   
   // Form State
   const [name, setName] = useState('')
@@ -143,17 +145,31 @@ export default function VisitorsPage() {
     }
   }
 
-  const handleCheckIn = async (visitorId: string) => {
-    if (!confirm('Are you sure you want to check in this visitor?')) return
+  const handleCheckIn = async (visitorId: string, assignedSlot?: string) => {
+    if (!assignedSlot && !confirm('Are you sure you want to check in this visitor?')) return
     try {
       const now = new Date().toISOString()
-      await updateDoc(doc(db, 'visitors', visitorId), {
+      const updateData: any = {
         status: 'entered',
         entryTime: now
-      })
+      }
+      if (assignedSlot) {
+        updateData.parkingSlot = assignedSlot
+      }
+      await updateDoc(doc(db, 'visitors', visitorId), updateData)
+      setCheckInVisitor(null)
     } catch (error) {
       console.error('Error checking in visitor:', error)
       alert('Failed to check in visitor')
+    }
+  }
+
+  const initiateCheckIn = (visitor: Visitor) => {
+    if (visitor.vehicleType !== 'pedestrian' && !visitor.parkingSlot) {
+      setCheckInVisitor(visitor)
+      setCheckInParkingSlot('')
+    } else {
+      handleCheckIn(visitor.id, visitor.parkingSlot)
     }
   }
 
@@ -334,17 +350,19 @@ export default function VisitorsPage() {
                         </div>
                       </div>
                     </div>
-                    <div className="space-y-2">
-                      <Label>Assigned Parking Slot *</Label>
-                      <Select required value={parkingSlot} onValueChange={setParkingSlot}>
-                        <SelectTrigger><SelectValue placeholder="Select slot..." /></SelectTrigger>
-                        <SelectContent className="max-h-[200px]">
-                          {availableVisitorSlots.map(slot => (
-                            <SelectItem key={slot} value={slot}>{slot}</SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </div>
+                    {!isResident && (
+                      <div className="space-y-2">
+                        <Label>Assigned Parking Slot *</Label>
+                        <Select required value={parkingSlot} onValueChange={setParkingSlot}>
+                          <SelectTrigger><SelectValue placeholder="Select slot..." /></SelectTrigger>
+                          <SelectContent className="max-h-[200px]">
+                            {availableVisitorSlots.map(slot => (
+                              <SelectItem key={slot} value={slot}>{slot}</SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    )}
                   </div>
                 )}
 
@@ -437,7 +455,7 @@ export default function VisitorsPage() {
                         </td>
                         <td className="py-3 text-right">
                           {v.status === 'waiting' && !isResident && (
-                            <Button size="sm" variant="outline" className="text-green-600 hover:text-green-700 hover:bg-green-50 border-green-200 mr-2" onClick={() => handleCheckIn(v.id)}>
+                            <Button size="sm" variant="outline" className="text-green-600 hover:text-green-700 hover:bg-green-50 border-green-200 mr-2" onClick={() => initiateCheckIn(v)}>
                               Check In
                             </Button>
                           )}
@@ -465,6 +483,34 @@ export default function VisitorsPage() {
           </CardContent>
         </Card>
       </div>
+
+      {/* Check In Modal for assigning parking slot */}
+      <Dialog open={!!checkInVisitor} onOpenChange={(open) => !open && setCheckInVisitor(null)}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Allot Parking & Check In</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 pt-4">
+            <div className="space-y-2">
+              <Label>Assign Parking Slot *</Label>
+              <Select value={checkInParkingSlot} onValueChange={setCheckInParkingSlot}>
+                <SelectTrigger><SelectValue placeholder="Select slot..." /></SelectTrigger>
+                <SelectContent className="max-h-[200px]">
+                  {availableVisitorSlots.map(slot => (
+                    <SelectItem key={slot} value={slot}>{slot}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="flex justify-end gap-3 pt-4">
+              <Button variant="outline" onClick={() => setCheckInVisitor(null)}>Cancel</Button>
+              <Button disabled={!checkInParkingSlot} onClick={() => handleCheckIn(checkInVisitor!.id, checkInParkingSlot)}>
+                Check In Visitor
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </DashboardLayout>
   )
 }
