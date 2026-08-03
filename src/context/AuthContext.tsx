@@ -9,6 +9,7 @@ export type UserRole =
   | 'SUPER_ADMIN'
   | 'MANAGER'
   | 'OFFICE_ASSISTANT'
+  | 'OWNER'
   | 'RESIDENT'
   | 'TENANT'
   | 'GENERAL_STAFF'

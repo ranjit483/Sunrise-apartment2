@@ -21,7 +21,7 @@ interface AuthModalProps {
 }
 
 type AuthMode = 'signin' | 'signup'
-type UserRole = 'MANAGER' | 'OFFICE_ASSISTANT' | 'RESIDENT' | 'TENANT' | 'GENERAL_STAFF' | 'PLUMBER' | 'ELECTRICIAN' | 'CLEANER' | 'GUARD' | 'ACCOUNTANT'
+type UserRole = 'MANAGER' | 'OFFICE_ASSISTANT' | 'OWNER' | 'RESIDENT' | 'TENANT' | 'GENERAL_STAFF' | 'PLUMBER' | 'ELECTRICIAN' | 'CLEANER' | 'GUARD' | 'ACCOUNTANT'
 
 const roles: { value: UserRole; label: string; description: string }[] = [
   { value: 'MANAGER', label: 'Manager', description: 'Manage properties and staff' },

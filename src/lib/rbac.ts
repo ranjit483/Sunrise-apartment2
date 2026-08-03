@@ -4,6 +4,7 @@ export const RoleHierarchy: Record<UserRole, number> = {
   SUPER_ADMIN: 1,
   MANAGER: 2,
   OFFICE_ASSISTANT: 3,
+  OWNER: 4,
   RESIDENT: 4,
   TENANT: 4,
   GENERAL_STAFF: 5,
@@ -34,6 +35,9 @@ const RolePermissions: Record<UserRole, PermissionAction[]> = {
     'view_financial_reports', 'manage_visitors'
   ],
   OFFICE_ASSISTANT: [
+    'manage_visitors'
+  ],
+  OWNER: [
     'manage_visitors'
   ],
   RESIDENT: [
