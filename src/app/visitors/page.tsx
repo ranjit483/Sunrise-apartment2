@@ -56,6 +56,8 @@ export default function VisitorsPage() {
   const [visitors, setVisitors] = useState<Visitor[]>([])
   const [loading, setLoading] = useState(true)
 
+  const isResident = profile ? ['OWNER', 'RESIDENT', 'TENANT'].includes(profile.role) : false
+
   // Modal State
   const [isRegisterModalOpen, setIsRegisterModalOpen] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -96,16 +98,19 @@ export default function VisitorsPage() {
 
     try {
       const now = new Date().toISOString()
-      const newVisitor: Omit<Visitor, 'id'> = {
+      const newVisitor: Partial<Visitor> = {
         name,
         unitId: `${hostTower} / ${hostUnit}`,
         phone,
         province,
         purpose,
         vehicleType,
-        entryTime: now,
-        status: 'entered',
+        status: isResident ? 'waiting' : 'entered',
         createdAt: now,
+      }
+
+      if (!isResident) {
+        newVisitor.entryTime = now
       }
 
       if (vehicleType !== 'pedestrian') {
@@ -138,6 +143,20 @@ export default function VisitorsPage() {
     }
   }
 
+  const handleCheckIn = async (visitorId: string) => {
+    if (!confirm('Are you sure you want to check in this visitor?')) return
+    try {
+      const now = new Date().toISOString()
+      await updateDoc(doc(db, 'visitors', visitorId), {
+        status: 'entered',
+        entryTime: now
+      })
+    } catch (error) {
+      console.error('Error checking in visitor:', error)
+      alert('Failed to check in visitor')
+    }
+  }
+
   const handleCheckOut = async (visitorId: string) => {
     if (!confirm('Are you sure you want to check out this visitor?')) return
     try {
@@ -154,14 +173,13 @@ export default function VisitorsPage() {
 
   const filteredVisitors = React.useMemo(() => {
     if (!profile) return []
-    const isResident = ['OWNER', 'RESIDENT', 'TENANT'].includes(profile.role)
     if (!isResident) return visitors
     
     if (profile.unitNumber) {
       return visitors.filter(v => v.unitId.endsWith(`/ ${profile.unitNumber}`) || v.unitId === profile.unitNumber)
     }
     return visitors
-  }, [visitors, profile])
+  }, [visitors, profile, isResident])
 
   const currentlyInside = filteredVisitors.filter(v => v.status === 'entered').length
   const pendingApproval = filteredVisitors.filter(v => v.status === 'waiting').length
@@ -191,11 +209,13 @@ export default function VisitorsPage() {
           
           <Dialog open={isRegisterModalOpen} onOpenChange={setIsRegisterModalOpen}>
             <DialogTrigger asChild>
-              <Button className="bg-green-600 hover:bg-green-700">Register Visitor</Button>
+              <Button className="bg-green-600 hover:bg-green-700">
+                {isResident ? "Pre-Register Visitor" : "Register Visitor"}
+              </Button>
             </DialogTrigger>
             <DialogContent className="max-w-md max-h-[95vh] overflow-y-auto">
               <DialogHeader>
-                <DialogTitle>New Visitor Registration</DialogTitle>
+                <DialogTitle>{isResident ? "Pre-Register Visitor" : "New Visitor Registration"}</DialogTitle>
               </DialogHeader>
               <form onSubmit={handleRegisterVisitor} className="space-y-4 pt-4">
                 <div className="space-y-2">
@@ -332,7 +352,7 @@ export default function VisitorsPage() {
                   <Button type="button" variant="outline" onClick={() => setIsRegisterModalOpen(false)}>Cancel</Button>
                   <Button type="submit" disabled={isSubmitting}>
                     {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                    Check In Visitor
+                    {isResident ? "Submit Pre-Registration" : "Check In Visitor"}
                   </Button>
                 </div>
               </form>
@@ -401,7 +421,11 @@ export default function VisitorsPage() {
                           )}
                         </td>
                         <td className="py-3">
-                          <p className="text-xs"><span className="font-semibold">In:</span> {new Date(v.entryTime).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</p>
+                          {v.entryTime ? (
+                            <p className="text-xs"><span className="font-semibold">In:</span> {new Date(v.entryTime).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</p>
+                          ) : (
+                            <p className="text-xs text-yellow-600 font-medium">Expected Today</p>
+                          )}
                           {v.exitTime && (
                             <p className="text-xs text-gray-500"><span className="font-semibold">Out:</span> {new Date(v.exitTime).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</p>
                           )}
@@ -412,13 +436,24 @@ export default function VisitorsPage() {
                           </Badge>
                         </td>
                         <td className="py-3 text-right">
-                          {v.status === 'entered' ? (
-                            <Button size="sm" variant="outline" className="text-red-600 hover:text-red-700 hover:bg-red-50 border-red-200" onClick={() => handleCheckOut(v.id)}>
-                              <LogOut className="h-4 w-4 mr-1" />
-                              Check Out
+                          {v.status === 'waiting' && !isResident && (
+                            <Button size="sm" variant="outline" className="text-green-600 hover:text-green-700 hover:bg-green-50 border-green-200 mr-2" onClick={() => handleCheckIn(v.id)}>
+                              Check In
                             </Button>
-                          ) : (
+                          )}
+                          {v.status === 'entered' ? (
+                            !isResident ? (
+                              <Button size="sm" variant="outline" className="text-red-600 hover:text-red-700 hover:bg-red-50 border-red-200" onClick={() => handleCheckOut(v.id)}>
+                                <LogOut className="h-4 w-4 mr-1" />
+                                Check Out
+                              </Button>
+                            ) : (
+                              <span className="text-xs text-gray-500 italic">Inside</span>
+                            )
+                          ) : v.status === 'exited' ? (
                             <span className="text-xs text-gray-400">Completed</span>
+                          ) : (
+                            isResident && <span className="text-xs text-gray-500 italic">Expected</span>
                           )}
                         </td>
                       </tr>
