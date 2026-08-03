@@ -62,6 +62,7 @@ export default function DashboardPage() {
       case 'OFFICE_ASSISTANT':
       case 'GENERAL_STAFF':
         return <StaffView profile={profile} />
+      case 'OWNER':
       case 'RESIDENT':
       case 'TENANT':
         return <TenantView profile={profile} />
