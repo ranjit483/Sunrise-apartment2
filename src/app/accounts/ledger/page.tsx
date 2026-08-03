@@ -44,7 +44,7 @@ export default function TenantLedgerPage() {
   // Fetch all users who are tenants or residents
   useEffect(() => {
     const fetchTenants = async () => {
-      const q = query(collection(db, 'users'), where('role', 'in', ['TENANT', 'RESIDENT']))
+      const q = query(collection(db, 'users'), where('role', 'in', ['TENANT', 'OWNER']))
       const snap = await getDocs(q)
       const data: UserData[] = []
       snap.forEach((doc: any) => {
@@ -160,11 +160,11 @@ export default function TenantLedgerPage() {
   }
 
   return (
-    <DashboardLayout title="Tenant Ledger">
+    <DashboardLayout title="Resident/Tenant Ledger">
       <div className="space-y-6">
         <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
           <div>
-            <h2 className="text-3xl font-bold">Tenant Ledger</h2>
+            <h2 className="text-3xl font-bold">Resident/Tenant Ledger</h2>
             <p className="text-muted-foreground">Detailed statement of account for individual tenants</p>
           </div>
           {selectedTenant && (
