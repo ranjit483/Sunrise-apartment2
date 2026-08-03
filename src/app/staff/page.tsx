@@ -35,7 +35,7 @@ export default function StaffPage() {
       snapshot.forEach((doc: any) => {
         const data = doc.data() as StaffUser
         // Filter out non-staff roles
-        if (!['SUPER_ADMIN', 'RESIDENT', 'TENANT'].includes(data.role)) {
+        if (!['SUPER_ADMIN', 'RESIDENT', 'TENANT', 'OWNER'].includes(data.role)) {
           sData.push(data)
         }
       })
