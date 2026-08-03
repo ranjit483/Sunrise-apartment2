@@ -90,6 +90,7 @@ const TOWER_UNITS: Record<string, string[]> = {
 export default function UsersPage() {
   const [users, setUsers] = useState<UserData[]>([])
   const [loading, setLoading] = useState(true)
+  const [searchQuery, setSearchQuery] = useState('')
   const [deleting, setDeleting] = useState<string | null>(null)
   
   const [editingUser, setEditingUser] = useState<UserData | null>(null)
@@ -189,11 +190,11 @@ export default function UsersPage() {
           })
         })
         
-        // Sort in memory instead of relying on Firestore index
+        // Sort by full name ascending
         fetchedUsers.sort((a, b) => {
-          if (!a.createdAt) return 1;
-          if (!b.createdAt) return -1;
-          return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+          const nameA = a.fullName || '';
+          const nameB = b.fullName || '';
+          return nameA.localeCompare(nameB);
         });
 
         setUsers(fetchedUsers)
@@ -208,9 +209,15 @@ export default function UsersPage() {
   }, [])
 
   const filteredUsers = users.filter(u => {
-    if (currentUserRole === 'SUPER_ADMIN') return true;
-    // Hide SUPER_ADMIN users from anyone who is not a SUPER_ADMIN
-    if (u.role === 'SUPER_ADMIN') return false;
+    if (currentUserRole !== 'SUPER_ADMIN' && u.role === 'SUPER_ADMIN') return false;
+    
+    if (searchQuery) {
+      const query = searchQuery.toLowerCase();
+      const matchName = (u.fullName || '').toLowerCase().includes(query);
+      const matchUnit = (u.unitNumber || '').toLowerCase().includes(query);
+      if (!matchName && !matchUnit) return false;
+    }
+    
     return true;
   });
 
@@ -266,7 +273,15 @@ export default function UsersPage() {
         </div>
 
         <Card>
-          <CardHeader><CardTitle>All Users</CardTitle></CardHeader>
+          <CardHeader className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+            <CardTitle>All Users</CardTitle>
+            <Input
+              placeholder="Search by name or unit..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="max-w-sm"
+            />
+          </CardHeader>
           <CardContent>
             <div className="overflow-x-auto overflow-y-hidden"><table className="w-full min-w-[800px]">
               <thead>
@@ -296,7 +311,19 @@ export default function UsersPage() {
                     </td>
                     <td className="py-3">{user.phone}</td>
                     <td className="py-3"><Badge className={roleColors[user.role] || 'bg-gray-100'}>{roleLabels[user.role] || user.role}</Badge></td>
-                    <td className="py-3">{user.buildingId || '-'}</td>
+                    <td className="py-3">
+                      {(() => {
+                        let tower = null;
+                        for (const [t, units] of Object.entries(TOWER_UNITS)) {
+                          if (units.includes(user.unitNumber || '')) {
+                            tower = t;
+                            break;
+                          }
+                        }
+                        const displayBuilding = tower || user.buildingId || '-';
+                        return displayBuilding.length > 15 ? '-' : displayBuilding; // Ignore random firebase IDs
+                      })()}
+                    </td>
                     <td className="py-3">{user.unitNumber || '-'}</td>
                     <td className="py-3"><Badge variant={user.status === 'approved' ? 'success' : user.status === 'rejected' ? 'destructive' : 'secondary'}>{user.status === 'pending_approval' ? 'Pending' : user.status}</Badge></td>
                     {isAuthorized('manage_users') && (
