@@ -447,7 +447,7 @@ export default function PaymentsPage() {
       </div>
 
       {/* RENDER FOR PRINT MODE ONLY */}
-      <div className="hidden print-area block">
+      <div className="hidden print:block print-area">
         {activeReceipt && receiptInvoice && (
           <div className="bg-white p-6 max-w-[650px] mx-auto text-black border border-black rounded-sm print-sheet shadow-none">
             <div className="border-b pb-3 mb-4 text-center">

@@ -723,7 +723,7 @@ export default function InvoicesPage() {
       </div>
 
       {/* RENDER FOR PRINT MODE ONLY */}
-      <div className="hidden print-area block">
+      <div className="hidden print:block print-area">
         {/* If viewing invoice details */}
         {viewingInvoice && (
           <div className="bg-white p-8 max-w-[800px] mx-auto text-black border border-black rounded-sm print-sheet shadow-none">
