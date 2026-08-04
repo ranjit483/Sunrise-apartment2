@@ -94,6 +94,23 @@ export default function VisitorsPage() {
     return () => unsubscribe()
   }, [])
 
+  // Auto-populate tower and unit for residents
+  useEffect(() => {
+    if (isResident && profile?.unitNumber) {
+      setHostUnit(profile.unitNumber)
+      let foundTower = ''
+      for (const [tower, units] of Object.entries(TOWER_UNITS)) {
+        if (units.includes(profile.unitNumber)) {
+          foundTower = tower
+          break
+        }
+      }
+      if (foundTower) {
+        setHostTower(foundTower)
+      }
+    }
+  }, [isResident, profile])
+
   const handleRegisterVisitor = async (e: React.FormEvent) => {
     e.preventDefault()
     setIsSubmitting(true)
@@ -126,8 +143,10 @@ export default function VisitorsPage() {
       
       // Reset form
       setName('')
-      setHostTower('')
-      setHostUnit('')
+      if (!isResident) {
+        setHostTower('')
+        setHostUnit('')
+      }
       setPhone('')
       setProvince('')
       setPurpose('')
@@ -242,7 +261,7 @@ export default function VisitorsPage() {
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <div className="space-y-2">
                     <Label>Host Tower *</Label>
-                    <Select required value={hostTower} onValueChange={(v) => { setHostTower(v); setHostUnit(''); }}>
+                    <Select required disabled={isResident} value={hostTower} onValueChange={(v) => { setHostTower(v); setHostUnit(''); }}>
                       <SelectTrigger><SelectValue placeholder="Tower..." /></SelectTrigger>
                       <SelectContent>
                         {Object.keys(TOWER_UNITS).map(tower => (
@@ -253,7 +272,7 @@ export default function VisitorsPage() {
                   </div>
                   <div className="space-y-2">
                     <Label>Unit *</Label>
-                    <Select required disabled={!hostTower} value={hostUnit} onValueChange={setHostUnit}>
+                    <Select required disabled={isResident || !hostTower} value={hostUnit} onValueChange={setHostUnit}>
                       <SelectTrigger><SelectValue placeholder="Unit..." /></SelectTrigger>
                       <SelectContent>
                         {hostTower && TOWER_UNITS[hostTower].map(unit => (
