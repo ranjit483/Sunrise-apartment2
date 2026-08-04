@@ -6,7 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { db } from '@/config/firebase'
-import { collection, onSnapshot, query, orderBy, getDocs, doc, writeBatch, where, updateDoc } from 'firebase/firestore'
+import { collection, onSnapshot, query, orderBy, getDocs, doc, writeBatch, where, updateDoc, getDoc } from 'firebase/firestore'
 import { Invoice, Unit, Payment } from '@/types/models'
 import { Loader2, Plus, Send, Edit2, CheckCircle2, Eye, Printer, FileText, Check, DollarSign, Search } from 'lucide-react'
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
@@ -235,6 +235,11 @@ export default function InvoicesPage() {
         if (mType === 'generator') readingsByUnit[data.unitId].generator = data;
       });
 
+      const settingsDoc = await getDoc(doc(db, 'settings', 'general'))
+      const settingsData = settingsDoc.exists() ? settingsDoc.data() : {}
+      const waterFee = settingsData.waterSupplyFlatFee || 0
+      const insuranceRate = settingsData.insuranceRatePerSqFt || 0
+
       const batch = writeBatch(db)
       let count = 0
       
@@ -262,8 +267,8 @@ export default function InvoicesPage() {
           generatorReading: gReading,
           generatorAmount: gAmount,
           utilityAmount: 0,
-          waterAmount: 0,
-          otherAmount: 0,
+          waterAmount: waterFee,
+          otherAmount: matchingUnit ? (matchingUnit.area || 0) * insuranceRate : 0,
           dueDate: invoiceDueDate,
           status: 'draft',
           createdAt: new Date().toISOString(),
@@ -790,7 +795,7 @@ export default function InvoicesPage() {
                   <td className="border border-black p-2 text-center">6.</td>
                   <td className="border border-black p-2">
                     <div><strong>Apartment Structure Insurance Contribution</strong></div>
-                    <span className="text-xs text-gray-600">Welfare pool contribution (Rs 6.20 per Sq Ft)</span>
+                    <span className="text-xs text-gray-600">Welfare pool contribution (Yearly Onetime per Sq Ft)</span>
                   </td>
                   <td className="border border-black p-2 text-right font-medium">₨ {(viewingInvoice.otherAmount || 0).toLocaleString()}</td>
                 </tr>

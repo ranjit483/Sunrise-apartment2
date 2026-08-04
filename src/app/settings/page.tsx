@@ -24,6 +24,8 @@ const defaultSystemSettings: SystemSettings = {
   sendEmailReminders: true,
   electricityPricePerUnit: 15,
   generatorPricePerUnit: 25,
+  waterSupplyFlatFee: 0,
+  insuranceRatePerSqFt: 0,
 }
 
 const defaultUserSettings: UserSettings = {
@@ -224,7 +226,17 @@ export default function SettingsPage() {
                     <Input value={globalSettings.generatorPricePerUnit || ''} onChange={(e) => handleChangeGlobal('generatorPricePerUnit', parseFloat(e.target.value) || 0)} type="number" />
                     <p className="text-xs text-muted-foreground">This rate is used to calculate the monthly Generator electricity bills based on meter readings.</p>
                   </div>
-                  <div className="flex items-center justify-between">
+                  <div className="space-y-2 pt-2 border-t mt-2">
+                    <Label>Water Supply Flat Fee (Rs.)</Label>
+                    <Input value={globalSettings.waterSupplyFlatFee || ''} onChange={(e) => handleChangeGlobal('waterSupplyFlatFee', parseFloat(e.target.value) || 0)} type="number" />
+                    <p className="text-xs text-muted-foreground">This is the fixed monthly flat fee for Water Supply & Society Maintenance.</p>
+                  </div>
+                  <div className="space-y-2 pt-2 border-t mt-2">
+                    <Label>Insurance Rate Per Sq Ft (Rs.)</Label>
+                    <Input value={globalSettings.insuranceRatePerSqFt || ''} onChange={(e) => handleChangeGlobal('insuranceRatePerSqFt', parseFloat(e.target.value) || 0)} type="number" />
+                    <p className="text-xs text-muted-foreground">This rate is used to calculate the Apartment Structure Insurance Contribution based on Unit area (Sq Ft).</p>
+                  </div>
+                  <div className="flex items-center justify-between pt-2 border-t mt-2">
                     <Label>Send Email Reminders</Label>
                     <Switch checked={globalSettings.sendEmailReminders} onCheckedChange={(c) => handleChangeGlobal('sendEmailReminders', c)} />
                   </div>

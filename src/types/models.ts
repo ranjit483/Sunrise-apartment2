@@ -180,6 +180,8 @@ export interface SystemSettings {
   sendEmailReminders: boolean
   electricityPricePerUnit?: number
   generatorPricePerUnit?: number
+  waterSupplyFlatFee?: number
+  insuranceRatePerSqFt?: number
 }
 
 export interface UserSettings {
