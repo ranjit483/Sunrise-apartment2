@@ -763,7 +763,7 @@ export default function InvoicesPage() {
         <style dangerouslySetInnerHTML={{__html: `
           @media print {
             @page {
-              size: 105mm 148.5mm;
+              size: 148.5mm 105mm; /* A6 Landscape */
               margin: 4mm;
             }
             body {
@@ -774,8 +774,8 @@ export default function InvoicesPage() {
         `}} />
         {/* If viewing invoice details */}
         {viewingInvoice && (
-          <div className="bg-white p-2 max-w-[105mm] mx-auto text-black border border-black rounded-sm print-sheet shadow-none">
-            <div className="text-center border-b pb-2 mb-2">
+          <div className="bg-white p-1.5 w-[140mm] mx-auto text-black border border-black rounded-sm print-sheet shadow-none">
+            <div className="text-center border-b pb-1.5 mb-1.5">
               <h1 className="text-sm font-black tracking-tight text-gray-900">SUNRISE APARTMENT WELFARE SOCIETY</h1>
               <p className="text-[9px] font-medium text-gray-700">Nakkhu-13, Lalitpur, Nepal | Phone: 01-5185110</p>
               <div className="inline-block border border-black font-extrabold px-2 py-0.5 rounded-sm bg-gray-50 text-[8px] mt-1 uppercase tracking-widest text-gray-950">
@@ -783,7 +783,7 @@ export default function InvoicesPage() {
               </div>
             </div>
 
-            <div className="grid grid-cols-2 gap-y-1 text-[8px] mb-2 border border-black p-1.5 rounded-sm bg-gray-50">
+            <div className="grid grid-cols-2 gap-y-0.5 text-[8px] mb-1.5 border border-black p-1 rounded-sm bg-gray-50">
               <div><strong>Unit Number:</strong> {viewingInvoice.unitNumber}</div>
               <div className="text-right"><strong>Invoice No:</strong> {viewingInvoice.id.substring(0, 10).toUpperCase()}</div>
               <div><strong>Owner/Tenant:</strong> {formatTenantName(viewingInvoice.tenantName, viewingInvoice.tenantId)}</div>
@@ -794,18 +794,18 @@ export default function InvoicesPage() {
               <div className="text-right font-bold text-red-700"><strong>Due Date:</strong> {getNepaliDate(viewingInvoice.dueDate).ad}</div>
             </div>
 
-            <table className="w-full text-[8px] border-collapse border border-black mb-2">
+            <table className="w-full text-[8px] border-collapse border border-black mb-1.5 leading-tight">
               <thead>
                 <tr className="bg-gray-100 font-bold border-b border-black text-[8px] uppercase text-gray-950">
-                  <th className="border border-black p-1 text-center w-6">S.N.</th>
-                  <th className="border border-black p-1 text-left">Particulars & Service Details</th>
-                  <th className="border border-black p-1 text-right w-20">Amount (₨)</th>
+                  <th className="border border-black p-0.5 text-center w-6">S.N.</th>
+                  <th className="border border-black p-0.5 text-left">Particulars & Service Details</th>
+                  <th className="border border-black p-0.5 text-right w-20">Amount (₨)</th>
                 </tr>
               </thead>
               <tbody>
                 <tr className="border-b border-black">
-                  <td className="border border-black p-1 text-center">1.</td>
-                  <td className="border border-black p-1">
+                  <td className="border border-black p-0.5 text-center">1.</td>
+                  <td className="border border-black p-0.5 flex flex-col justify-center">
                     <div><strong>Electricity Charge Including Usage Pool</strong></div>
                     {(viewingInvoice.electricityReading || viewingInvoice.electricityConsumed) ? (
                       <span className="text-[7px] text-gray-600">Prev: {viewingInvoice.electricityPreviousReading || 0} | Curr: {viewingInvoice.electricityReading || 0} | Unit: {viewingInvoice.electricityConsumed || 0}</span>
@@ -813,106 +813,108 @@ export default function InvoicesPage() {
                       <span className="text-[7px] text-gray-600">Meter usage</span>
                     )}
                   </td>
-                  <td className="border border-black p-1 text-right font-medium">₨ {(viewingInvoice.electricityAmount || 0).toLocaleString()}</td>
+                  <td className="border border-black p-0.5 text-right font-medium align-middle">₨ {(viewingInvoice.electricityAmount || 0).toLocaleString()}</td>
                 </tr>
                 <tr className="border-b border-black">
-                  <td className="border border-black p-1 text-center">2.</td>
-                  <td className="border border-black p-1">
-                    <div><strong>Backup (Generator / DG meter flat fee)</strong></div>
+                  <td className="border border-black p-0.5 text-center align-middle">2.</td>
+                  <td className="border border-black p-0.5 flex items-center justify-between">
+                    <strong>Backup (Generator / DG meter flat fee)</strong>
                     <span className="text-[7px] text-gray-600">{viewingInvoice.generatorReading || 0} Units</span>
                   </td>
-                  <td className="border border-black p-1 text-right font-medium">₨ {(viewingInvoice.generatorAmount || 0).toLocaleString()}</td>
+                  <td className="border border-black p-0.5 text-right font-medium align-middle">₨ {(viewingInvoice.generatorAmount || 0).toLocaleString()}</td>
                 </tr>
                 <tr className="border-b border-black">
-                  <td className="border border-black p-1 text-center">3.</td>
-                  <td className="border border-black p-1">
-                    <div><strong>Diesel Cost Sharing Standby pool</strong></div>
-                    <span className="text-[7px] text-gray-600">Diesel standby maintenance pool sharing</span>
+                  <td className="border border-black p-0.5 text-center align-middle">3.</td>
+                  <td className="border border-black p-0.5 flex items-center justify-between">
+                    <strong>Diesel Cost Sharing Standby pool</strong>
+                    <span className="text-[7px] text-gray-600">Standby maintenance pool</span>
                   </td>
-                  <td className="border border-black p-1 text-right font-medium">₨ {(viewingInvoice.dieselAmount || 0).toLocaleString()}</td>
+                  <td className="border border-black p-0.5 text-right font-medium align-middle">₨ {(viewingInvoice.dieselAmount || 0).toLocaleString()}</td>
                 </tr>
                 <tr className="border-b border-black">
-                  <td className="border border-black p-1 text-center">4.</td>
-                  <td className="border border-black p-1">
-                    <div><strong>Structure/ Maintenance Charge</strong></div>
+                  <td className="border border-black p-0.5 text-center align-middle">4.</td>
+                  <td className="border border-black p-0.5 flex items-center justify-between">
+                    <strong>Structure/ Maintenance Charge</strong>
                     <span className="text-[7px] text-gray-600">Monthly per Sq Ft Basis Bill</span>
                   </td>
-                  <td className="border border-black p-1 text-right font-medium">₨ {(viewingInvoice.structureMaintenanceAmount || 0).toLocaleString()}</td>
+                  <td className="border border-black p-0.5 text-right font-medium align-middle">₨ {(viewingInvoice.structureMaintenanceAmount || 0).toLocaleString()}</td>
                 </tr>
                 <tr className="border-b border-black">
-                  <td className="border border-black p-1 text-center">5.</td>
-                  <td className="border border-black p-1">
-                    <div><strong>Water Supply & Society Maintenance</strong></div>
-                    <span className="text-[7px] text-gray-600">Fixed monthly supply & cleaning pool fee</span>
+                  <td className="border border-black p-0.5 text-center align-middle">5.</td>
+                  <td className="border border-black p-0.5 flex items-center justify-between">
+                    <strong>Water Supply & Society Maintenance</strong>
+                    <span className="text-[7px] text-gray-600">Fixed monthly pool fee</span>
                   </td>
-                  <td className="border border-black p-1 text-right font-medium">₨ {(viewingInvoice.waterAmount || 0).toLocaleString()}</td>
+                  <td className="border border-black p-0.5 text-right font-medium align-middle">₨ {(viewingInvoice.waterAmount || 0).toLocaleString()}</td>
                 </tr>
                 <tr className="border-b border-black">
-                  <td className="border border-black p-1 text-center">6.</td>
-                  <td className="border border-black p-1">
-                    <div><strong>Apartment Structure Insurance Contribution</strong></div>
-                    <span className="text-[7px] text-gray-600">Welfare pool contribution (Yearly Onetime per Sq Ft)</span>
+                  <td className="border border-black p-0.5 text-center align-middle">6.</td>
+                  <td className="border border-black p-0.5 flex items-center justify-between">
+                    <strong>Apartment Structure Insurance Contribution</strong>
+                    <span className="text-[7px] text-gray-600">Yearly Onetime per Sq Ft</span>
                   </td>
-                  <td className="border border-black p-1 text-right font-medium">₨ {(viewingInvoice.insuranceAmount || 0).toLocaleString()}</td>
+                  <td className="border border-black p-0.5 text-right font-medium align-middle">₨ {(viewingInvoice.insuranceAmount || 0).toLocaleString()}</td>
                 </tr>
                 <tr className="border-b border-black">
-                  <td className="border border-black p-1 text-center">7.</td>
-                  <td className="border border-black p-1">
-                    <div><strong>Other Charges</strong></div>
+                  <td className="border border-black p-0.5 text-center align-middle">7.</td>
+                  <td className="border border-black p-0.5 flex items-center justify-between">
+                    <strong>Other Charges</strong>
                     <span className="text-[7px] text-gray-600">Miscellaneous fees</span>
                   </td>
-                  <td className="border border-black p-1 text-right font-medium">₨ {(viewingInvoice.otherAmount || 0).toLocaleString()}</td>
+                  <td className="border border-black p-0.5 text-right font-medium align-middle">₨ {(viewingInvoice.otherAmount || 0).toLocaleString()}</td>
                 </tr>
                 <tr className="border-b border-black">
-                  <td className="border border-black p-1 text-center">8.</td>
-                  <td className="border border-black p-1">
-                    <div><strong>Previous Pending Outstanding Due</strong></div>
-                    <span className="text-[7px] text-gray-600">Brought forward balance from previous cycles</span>
+                  <td className="border border-black p-0.5 text-center align-middle">8.</td>
+                  <td className="border border-black p-0.5 flex items-center justify-between">
+                    <strong>Previous Pending Outstanding Due</strong>
+                    <span className="text-[7px] text-gray-600">Brought forward balance</span>
                   </td>
-                  <td className="border border-black p-1 text-right font-medium">₨ 0.00</td>
+                  <td className="border border-black p-0.5 text-right font-medium align-middle">₨ 0.00</td>
                 </tr>
                 <tr className="border-b border-black">
-                  <td className="border border-black p-1 text-center">9.</td>
-                  <td className="border border-black p-1">
-                    <div><strong>Society Delay / Late Penalty Surcharges</strong></div>
+                  <td className="border border-black p-0.5 text-center align-middle">9.</td>
+                  <td className="border border-black p-0.5 flex items-center justify-between">
+                    <strong>Society Delay / Late Penalty Surcharges</strong>
                     <span className="text-[7px] text-gray-600">Applied delay penalty</span>
                   </td>
-                  <td className="border border-black p-1 text-right font-medium">₨ 0.00</td>
+                  <td className="border border-black p-0.5 text-right font-medium align-middle">₨ 0.00</td>
                 </tr>
                 {viewingInvoice.amount > 0 && (
                   <tr className="border-b border-black">
-                    <td className="border border-black p-1 text-center">10.</td>
-                    <td className="border border-black p-1">
-                      <div><strong>Basic Unit Service Charge</strong></div>
+                    <td className="border border-black p-0.5 text-center align-middle">10.</td>
+                    <td className="border border-black p-0.5 flex items-center justify-between">
+                      <strong>Basic Unit Service Charge</strong>
                       <span className="text-[7px] text-gray-600">Apartment basic rent amount</span>
                     </td>
-                    <td className="border border-black p-1 text-right font-medium">₨ {viewingInvoice.amount.toLocaleString()}</td>
+                    <td className="border border-black p-0.5 text-right font-medium align-middle">₨ {viewingInvoice.amount.toLocaleString()}</td>
                   </tr>
                 )}
                 <tr className="bg-gray-100 font-extrabold text-[9px] border-t border-black text-gray-950">
-                  <td colSpan={2} className="border border-black p-1 text-right uppercase tracking-wider">Grand Total:</td>
-                  <td className="border border-black p-1 text-right font-black">
+                  <td colSpan={2} className="border border-black p-0.5 text-right uppercase tracking-wider">Grand Total:</td>
+                  <td className="border border-black p-0.5 text-right font-black align-middle">
                     ₨ {(viewingInvoice.amount + (viewingInvoice.electricityAmount || 0) + (viewingInvoice.generatorAmount || 0) + (viewingInvoice.utilityAmount || 0) + (viewingInvoice.waterAmount || 0) + (viewingInvoice.insuranceAmount || 0) + (viewingInvoice.dieselAmount || 0) + (viewingInvoice.structureMaintenanceAmount || 0) + (viewingInvoice.otherAmount || 0)).toLocaleString()}
                   </td>
                 </tr>
               </tbody>
             </table>
 
-            <div className="border border-black p-1.5 rounded-sm bg-gray-50 mb-2 text-[8px]">
-              <strong className="text-[7px] uppercase text-gray-600 block mb-0.5">Amount in Words:</strong>
-              <div className="font-bold text-gray-900 text-[9px]">
-                {numberToWords(viewingInvoice.amount + (viewingInvoice.electricityAmount || 0) + (viewingInvoice.generatorAmount || 0) + (viewingInvoice.utilityAmount || 0) + (viewingInvoice.waterAmount || 0) + (viewingInvoice.insuranceAmount || 0) + (viewingInvoice.dieselAmount || 0) + (viewingInvoice.structureMaintenanceAmount || 0) + (viewingInvoice.otherAmount || 0))}
+            <div className="flex justify-between items-end gap-2">
+              <div className="border border-black p-1 rounded-sm bg-gray-50 flex-grow text-[8px] self-stretch">
+                <strong className="text-[7px] uppercase text-gray-600 block mb-0.5">Amount in Words:</strong>
+                <div className="font-bold text-gray-900 text-[8px]">
+                  {numberToWords(viewingInvoice.amount + (viewingInvoice.electricityAmount || 0) + (viewingInvoice.generatorAmount || 0) + (viewingInvoice.utilityAmount || 0) + (viewingInvoice.waterAmount || 0) + (viewingInvoice.insuranceAmount || 0) + (viewingInvoice.dieselAmount || 0) + (viewingInvoice.structureMaintenanceAmount || 0) + (viewingInvoice.otherAmount || 0))}
+                </div>
               </div>
-            </div>
 
-            <div className="grid grid-cols-2 gap-2 items-end mt-4 pt-2 border-t border-dashed">
-              <div className="text-center w-24">
-                <div className="border-b border-black h-6 w-full mx-auto"></div>
-                <p className="text-[7px] font-bold uppercase mt-1 text-gray-700">Resident Signature</p>
-              </div>
-              <div className="text-center w-24 ml-auto">
-                <div className="border-b border-black h-6 w-full mx-auto"></div>
-                <p className="text-[7px] font-bold uppercase mt-1 text-gray-700">Society Authorized Signatory & Seal</p>
+              <div className="flex gap-4 shrink-0 pb-1 pr-1">
+                <div className="text-center w-20">
+                  <div className="border-b border-black h-4 w-full mx-auto"></div>
+                  <p className="text-[6px] font-bold uppercase mt-1 text-gray-700">Resident Signature</p>
+                </div>
+                <div className="text-center w-20">
+                  <div className="border-b border-black h-4 w-full mx-auto"></div>
+                  <p className="text-[6px] font-bold uppercase mt-1 text-gray-700">Society Signatory</p>
+                </div>
               </div>
             </div>
           </div>
