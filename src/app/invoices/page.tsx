@@ -223,7 +223,7 @@ export default function InvoicesPage() {
       const targetMonthStr = `${yyyy}-${mm}`; 
 
       // Fetch electricity readings for the target month
-      const readingsSnap = await getDocs(query(collection(db, 'electricity_readings'), where('month', '==', targetMonthStr), where('status', '==', 'approved')));
+      const readingsSnap = await getDocs(query(collection(db, 'electricity_readings'), where('month', 'in', Array.from(new Set([targetMonthStr, invoiceMonth]))), where('status', '==', 'approved')));
       const readingsByUnit: Record<string, { city?: any, generator?: any }> = {};
       readingsSnap.forEach((doc: any) => {
         const data = doc.data();
@@ -248,7 +248,9 @@ export default function InvoicesPage() {
         const matchingUnit = unitsByNumber[unitNumberKey]
         
         const readingData = matchingUnit ? readingsByUnit[matchingUnit.id] : null;
+        const ePrev = readingData?.city ? readingData.city.previousReading : 0;
         const eReading = readingData?.city ? readingData.city.currentReading : 0;
+        const eConsumed = readingData?.city ? readingData.city.totalConsumed : 0;
         const eAmount = readingData?.city ? readingData.city.totalBill : 0;
         const gReading = readingData?.generator ? readingData.generator.currentReading : 0;
         const gAmount = readingData?.generator ? readingData.generator.totalBill : 0;
@@ -262,7 +264,9 @@ export default function InvoicesPage() {
           tenantName: user.name || user.email || user.fullName || 'Unknown',
           month: invoiceMonth,
           amount: matchingUnit ? (matchingUnit.rent || 0) : 0,
+          electricityPreviousReading: ePrev,
           electricityReading: eReading,
+          electricityConsumed: eConsumed,
           electricityAmount: eAmount,
           generatorReading: gReading,
           generatorAmount: gAmount,
@@ -755,8 +759,8 @@ export default function InvoicesPage() {
                   <td className="border border-black p-2 text-center">1.</td>
                   <td className="border border-black p-2">
                     <div><strong>Electricity Charge Including Usage Pool</strong></div>
-                    {viewingInvoice.electricityReading ? (
-                      <span className="text-xs text-gray-600">Current Reading: {viewingInvoice.electricityReading} units</span>
+                    {(viewingInvoice.electricityReading || viewingInvoice.electricityConsumed) ? (
+                      <span className="text-xs text-gray-600">Prev: {viewingInvoice.electricityPreviousReading || 0} | Curr: {viewingInvoice.electricityReading || 0} | Unit: {viewingInvoice.electricityConsumed || 0}</span>
                     ) : (
                       <span className="text-xs text-gray-600">Meter usage</span>
                     )}
@@ -963,11 +967,27 @@ export default function InvoicesPage() {
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label>Electricity Reading</Label>
+                  <Label>Prev Elect. Reading</Label>
+                  <Input 
+                    type="number" 
+                    value={editingInvoice.electricityPreviousReading || 0} 
+                    onChange={e => setEditingInvoice({...editingInvoice, electricityPreviousReading: Number(e.target.value)})} 
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label>Curr Elect. Reading</Label>
                   <Input 
                     type="number" 
                     value={editingInvoice.electricityReading || 0} 
                     onChange={e => setEditingInvoice({...editingInvoice, electricityReading: Number(e.target.value)})} 
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label>Consumed Elect. Units</Label>
+                  <Input 
+                    type="number" 
+                    value={editingInvoice.electricityConsumed || 0} 
+                    onChange={e => setEditingInvoice({...editingInvoice, electricityConsumed: Number(e.target.value)})} 
                   />
                 </div>
                 <div className="space-y-2">
@@ -1238,8 +1258,8 @@ export default function InvoicesPage() {
                     <td className="border border-black p-2 text-center">1.</td>
                     <td className="border border-black p-2">
                       <div><strong>Electricity Charge Including Usage Pool</strong></div>
-                      {viewingInvoice.electricityReading ? (
-                        <span className="text-[10px] text-gray-600">Current Reading: {viewingInvoice.electricityReading} units</span>
+                      {(viewingInvoice.electricityReading || viewingInvoice.electricityConsumed) ? (
+                        <span className="text-[10px] text-gray-600">Prev: {viewingInvoice.electricityPreviousReading || 0} | Curr: {viewingInvoice.electricityReading || 0} | Unit: {viewingInvoice.electricityConsumed || 0}</span>
                       ) : (
                         <span className="text-[10px] text-gray-600">Meter usage</span>
                       )}

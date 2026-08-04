@@ -32,7 +32,9 @@ export interface Invoice {
   tenantName?: string
   month: string
   amount: number
+  electricityPreviousReading?: number
   electricityReading?: number
+  electricityConsumed?: number
   electricityAmount?: number
   generatorReading?: number
   generatorAmount?: number
