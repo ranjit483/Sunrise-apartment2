@@ -227,6 +227,10 @@ export default function InvoicesPage() {
         invoiceMonth, 
         invoiceMonth.replace('Asadha', 'Asadh'), 
         invoiceMonth.replace('Asadh', 'Asadha'),
+        invoiceMonth.replace('Ashadh', 'Asadh'),
+        invoiceMonth.replace('Ashadha', 'Asadh'),
+        invoiceMonth.replace('Asadh', 'Ashadh'),
+        invoiceMonth.replace('Asadha', 'Ashadh'),
         invoiceMonth.replace('Jestha', 'Jesth'),
         invoiceMonth.replace('Jesth', 'Jestha')
       ].filter(Boolean);
