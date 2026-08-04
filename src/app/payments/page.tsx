@@ -587,15 +587,15 @@ export default function PaymentsPage() {
                           <div><strong>Apartment Structure Insurance Contribution</strong></div>
                           <span className="text-[10px] text-gray-600">Welfare pool contribution (Rs 6.20 per Sq Ft)</span>
                         </td>
-                        <td className="border border-black p-2 text-right font-medium">₨ {(viewingInvoice.otherAmount || 0).toLocaleString()}</td>
+                        <td className="border border-black p-2 text-right font-medium">₨ {(viewingInvoice.insuranceAmount || 0).toLocaleString()}</td>
                       </tr>
                       <tr className="border-b border-black">
                         <td className="border border-black p-2 text-center">7.</td>
                         <td className="border border-black p-2">
-                          <div><strong>Delay Charge on Structural Insurance contribution</strong></div>
-                          <span className="text-[10px] text-gray-600">Late penalty fee on insurance pool</span>
+                          <div><strong>Other Charges</strong></div>
+                          <span className="text-[10px] text-gray-600">Miscellaneous fees</span>
                         </td>
-                        <td className="border border-black p-2 text-right font-medium">₨ 0.00</td>
+                        <td className="border border-black p-2 text-right font-medium">₨ {(viewingInvoice.otherAmount || 0).toLocaleString()}</td>
                       </tr>
                       <tr className="border-b border-black">
                         <td className="border border-black p-2 text-center">8.</td>

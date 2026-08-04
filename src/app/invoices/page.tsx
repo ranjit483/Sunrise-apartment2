@@ -841,14 +841,6 @@ export default function InvoicesPage() {
                 <tr className="border-b border-black">
                   <td className="border border-black p-2 text-center">8.</td>
                   <td className="border border-black p-2">
-                    <div><strong>Delay Charge on Structural Insurance</strong></div>
-                    <span className="text-xs text-gray-600">Late penalty fee on insurance pool</span>
-                  </td>
-                  <td className="border border-black p-2 text-right font-medium">₨ 0.00</td>
-                </tr>
-                <tr className="border-b border-black">
-                  <td className="border border-black p-2 text-center">8.</td>
-                  <td className="border border-black p-2">
                     <div><strong>Previous Pending Outstanding Due</strong></div>
                     <span className="text-xs text-gray-600">Brought forward balance from previous cycles</span>
                   </td>
@@ -875,7 +867,7 @@ export default function InvoicesPage() {
                 <tr className="bg-gray-100 font-extrabold text-base border-t border-black text-gray-950">
                   <td colSpan={2} className="border border-black p-2.5 text-right uppercase tracking-wider">Grand Total:</td>
                   <td className="border border-black p-2.5 text-right font-black">
-                    ₨ {(viewingInvoice.amount + (viewingInvoice.electricityAmount || 0) + (viewingInvoice.generatorAmount || 0) + (viewingInvoice.utilityAmount || 0) + (viewingInvoice.waterAmount || 0) + (viewingInvoice.otherAmount || 0)).toLocaleString()}
+                    ₨ {(viewingInvoice.amount + (viewingInvoice.electricityAmount || 0) + (viewingInvoice.generatorAmount || 0) + (viewingInvoice.utilityAmount || 0) + (viewingInvoice.waterAmount || 0) + (viewingInvoice.insuranceAmount || 0) + (viewingInvoice.dieselAmount || 0) + (viewingInvoice.structureMaintenanceAmount || 0) + (viewingInvoice.otherAmount || 0)).toLocaleString()}
                   </td>
                 </tr>
               </tbody>
@@ -884,7 +876,7 @@ export default function InvoicesPage() {
             <div className="border border-black p-3.5 rounded-sm bg-gray-50 mb-6 text-sm">
               <strong className="text-xs uppercase text-gray-600 block mb-1">Amount in Words:</strong>
               <div className="font-bold text-gray-900 text-[15px]">
-                {numberToWords(viewingInvoice.amount + (viewingInvoice.electricityAmount || 0) + (viewingInvoice.generatorAmount || 0) + (viewingInvoice.utilityAmount || 0) + (viewingInvoice.waterAmount || 0) + (viewingInvoice.otherAmount || 0))}
+                {numberToWords(viewingInvoice.amount + (viewingInvoice.electricityAmount || 0) + (viewingInvoice.generatorAmount || 0) + (viewingInvoice.utilityAmount || 0) + (viewingInvoice.waterAmount || 0) + (viewingInvoice.insuranceAmount || 0) + (viewingInvoice.dieselAmount || 0) + (viewingInvoice.structureMaintenanceAmount || 0) + (viewingInvoice.otherAmount || 0))}
               </div>
             </div>
 
@@ -1356,21 +1348,13 @@ export default function InvoicesPage() {
                   <tr className="border-b border-black">
                     <td className="border border-black p-2 text-center">8.</td>
                     <td className="border border-black p-2">
-                      <div><strong>Delay Charge on Structural Insurance contribution</strong></div>
-                      <span className="text-[10px] text-gray-600">Late penalty fee on insurance pool</span>
-                    </td>
-                    <td className="border border-black p-2 text-right font-medium">₨ 0.00</td>
-                  </tr>
-                  <tr className="border-b border-black">
-                    <td className="border border-black p-2 text-center">9.</td>
-                    <td className="border border-black p-2">
                       <div><strong>Previous Pending Outstanding Due</strong></div>
                       <span className="text-[10px] text-gray-600">Brought forward balance from previous cycles</span>
                     </td>
                     <td className="border border-black p-2 text-right font-medium">₨ 0.00</td>
                   </tr>
                   <tr className="border-b border-black">
-                    <td className="border border-black p-2 text-center">10.</td>
+                    <td className="border border-black p-2 text-center">9.</td>
                     <td className="border border-black p-2">
                       <div><strong>Society Delay / Late Penalty Surcharges</strong></div>
                       <span className="text-[10px] text-gray-600">Applied delay penalty</span>
@@ -1379,7 +1363,7 @@ export default function InvoicesPage() {
                   </tr>
                   {viewingInvoice.amount > 0 && (
                     <tr className="border-b border-black">
-                      <td className="border border-black p-2 text-center">11.</td>
+                      <td className="border border-black p-2 text-center">10.</td>
                       <td className="border border-black p-2">
                         <div><strong>Basic Unit Service Charge</strong></div>
                         <span className="text-[10px] text-gray-600">Apartment basic rent amount</span>
@@ -1390,7 +1374,7 @@ export default function InvoicesPage() {
                   <tr className="bg-gray-100 font-extrabold text-[13px] border-t border-black text-gray-950">
                     <td colSpan={2} className="border border-black p-2 text-right uppercase tracking-wider">Grand Total:</td>
                     <td className="border border-black p-2 text-right font-black">
-                      ₨ {(viewingInvoice.amount + (viewingInvoice.electricityAmount || 0) + (viewingInvoice.generatorAmount || 0) + (viewingInvoice.utilityAmount || 0) + (viewingInvoice.waterAmount || 0) + (viewingInvoice.insuranceAmount || 0) + (viewingInvoice.otherAmount || 0)).toLocaleString()}
+                      ₨ {(viewingInvoice.amount + (viewingInvoice.electricityAmount || 0) + (viewingInvoice.generatorAmount || 0) + (viewingInvoice.utilityAmount || 0) + (viewingInvoice.waterAmount || 0) + (viewingInvoice.insuranceAmount || 0) + (viewingInvoice.dieselAmount || 0) + (viewingInvoice.structureMaintenanceAmount || 0) + (viewingInvoice.otherAmount || 0)).toLocaleString()}
                     </td>
                   </tr>
                 </tbody>
@@ -1399,7 +1383,7 @@ export default function InvoicesPage() {
               <div className="border border-black p-3 rounded-sm bg-gray-50 mb-5 text-[11px]">
                 <strong className="text-[9px] uppercase text-gray-600 block mb-0.5">Amount in Words:</strong>
                 <div className="font-bold text-gray-900 text-xs">
-                  {numberToWords(viewingInvoice.amount + (viewingInvoice.electricityAmount || 0) + (viewingInvoice.generatorAmount || 0) + (viewingInvoice.utilityAmount || 0) + (viewingInvoice.waterAmount || 0) + (viewingInvoice.insuranceAmount || 0) + (viewingInvoice.otherAmount || 0))}
+                  {numberToWords(viewingInvoice.amount + (viewingInvoice.electricityAmount || 0) + (viewingInvoice.generatorAmount || 0) + (viewingInvoice.utilityAmount || 0) + (viewingInvoice.waterAmount || 0) + (viewingInvoice.insuranceAmount || 0) + (viewingInvoice.dieselAmount || 0) + (viewingInvoice.structureMaintenanceAmount || 0) + (viewingInvoice.otherAmount || 0))}
                 </div>
               </div>
 
