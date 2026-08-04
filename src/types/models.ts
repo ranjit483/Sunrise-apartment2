@@ -41,6 +41,8 @@ export interface Invoice {
   utilityAmount?: number
   waterAmount?: number
   insuranceAmount?: number
+  dieselAmount?: number
+  structureMaintenanceAmount?: number
   otherAmount?: number
   paidAmount?: number
   dueDate: string
@@ -185,6 +187,9 @@ export interface SystemSettings {
   generatorPricePerUnit?: number
   waterSupplyFlatFee?: number
   insuranceRatePerSqFt?: number
+  dieselCostFlatFee?: number
+  structureMaintenanceRatePerSqFt?: number
+  otherChargesFlatFee?: number
 }
 
 export interface UserSettings {

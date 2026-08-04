@@ -236,6 +236,21 @@ export default function SettingsPage() {
                     <Input value={globalSettings.insuranceRatePerSqFt || ''} onChange={(e) => handleChangeGlobal('insuranceRatePerSqFt', parseFloat(e.target.value) || 0)} type="number" />
                     <p className="text-xs text-muted-foreground">This rate is used to calculate the Apartment Structure Insurance Contribution based on Unit area (Sq Ft).</p>
                   </div>
+                  <div className="space-y-2 pt-2 border-t mt-2">
+                    <Label>Diesel Cost Sharing Flat Fee (Rs.)</Label>
+                    <Input value={globalSettings.dieselCostFlatFee || ''} onChange={(e) => handleChangeGlobal('dieselCostFlatFee', parseFloat(e.target.value) || 0)} type="number" />
+                    <p className="text-xs text-muted-foreground">This is the fixed monthly flat fee for Diesel Cost Sharing Standby pool.</p>
+                  </div>
+                  <div className="space-y-2 pt-2 border-t mt-2">
+                    <Label>Structure/Maintenance Rate Per Sq Ft (Rs.)</Label>
+                    <Input value={globalSettings.structureMaintenanceRatePerSqFt || ''} onChange={(e) => handleChangeGlobal('structureMaintenanceRatePerSqFt', parseFloat(e.target.value) || 0)} type="number" />
+                    <p className="text-xs text-muted-foreground">This rate is used to calculate the Monthly Service Charge per Sq Ft.</p>
+                  </div>
+                  <div className="space-y-2 pt-2 border-t mt-2">
+                    <Label>Other Charges Flat Fee (Rs.)</Label>
+                    <Input value={globalSettings.otherChargesFlatFee || ''} onChange={(e) => handleChangeGlobal('otherChargesFlatFee', parseFloat(e.target.value) || 0)} type="number" />
+                    <p className="text-xs text-muted-foreground">This is the fixed monthly flat fee for Other Charges.</p>
+                  </div>
                   <div className="flex items-center justify-between pt-2 border-t mt-2">
                     <Label>Send Email Reminders</Label>
                     <Switch checked={globalSettings.sendEmailReminders} onCheckedChange={(c) => handleChangeGlobal('sendEmailReminders', c)} />

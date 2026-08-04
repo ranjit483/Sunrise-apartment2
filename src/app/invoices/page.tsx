@@ -239,6 +239,9 @@ export default function InvoicesPage() {
       const settingsData = settingsDoc.exists() ? settingsDoc.data() : {}
       const waterFee = settingsData.waterSupplyFlatFee || 0
       const insuranceRate = settingsData.insuranceRatePerSqFt || 0
+      const dieselFlatFee = settingsData.dieselCostFlatFee || 0
+      const structureRate = settingsData.structureMaintenanceRatePerSqFt || 0
+      const otherFlatFee = settingsData.otherChargesFlatFee || 0
 
       const batch = writeBatch(db)
       let count = 0
@@ -273,7 +276,9 @@ export default function InvoicesPage() {
           utilityAmount: 0,
           waterAmount: waterFee,
           insuranceAmount: matchingUnit ? (matchingUnit.area || 0) * insuranceRate : 0,
-          otherAmount: 0,
+          dieselAmount: dieselFlatFee,
+          structureMaintenanceAmount: matchingUnit ? (matchingUnit.area || 0) * structureRate : 0,
+          otherAmount: otherFlatFee,
           dueDate: invoiceDueDate,
           status: 'draft',
           createdAt: new Date().toISOString(),
@@ -350,7 +355,7 @@ export default function InvoicesPage() {
     setPaymentMethod('cash')
     setBankName('')
     setChequeNumber('')
-    const totalAmount = invoice.amount + (invoice.electricityAmount || 0) + (invoice.generatorAmount || 0) + (invoice.utilityAmount || 0) + (invoice.waterAmount || 0) + (invoice.insuranceAmount || 0) + (invoice.otherAmount || 0) - (invoice.paidAmount || 0)
+    const totalAmount = invoice.amount + (invoice.electricityAmount || 0) + (invoice.generatorAmount || 0) + (invoice.utilityAmount || 0) + (invoice.waterAmount || 0) + (invoice.insuranceAmount || 0) + (invoice.dieselAmount || 0) + (invoice.structureMaintenanceAmount || 0) + (invoice.otherAmount || 0) - (invoice.paidAmount || 0)
     setReceiveAmount(totalAmount.toString())
     setChequeAmount(totalAmount.toString())
     setIsReceiveModalOpen(true)
@@ -636,7 +641,7 @@ export default function InvoicesPage() {
                   </thead>
                   <tbody>
                     {filteredInvoices.map((inv) => {
-                      const total = inv.amount + (inv.electricityAmount || 0) + (inv.generatorAmount || 0) + (inv.utilityAmount || 0) + (inv.waterAmount || 0) + (inv.insuranceAmount || 0) + (inv.otherAmount || 0)
+                      const total = inv.amount + (inv.electricityAmount || 0) + (inv.generatorAmount || 0) + (inv.utilityAmount || 0) + (inv.waterAmount || 0) + (inv.insuranceAmount || 0) + (inv.dieselAmount || 0) + (inv.structureMaintenanceAmount || 0) + (inv.otherAmount || 0)
                       return (
                         <tr key={inv.id} className="border-b hover:bg-gray-50/50">
                           <td className="py-3 px-3 font-medium whitespace-nowrap">{inv.id.substring(0, 8)}...</td>
@@ -1040,6 +1045,22 @@ export default function InvoicesPage() {
                       onChange={e => setEditingInvoice({...editingInvoice, insuranceAmount: Number(e.target.value)})} 
                     />
                   </div>
+                  <div className="space-y-2">
+                    <Label>Diesel Cost Amount (Rs)</Label>
+                    <Input 
+                      type="number" 
+                      value={editingInvoice.dieselAmount || 0} 
+                      onChange={e => setEditingInvoice({...editingInvoice, dieselAmount: Number(e.target.value)})} 
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Structure/Maint Amount (Rs)</Label>
+                    <Input 
+                      type="number" 
+                      value={editingInvoice.structureMaintenanceAmount || 0} 
+                      onChange={e => setEditingInvoice({...editingInvoice, structureMaintenanceAmount: Number(e.target.value)})} 
+                    />
+                  </div>
                 <div className="space-y-2">
                   <Label>Other Amount (₨)</Label>
                   <Input 
@@ -1280,15 +1301,15 @@ export default function InvoicesPage() {
                       <div><strong>Diesel Cost Sharing Standby pool</strong></div>
                       <span className="text-[10px] text-gray-600">Diesel standby maintenance pool sharing</span>
                     </td>
-                    <td className="border border-black p-2 text-right font-medium">₨ 850</td>
+                    <td className="border border-black p-2 text-right font-medium">₨ {(viewingInvoice.dieselAmount || 0).toLocaleString()}</td>
                   </tr>
                   <tr className="border-b border-black">
                     <td className="border border-black p-2 text-center">4.</td>
                     <td className="border border-black p-2">
-                      <div><strong>Monthly Service Charge per Sq Ft</strong></div>
-                      <span className="text-[10px] text-gray-600">Sunrise welfare operations rate (Rs 1.75 per Sq Ft)</span>
+                      <div><strong>Structure/ Maintenance Charge</strong></div>
+                      <span className="text-[10px] text-gray-600">Monthly per Sq Ft Basis Bill</span>
                     </td>
-                    <td className="border border-black p-2 text-right font-medium">₨ {(viewingInvoice.utilityAmount || 0).toLocaleString()}</td>
+                    <td className="border border-black p-2 text-right font-medium">₨ {(viewingInvoice.structureMaintenanceAmount || 0).toLocaleString()}</td>
                   </tr>
                   <tr className="border-b border-black">
                     <td className="border border-black p-2 text-center">5.</td>
