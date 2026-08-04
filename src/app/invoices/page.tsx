@@ -764,11 +764,16 @@ export default function InvoicesPage() {
           @media print {
             @page {
               size: 148.5mm 105mm; /* A6 Landscape */
-              margin: 4mm;
+              margin: 0; /* Removing page margins to maximize space */
             }
             body {
               -webkit-print-color-adjust: exact;
               print-color-adjust: exact;
+            }
+            .print-sheet {
+              transform: scale(0.92);
+              transform-origin: top center;
+              margin-top: 2mm !important;
             }
           }
         `}} />
