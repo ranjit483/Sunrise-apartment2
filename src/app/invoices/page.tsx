@@ -771,9 +771,8 @@ export default function InvoicesPage() {
               print-color-adjust: exact;
             }
             .print-sheet {
-              transform: scale(0.92);
-              transform-origin: top center;
-              margin-top: 2mm !important;
+              zoom: 0.85;
+              margin: 0 auto !important;
             }
           }
         `}} />
