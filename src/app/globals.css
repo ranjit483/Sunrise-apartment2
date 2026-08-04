@@ -66,6 +66,10 @@
 }
 
 @media print {
+  body, html, main {
+    overflow: visible !important;
+    height: auto !important;
+  }
   body * {
     visibility: hidden;
   }
@@ -73,6 +77,7 @@
     visibility: visible;
   }
   .print-area {
+    display: block !important;
     position: absolute;
     left: 0;
     top: 0;
