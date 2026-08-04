@@ -111,7 +111,7 @@ export default function PaymentsPage() {
   useEffect(() => {
     if (!profile?.role) return;
     
-    const isResident = profile.role === 'RESIDENT' || profile.role === 'TENANT'
+    const isResident = profile.role === 'RESIDENT' || profile.role === 'TENANT' || profile.role === 'OWNER'
 
     // Fetch payments without index-dependent orderBy to prevent empty history lists
     let q = query(collection(db, 'payments'))

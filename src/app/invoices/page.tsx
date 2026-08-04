@@ -166,12 +166,25 @@ export default function InvoicesPage() {
   }, [])
 
   useEffect(() => {
-    const q = query(collection(db, 'invoices'), orderBy('createdAt', 'desc'))
+    if (profile === undefined) return;
+
+    let q;
+    if (canManageInvoices) {
+      q = query(collection(db, 'invoices'), orderBy('createdAt', 'desc'))
+    } else {
+      q = query(collection(db, 'invoices'), where('tenantId', '==', profile?.uid || ''))
+    }
+
     const unsubscribe = onSnapshot(q, (snapshot: any) => {
       const bData: Invoice[] = []
       snapshot.forEach((doc: any) => {
         bData.push(doc.data() as Invoice)
       })
+      
+      if (!canManageInvoices) {
+        bData.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+      }
+      
       setInvoices(bData)
       setLoading(false)
     }, (error: any) => {
@@ -180,7 +193,7 @@ export default function InvoicesPage() {
     })
 
     return () => unsubscribe()
-  }, [])
+  }, [profile, canManageInvoices])
 
   const handleGenerateDrafts = async () => {
     if (!invoiceMonth || !invoiceDueDate) {
