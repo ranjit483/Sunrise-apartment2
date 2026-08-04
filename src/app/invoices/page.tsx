@@ -804,15 +804,15 @@ export default function InvoicesPage() {
                     <div><strong>Diesel Cost Sharing Standby pool</strong></div>
                     <span className="text-xs text-gray-600">Diesel standby maintenance pool sharing</span>
                   </td>
-                  <td className="border border-black p-2 text-right font-medium">₨ 850</td>
+                  <td className="border border-black p-2 text-right font-medium">₨ {(viewingInvoice.dieselAmount || 0).toLocaleString()}</td>
                 </tr>
                 <tr className="border-b border-black">
                   <td className="border border-black p-2 text-center">4.</td>
                   <td className="border border-black p-2">
-                    <div><strong>Monthly Service Charge per Sq Ft</strong></div>
-                    <span className="text-xs text-gray-600">Sunrise welfare operations rate (Rs 1.75 per Sq Ft)</span>
+                    <div><strong>Structure/ Maintenance Charge</strong></div>
+                    <span className="text-xs text-gray-600">Monthly per Sq Ft Basis Bill</span>
                   </td>
-                  <td className="border border-black p-2 text-right font-medium">₨ {(viewingInvoice.utilityAmount || 0).toLocaleString()}</td>
+                  <td className="border border-black p-2 text-right font-medium">₨ {(viewingInvoice.structureMaintenanceAmount || 0).toLocaleString()}</td>
                 </tr>
                 <tr className="border-b border-black">
                   <td className="border border-black p-2 text-center">5.</td>
