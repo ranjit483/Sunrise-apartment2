@@ -610,24 +610,24 @@ export default function InvoicesPage() {
             ) : invoices.length === 0 ? (
               <div className="text-center py-8 text-muted-foreground">No invoices found. Generate invoices to get started.</div>
             ) : (
-              <div className="overflow-x-auto overflow-y-hidden">
-                <table className="w-full min-w-[1200px] text-sm">
-                  <thead>
+              <div className="overflow-auto max-h-[calc(100vh-280px)] border rounded-md">
+                <table className="w-full min-w-[1200px] text-sm relative">
+                  <thead className="sticky top-0 bg-gray-50 shadow-sm z-10">
                     <tr className="border-b">
-                      <th className="pb-3 text-left px-3 whitespace-nowrap">Invoice ID</th>
-                      <th className="pb-3 text-left px-3 whitespace-nowrap">Unit</th>
-                      <th className="pb-3 text-left px-3 whitespace-nowrap">Resident/Tenant</th>
-                      <th className="pb-3 text-left px-3 whitespace-nowrap">Month</th>
-                      <th className="pb-3 text-left px-3 whitespace-nowrap">Due Date</th>
-                      <th className="pb-3 text-left px-3 whitespace-nowrap">Rent</th>
-                      <th className="pb-3 text-left px-3 whitespace-nowrap">Electricity</th>
-                      <th className="pb-3 text-left px-3 whitespace-nowrap">Utility</th>
-                      <th className="pb-3 text-left px-3 whitespace-nowrap">Water</th>
-                      <th className="pb-3 text-left px-3 whitespace-nowrap">Insurance</th>
-                      <th className="pb-3 text-left px-3 whitespace-nowrap">Other</th>
-                      <th className="pb-3 text-left px-3 whitespace-nowrap">Total</th>
-                      <th className="pb-3 text-left px-3 whitespace-nowrap">Status</th>
-                      <th className="pb-3 text-left px-3 whitespace-nowrap">Actions</th>
+                      <th className="py-3 px-3 text-left whitespace-nowrap">Invoice ID</th>
+                      <th className="py-3 px-3 text-left whitespace-nowrap">Unit</th>
+                      <th className="py-3 px-3 text-left whitespace-nowrap">Resident/Tenant</th>
+                      <th className="py-3 px-3 text-left whitespace-nowrap">Month</th>
+                      <th className="py-3 px-3 text-left whitespace-nowrap">Due Date</th>
+                      <th className="py-3 px-3 text-left whitespace-nowrap">Rent</th>
+                      <th className="py-3 px-3 text-left whitespace-nowrap">Electricity</th>
+                      <th className="py-3 px-3 text-left whitespace-nowrap">Utility</th>
+                      <th className="py-3 px-3 text-left whitespace-nowrap">Water</th>
+                      <th className="py-3 px-3 text-left whitespace-nowrap">Insurance</th>
+                      <th className="py-3 px-3 text-left whitespace-nowrap">Other</th>
+                      <th className="py-3 px-3 text-left whitespace-nowrap">Total</th>
+                      <th className="py-3 px-3 text-left whitespace-nowrap">Status</th>
+                      <th className="py-3 px-3 text-left whitespace-nowrap">Actions</th>
                     </tr>
                   </thead>
                   <tbody>
