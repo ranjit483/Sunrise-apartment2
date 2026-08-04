@@ -38,6 +38,7 @@ export interface Invoice {
   generatorAmount?: number
   utilityAmount?: number
   waterAmount?: number
+  insuranceAmount?: number
   otherAmount?: number
   paidAmount?: number
   dueDate: string
