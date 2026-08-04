@@ -611,23 +611,23 @@ export default function InvoicesPage() {
               <div className="text-center py-8 text-muted-foreground">No invoices found. Generate invoices to get started.</div>
             ) : (
               <div className="overflow-x-auto overflow-y-hidden">
-                <table className="w-full min-w-[850px] text-sm">
+                <table className="w-full min-w-[1200px] text-sm">
                   <thead>
                     <tr className="border-b">
-                      <th className="pb-3 text-left">Invoice ID</th>
-                      <th className="pb-3 text-left">Unit</th>
-                      <th className="pb-3 text-left">Resident/Tenant</th>
-                      <th className="pb-3 text-left">Month</th>
-                      <th className="pb-3 text-left">Due Date</th>
-                      <th className="pb-3 text-left">Rent</th>
-                      <th className="pb-3 text-left">Electricity</th>
-                      <th className="pb-3 text-left">Utility</th>
-                      <th className="pb-3 text-left">Water</th>
-                      <th className="pb-3 text-left">Insurance</th>
-                      <th className="pb-3 text-left">Other</th>
-                      <th className="pb-3 text-left">Total</th>
-                      <th className="pb-3 text-left">Status</th>
-                      <th className="pb-3 text-left">Actions</th>
+                      <th className="pb-3 text-left px-3 whitespace-nowrap">Invoice ID</th>
+                      <th className="pb-3 text-left px-3 whitespace-nowrap">Unit</th>
+                      <th className="pb-3 text-left px-3 whitespace-nowrap">Resident/Tenant</th>
+                      <th className="pb-3 text-left px-3 whitespace-nowrap">Month</th>
+                      <th className="pb-3 text-left px-3 whitespace-nowrap">Due Date</th>
+                      <th className="pb-3 text-left px-3 whitespace-nowrap">Rent</th>
+                      <th className="pb-3 text-left px-3 whitespace-nowrap">Electricity</th>
+                      <th className="pb-3 text-left px-3 whitespace-nowrap">Utility</th>
+                      <th className="pb-3 text-left px-3 whitespace-nowrap">Water</th>
+                      <th className="pb-3 text-left px-3 whitespace-nowrap">Insurance</th>
+                      <th className="pb-3 text-left px-3 whitespace-nowrap">Other</th>
+                      <th className="pb-3 text-left px-3 whitespace-nowrap">Total</th>
+                      <th className="pb-3 text-left px-3 whitespace-nowrap">Status</th>
+                      <th className="pb-3 text-left px-3 whitespace-nowrap">Actions</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -635,18 +635,18 @@ export default function InvoicesPage() {
                       const total = inv.amount + (inv.electricityAmount || 0) + (inv.generatorAmount || 0) + (inv.utilityAmount || 0) + (inv.waterAmount || 0) + (inv.insuranceAmount || 0) + (inv.otherAmount || 0)
                       return (
                         <tr key={inv.id} className="border-b hover:bg-gray-50/50">
-                          <td className="py-3 font-medium">{inv.id.substring(0, 8)}...</td>
-                          <td className="py-3 font-semibold text-gray-700">{inv.unitNumber || (inv.unitId !== 'N/A' ? inv.unitId.substring(0,8) + '...' : 'N/A')}</td>
-                          <td className="py-3">{formatTenantName(inv.tenantName, inv.tenantId)}</td>
-                          <td className="py-3">{inv.month}</td>
-                          <td className="py-3">{inv.dueDate}</td>
-                          <td className="py-3">₨ {inv.amount.toLocaleString()}</td>
-                          <td className="py-3">₨ {((inv.electricityAmount || 0) + (inv.generatorAmount || 0)).toLocaleString()}</td>
-                          <td className="py-3">₨ {(inv.utilityAmount || 0).toLocaleString()}</td>
-                          <td className="py-3">₨ {(inv.waterAmount || 0).toLocaleString()}</td>
-                          <td className="py-3">₨ {(inv.insuranceAmount || 0).toLocaleString()}</td>
-                          <td className="py-3">₨ {(inv.otherAmount || 0).toLocaleString()}</td>
-                          <td className="py-3 font-semibold text-indigo-700">
+                          <td className="py-3 px-3 font-medium whitespace-nowrap">{inv.id.substring(0, 8)}...</td>
+                          <td className="py-3 px-3 font-semibold text-gray-700 whitespace-nowrap">{inv.unitNumber || (inv.unitId !== 'N/A' ? inv.unitId.substring(0,8) + '...' : 'N/A')}</td>
+                          <td className="py-3 px-3 whitespace-nowrap">{formatTenantName(inv.tenantName, inv.tenantId)}</td>
+                          <td className="py-3 px-3 whitespace-nowrap">{inv.month}</td>
+                          <td className="py-3 px-3 whitespace-nowrap">{inv.dueDate}</td>
+                          <td className="py-3 px-3 whitespace-nowrap">₨ {inv.amount.toLocaleString()}</td>
+                          <td className="py-3 px-3 whitespace-nowrap">₨ {((inv.electricityAmount || 0) + (inv.generatorAmount || 0)).toLocaleString()}</td>
+                          <td className="py-3 px-3 whitespace-nowrap">₨ {(inv.utilityAmount || 0).toLocaleString()}</td>
+                          <td className="py-3 px-3 whitespace-nowrap">₨ {(inv.waterAmount || 0).toLocaleString()}</td>
+                          <td className="py-3 px-3 whitespace-nowrap">₨ {(inv.insuranceAmount || 0).toLocaleString()}</td>
+                          <td className="py-3 px-3 whitespace-nowrap">₨ {(inv.otherAmount || 0).toLocaleString()}</td>
+                          <td className="py-3 px-3 font-semibold text-indigo-700 whitespace-nowrap">
                             ₨ {total.toLocaleString()}
                             {inv.paidAmount ? (
                               <div className="text-[10px] text-gray-500 font-normal">
@@ -654,12 +654,12 @@ export default function InvoicesPage() {
                               </div>
                             ) : null}
                           </td>
-                          <td className="py-3">
+                          <td className="py-3 px-3 whitespace-nowrap">
                             <Badge variant="outline" className={`${statusColors[inv.status] || ''} font-semibold uppercase text-xs px-2 py-0.5 rounded-full`}>
                               {inv.status}
                             </Badge>
                           </td>
-                          <td className="py-3">
+                          <td className="py-3 px-3 whitespace-nowrap">
                             <div className="flex gap-1.5 items-center">
                               <Button 
                                 variant="ghost" 
