@@ -222,8 +222,17 @@ export default function InvoicesPage() {
       const mm = String(monthNames.indexOf(mName) + 1).padStart(2, '0');
       const targetMonthStr = `${yyyy}-${mm}`; 
 
+      const variations = [
+        targetMonthStr, 
+        invoiceMonth, 
+        invoiceMonth.replace('Asadha', 'Asadh'), 
+        invoiceMonth.replace('Asadh', 'Asadha'),
+        invoiceMonth.replace('Jestha', 'Jesth'),
+        invoiceMonth.replace('Jesth', 'Jestha')
+      ].filter(Boolean);
+      
       // Fetch electricity readings for the target month
-      const readingsSnap = await getDocs(query(collection(db, 'electricity_readings'), where('month', 'in', Array.from(new Set([targetMonthStr, invoiceMonth]))), where('status', '==', 'approved')));
+      const readingsSnap = await getDocs(query(collection(db, 'electricity_readings'), where('month', 'in', Array.from(new Set(variations))), where('status', '==', 'approved')));
       const readingsByUnit: Record<string, { city?: any, generator?: any }> = {};
       readingsSnap.forEach((doc: any) => {
         const data = doc.data();
@@ -628,9 +637,8 @@ export default function InvoicesPage() {
                       <th className="py-3 px-3 text-left whitespace-nowrap">Resident/Tenant</th>
                       <th className="py-3 px-3 text-left whitespace-nowrap">Month</th>
                       <th className="py-3 px-3 text-left whitespace-nowrap">Due Date</th>
-                      <th className="py-3 px-3 text-left whitespace-nowrap">Rent</th>
+                      <th className="py-3 px-3 text-left whitespace-nowrap">Service Charge</th>
                       <th className="py-3 px-3 text-left whitespace-nowrap">Electricity</th>
-                      <th className="py-3 px-3 text-left whitespace-nowrap">Utility</th>
                       <th className="py-3 px-3 text-left whitespace-nowrap">Water</th>
                       <th className="py-3 px-3 text-left whitespace-nowrap">Insurance</th>
                       <th className="py-3 px-3 text-left whitespace-nowrap">Other</th>
@@ -650,8 +658,14 @@ export default function InvoicesPage() {
                           <td className="py-3 px-3 whitespace-nowrap">{inv.month}</td>
                           <td className="py-3 px-3 whitespace-nowrap">{inv.dueDate}</td>
                           <td className="py-3 px-3 whitespace-nowrap">₨ {inv.amount.toLocaleString()}</td>
-                          <td className="py-3 px-3 whitespace-nowrap">₨ {((inv.electricityAmount || 0) + (inv.generatorAmount || 0)).toLocaleString()}</td>
-                          <td className="py-3 px-3 whitespace-nowrap">₨ {(inv.utilityAmount || 0).toLocaleString()}</td>
+                          <td className="py-3 px-3 whitespace-nowrap">
+                            <div className="font-medium">₨ {((inv.electricityAmount || 0) + (inv.generatorAmount || 0)).toLocaleString()}</div>
+                            {(inv.electricityReading || inv.electricityPreviousReading || inv.electricityConsumed) ? (
+                              <div className="text-[10px] text-gray-500 mt-0.5">
+                                Prev: {inv.electricityPreviousReading || 0} | Curr: {inv.electricityReading || 0} | Unit: {inv.electricityConsumed || 0}
+                              </div>
+                            ) : null}
+                          </td>
                           <td className="py-3 px-3 whitespace-nowrap">₨ {(inv.waterAmount || 0).toLocaleString()}</td>
                           <td className="py-3 px-3 whitespace-nowrap">₨ {(inv.insuranceAmount || 0).toLocaleString()}</td>
                           <td className="py-3 px-3 whitespace-nowrap">₨ {(inv.otherAmount || 0).toLocaleString()}</td>
@@ -848,7 +862,7 @@ export default function InvoicesPage() {
                   <tr className="border-b border-black">
                     <td className="border border-black p-2 text-center">10.</td>
                     <td className="border border-black p-2">
-                      <div><strong>Basic Unit Rent</strong></div>
+                      <div><strong>Basic Unit Service Charge</strong></div>
                       <span className="text-xs text-gray-600">Apartment basic rent amount</span>
                     </td>
                     <td className="border border-black p-2 text-right font-medium">₨ {viewingInvoice.amount.toLocaleString()}</td>
@@ -954,7 +968,7 @@ export default function InvoicesPage() {
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label>Rent Amount (₨)</Label>
+                  <Label>Service Charge Amount (₨)</Label>
                   <Input 
                     type="number" 
                     value={editingInvoice.amount} 
@@ -1363,7 +1377,7 @@ export default function InvoicesPage() {
                     <tr className="border-b border-black">
                       <td className="border border-black p-2 text-center">11.</td>
                       <td className="border border-black p-2">
-                        <div><strong>Basic Unit Rent</strong></div>
+                        <div><strong>Basic Unit Service Charge</strong></div>
                         <span className="text-[10px] text-gray-600">Apartment basic rent amount</span>
                       </td>
                       <td className="border border-black p-2 text-right font-medium">₨ {viewingInvoice.amount.toLocaleString()}</td>

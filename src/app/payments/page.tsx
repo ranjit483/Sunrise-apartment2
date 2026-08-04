@@ -617,7 +617,7 @@ export default function PaymentsPage() {
                         <tr className="border-b border-black">
                           <td className="border border-black p-2 text-center">10.</td>
                           <td className="border border-black p-2">
-                            <div><strong>Basic Unit Rent</strong></div>
+                            <div><strong>Basic Unit Service Charge</strong></div>
                             <span className="text-[10px] text-gray-600">Apartment basic rent amount</span>
                           </td>
                           <td className="border border-black p-2 text-right font-medium">₨ {viewingInvoice.amount.toLocaleString()}</td>
