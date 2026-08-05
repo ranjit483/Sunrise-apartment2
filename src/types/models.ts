@@ -44,6 +44,7 @@ export interface Invoice {
   dieselAmount?: number
   structureMaintenanceAmount?: number
   otherAmount?: number
+  previousPendingOutstandingDue?: number
   paidAmount?: number
   dueDate: string
   status: 'draft' | 'pending' | 'partial' | 'paid' | 'overdue'
