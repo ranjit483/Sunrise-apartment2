@@ -235,18 +235,36 @@ export default function InvoicesPage() {
       const mm = String(monthNames.indexOf(mName) + 1).padStart(2, '0');
       const targetMonthStr = `${yyyy}-${mm}`; 
 
-      const variations = [
-        targetMonthStr, 
-        invoiceMonth, 
-        invoiceMonth.replace('Asadha', 'Asadh'), 
-        invoiceMonth.replace('Asadh', 'Asadha'),
-        invoiceMonth.replace('Ashadh', 'Asadh'),
-        invoiceMonth.replace('Ashadha', 'Asadh'),
-        invoiceMonth.replace('Asadh', 'Ashadh'),
-        invoiceMonth.replace('Asadha', 'Ashadh'),
-        invoiceMonth.replace('Jestha', 'Jesth'),
-        invoiceMonth.replace('Jesth', 'Jestha')
-      ].filter(Boolean);
+      const base = invoiceMonth.trim();
+      const parts = base.split(' ');
+      let monthPart = parts[0];
+      let yearPart = parts[1] || '';
+
+      let normalized = [monthPart];
+      if (monthPart.toLowerCase().includes('asad')) {
+        normalized = ['Asadh', 'Asadha', 'Ashadh', 'Ashadha'];
+      } else if (monthPart.toLowerCase().includes('jest')) {
+        normalized = ['Jesth', 'Jestha'];
+      } else if (monthPart.toLowerCase().includes('bais')) {
+        normalized = ['Baishakh', 'Baisakh'];
+      } else if (monthPart.toLowerCase().includes('shraw')) {
+        normalized = ['Shrawan', 'Sawan'];
+      } else if (monthPart.toLowerCase().includes('bhad')) {
+        normalized = ['Bhadra', 'Bhadau'];
+      }
+
+      let rawVariations = [targetMonthStr, base];
+      normalized.forEach(n => {
+        rawVariations.push(n);
+        if (yearPart) {
+          rawVariations.push(`${n} ${yearPart}`);
+        } else {
+          rawVariations.push(`${n} 2083`);
+          rawVariations.push(`${n} 2084`);
+          rawVariations.push(`${n} 2026`);
+        }
+      });
+      const variations = Array.from(new Set(rawVariations)).filter(Boolean);
       
       // Fetch electricity readings for the target month
       const readingsSnap = await getDocs(query(collection(db, 'electricity_readings'), where('month', 'in', Array.from(new Set(variations))), where('status', '==', 'approved')));
