@@ -45,6 +45,7 @@ export interface Invoice {
   structureMaintenanceAmount?: number
   otherAmount?: number
   previousPendingOutstandingDue?: number
+  latePenaltyAmount?: number
   paidAmount?: number
   dueDate: string
   status: 'draft' | 'pending' | 'partial' | 'paid' | 'overdue'
