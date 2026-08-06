@@ -787,7 +787,7 @@ export default function InvoicesPage() {
         <style dangerouslySetInnerHTML={{__html: `
           @media print {
             @page {
-              size: A6 landscape !important; /* Force A6 Landscape */
+              size: 105mm 148mm portrait !important; /* Force A6 Portrait */
               margin: 0mm !important;
             }
             body, html {
@@ -795,36 +795,40 @@ export default function InvoicesPage() {
               print-color-adjust: exact;
               margin: 0 !important;
               padding: 0 !important;
-              width: 100vw !important;
-              height: 100vh !important;
+              width: 105mm !important;
+              height: 148mm !important;
+              overflow: hidden !important;
             }
             .print-sheet {
-              width: 100vw !important;
-              height: 100vh !important;
+              width: 105mm !important;
+              height: 147mm !important;
               margin: 0 !important;
-              padding: 4mm !important;
+              padding: 3mm !important;
               box-sizing: border-box;
               display: flex;
               flex-direction: column;
               justify-content: space-between;
+              overflow: hidden !important;
+              page-break-after: avoid;
+              page-break-inside: avoid;
             }
             .print-sheet table {
               flex-grow: 1;
             }
             .print-sheet td, .print-sheet th {
-              padding: 2mm !important;
+              padding: 1.5mm !important;
             }
             .print-sheet .text-\\[8px\\] {
-              font-size: 11px !important;
+              font-size: 8px !important;
             }
             .print-sheet .text-\\[7px\\] {
-              font-size: 10px !important;
+              font-size: 7px !important;
             }
             .print-sheet .text-\\[9px\\] {
-              font-size: 12px !important;
+              font-size: 9px !important;
             }
             .print-sheet .text-sm {
-              font-size: 18px !important;
+              font-size: 12px !important;
             }
           }
         `}} />
