@@ -783,27 +783,55 @@ export default function InvoicesPage() {
       </div>
 
       {/* RENDER FOR PRINT MODE ONLY */}
-      <div className="hidden print:block print-area">
+      <div className="hidden print:flex print:items-center print:justify-center print-area w-full h-full">
         <style dangerouslySetInnerHTML={{__html: `
           @media print {
             @page {
-              size: 148.5mm 105mm; /* A6 Landscape */
-              margin: 0; /* Removing page margins to maximize space */
+              size: 148mm 105mm; /* A6 Landscape */
+              margin: 0mm;
             }
             body {
               -webkit-print-color-adjust: exact;
               print-color-adjust: exact;
+              margin: 0;
+              padding: 0;
+              width: 148mm;
+              height: 105mm;
             }
             .print-sheet {
-              zoom: 0.85;
-              margin: 0 auto !important;
+              width: 148mm !important;
+              height: 105mm !important;
+              margin: 0 !important;
+              padding: 4mm !important;
+              box-sizing: border-box;
+              display: flex;
+              flex-direction: column;
+              justify-content: space-between; /* This spreads the content to fill the height */
+            }
+            .print-sheet table {
+              flex-grow: 1; /* Makes the table take up remaining space */
+            }
+            .print-sheet td, .print-sheet th {
+              padding: 2mm !important; /* slightly larger padding to fill space */
+            }
+            .print-sheet .text-\\[8px\\] {
+              font-size: 10px !important; /* Increase font size */
+            }
+            .print-sheet .text-\\[7px\\] {
+              font-size: 9px !important;
+            }
+            .print-sheet .text-\\[9px\\] {
+              font-size: 11px !important;
+            }
+            .print-sheet .text-sm {
+              font-size: 16px !important;
             }
           }
         `}} />
         {/* If viewing invoice details */}
         {viewingInvoice && (
-          <div className="bg-white p-1.5 w-[140mm] mx-auto text-black border border-black rounded-sm print-sheet shadow-none">
-            <div className="text-center border-b pb-1.5 mb-1.5">
+          <div className="bg-white p-1.5 w-full h-full mx-auto text-black border-2 border-black rounded-sm print-sheet shadow-none">
+            <div className="text-center border-b-2 border-black pb-1.5 mb-1.5">
               <h1 className="text-sm font-black tracking-tight text-gray-900">SUNRISE APARTMENT WELFARE SOCIETY</h1>
               <p className="text-[9px] font-medium text-gray-700">Nakkhu-13, Lalitpur, Nepal | Phone: 01-5185110</p>
               <div className="inline-block border border-black font-extrabold px-2 py-0.5 rounded-sm bg-gray-50 text-[8px] mt-1 uppercase tracking-widest text-gray-950">
@@ -811,7 +839,7 @@ export default function InvoicesPage() {
               </div>
             </div>
 
-            <div className="grid grid-cols-2 gap-y-0.5 text-[8px] mb-1.5 border border-black p-1 rounded-sm bg-gray-50">
+            <div className="grid grid-cols-2 gap-y-0.5 text-[8px] mb-1.5 border-2 border-black p-1 rounded-sm bg-gray-50">
               <div><strong>Unit Number:</strong> {viewingInvoice.unitNumber}</div>
               <div className="text-right"><strong>Invoice No:</strong> {viewingInvoice.id.substring(0, 10).toUpperCase()}</div>
               <div><strong>Owner/Tenant:</strong> {formatTenantName(viewingInvoice.tenantName, viewingInvoice.tenantId)}</div>
@@ -822,9 +850,9 @@ export default function InvoicesPage() {
               <div className="text-right font-bold text-red-700"><strong>Due Date:</strong> {getNepaliDate(viewingInvoice.dueDate).ad}</div>
             </div>
 
-            <table className="w-full text-[8px] border-collapse border border-black mb-1.5 leading-tight">
+            <table className="w-full text-[8px] border-collapse border-2 border-black mb-1.5 leading-tight flex-grow">
               <thead>
-                <tr className="bg-gray-100 font-bold border-b border-black text-[8px] uppercase text-gray-950">
+                <tr className="bg-gray-100 font-bold border-b-2 border-black text-[8px] uppercase text-gray-950">
                   <th className="border border-black p-0.5 text-center w-6">S.N.</th>
                   <th className="border border-black p-0.5 text-left">Particulars & Service Details</th>
                   <th className="border border-black p-0.5 text-right w-20">Amount (₨)</th>
@@ -917,8 +945,8 @@ export default function InvoicesPage() {
                     <td className="border border-black p-0.5 text-right font-medium align-middle">₨ {viewingInvoice.amount.toLocaleString()}</td>
                   </tr>
                 )}
-                <tr className="bg-gray-100 font-extrabold text-[9px] border-t border-black text-gray-950">
-                  <td colSpan={2} className="border border-black p-0.5 text-right uppercase tracking-wider">Grand Total:</td>
+                <tr className="bg-gray-100 font-extrabold text-[9px] border-t-2 border-black text-gray-950">
+                  <td colSpan={2} className="border border-black p-0.5 text-right uppercase tracking-wider align-middle">Grand Total:</td>
                   <td className="border border-black p-0.5 text-right font-black align-middle">
                     ₨ {(viewingInvoice.amount + (viewingInvoice.electricityAmount || 0) + (viewingInvoice.generatorAmount || 0) + (viewingInvoice.utilityAmount || 0) + (viewingInvoice.waterAmount || 0) + (viewingInvoice.insuranceAmount || 0) + (viewingInvoice.dieselAmount || 0) + (viewingInvoice.structureMaintenanceAmount || 0) + (viewingInvoice.otherAmount || 0) + (viewingInvoice.previousPendingOutstandingDue || 0) + (viewingInvoice.latePenaltyAmount || 0)).toLocaleString()}
                   </td>
@@ -926,8 +954,8 @@ export default function InvoicesPage() {
               </tbody>
             </table>
 
-            <div className="flex justify-between items-end gap-2">
-              <div className="border border-black p-1 rounded-sm bg-gray-50 flex-grow text-[8px] self-stretch">
+            <div className="flex justify-between items-end gap-2 mt-auto pt-1">
+              <div className="border-2 border-black p-1 rounded-sm bg-gray-50 flex-grow text-[8px] self-stretch">
                 <strong className="text-[7px] uppercase text-gray-600 block mb-0.5">Amount in Words:</strong>
                 <div className="font-bold text-gray-900 text-[8px]">
                   {numberToWords(viewingInvoice.amount + (viewingInvoice.electricityAmount || 0) + (viewingInvoice.generatorAmount || 0) + (viewingInvoice.utilityAmount || 0) + (viewingInvoice.waterAmount || 0) + (viewingInvoice.insuranceAmount || 0) + (viewingInvoice.dieselAmount || 0) + (viewingInvoice.structureMaintenanceAmount || 0) + (viewingInvoice.otherAmount || 0) + (viewingInvoice.previousPendingOutstandingDue || 0) + (viewingInvoice.latePenaltyAmount || 0))}
@@ -936,11 +964,11 @@ export default function InvoicesPage() {
 
               <div className="flex gap-4 shrink-0 pb-1 pr-1">
                 <div className="text-center w-20">
-                  <div className="border-b border-black h-4 w-full mx-auto"></div>
+                  <div className="border-b-2 border-black h-4 w-full mx-auto"></div>
                   <p className="text-[6px] font-bold uppercase mt-1 text-gray-700">Resident Signature</p>
                 </div>
                 <div className="text-center w-20">
-                  <div className="border-b border-black h-4 w-full mx-auto"></div>
+                  <div className="border-b-2 border-black h-4 w-full mx-auto"></div>
                   <p className="text-[6px] font-bold uppercase mt-1 text-gray-700">Society Signatory</p>
                 </div>
               </div>
