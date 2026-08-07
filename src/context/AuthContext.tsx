@@ -2,8 +2,8 @@
 
 import { createContext, useContext, useEffect, useState, ReactNode } from 'react'
 import { User, onAuthStateChanged, signOut as firebaseSignOut } from 'firebase/auth'
-import { doc, getDoc, DocumentData, getFirestore } from 'firebase/firestore'
-import { auth, app } from '@/config/firebase'
+import { DocumentData } from 'firebase/firestore'
+import { auth, app, db, doc, getDoc, setDoc, updateDoc } from '@/config/firebase'
 
 export type UserRole = 
   | 'SUPER_ADMIN'
@@ -57,7 +57,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const fetchProfile = async (userId: string) => {
     try {
       setError(null);
-      const firestoreDb = getFirestore(app);
+      const firestoreDb = db;
       const userDoc = await getDoc(doc(firestoreDb, 'users', userId));
       
       if (userDoc.exists()) {
@@ -70,7 +70,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         
         if (data.email === 'ranjitmanaraja@gmail.com' && (data.status !== 'approved' || data.role !== 'SUPER_ADMIN')) {
           try {
-            const { updateDoc } = await import('firebase/firestore');
             await updateDoc(doc(firestoreDb, 'users', userId), {
               status: 'approved',
               role: 'SUPER_ADMIN',
@@ -110,7 +109,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           }
 
           try {
-            const { setDoc } = await import('firebase/firestore');
             await setDoc(doc(firestoreDb, 'users', userId), newProfile);
           } catch (e) {
             console.error('Failed fallback setDoc, proceeding with local profile:', e);
@@ -123,7 +121,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
     } catch (err: any) {
       console.error('Error fetching profile:', err)
-      const firestoreDb = getFirestore(app);
+      const firestoreDb = db;
       const debugInfo = `db is: ${typeof firestoreDb}, constructor: ${firestoreDb?.constructor?.name}, has type: ${firestoreDb?.type}`
       setError(err.message + ' | ' + debugInfo)
       setProfile(null)

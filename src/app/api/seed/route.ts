@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import { db } from '@/config/firebase'
+import { db } from '@/config/firebase-server'
 import { collection, writeBatch, doc } from 'firebase/firestore'
 import { Building, Unit, Lease, Invoice, Payment, MaintenanceTicket, ChartOfAccount } from '@/types/models'
 

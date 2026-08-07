@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { collection, getDocs, updateDoc, doc } from 'firebase/firestore';
-import { db } from '@/config/firebase';
+import { db } from '@/config/firebase-server';
 import * as xlsx from 'xlsx';
 import path from 'path';
 
