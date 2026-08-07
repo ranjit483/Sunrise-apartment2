@@ -4,7 +4,6 @@ import { createContext, useContext, useEffect, useState, ReactNode } from 'react
 import { User, onAuthStateChanged, signOut as firebaseSignOut } from 'firebase/auth'
 import { doc, getDoc, DocumentData, getFirestore } from 'firebase/firestore'
 import { auth, app } from '@/config/firebase'
-import { logActivity } from '@/lib/logger'
 
 export type UserRole = 
   | 'SUPER_ADMIN'
@@ -112,7 +111,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
           try {
             const { setDoc } = await import('firebase/firestore');
-            await setDoc(doc(db, 'users', userId), newProfile);
+            await setDoc(doc(firestoreDb, 'users', userId), newProfile);
           } catch (e) {
             console.error('Failed fallback setDoc, proceeding with local profile:', e);
           }
@@ -148,9 +147,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const signOut = async () => {
     try {
-      if (user) {
-        await logActivity(user.uid, user.email || 'Unknown', 'LOGOUT', 'User logged out')
-      }
       await firebaseSignOut(auth)
       setUser(null)
       setProfile(null)
