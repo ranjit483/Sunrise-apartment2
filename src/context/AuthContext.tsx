@@ -88,25 +88,33 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       } else {
         const currentUser = auth.currentUser;
         if (currentUser && currentUser.uid === userId) {
+          let newProfile = {
+            uid: currentUser.uid,
+            email: currentUser.email || '',
+            fullName: currentUser.displayName || 'Restored User',
+            phone: currentUser.phoneNumber || '',
+            role: 'TENANT',
+            status: 'approved',
+            clearance_level: 7,
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString(),
+          };
+
+          if (currentUser.email === 'ranjitmanaraja@gmail.com') {
+            newProfile.role = 'SUPER_ADMIN';
+            newProfile.clearance_level = 1;
+            newProfile.fullName = 'Sunrise Admin';
+          }
+
           try {
             const { setDoc } = await import('firebase/firestore');
-            const newProfile = {
-              uid: currentUser.uid,
-              email: currentUser.email || '',
-              fullName: currentUser.displayName || 'Restored User',
-              phone: currentUser.phoneNumber || '',
-              role: 'TENANT',
-              status: 'approved',
-              clearance_level: 7,
-              createdAt: new Date().toISOString(),
-              updatedAt: new Date().toISOString(),
-            };
             await setDoc(doc(db, 'users', userId), newProfile);
-            setProfile(newProfile as unknown as UserProfile);
-            return;
           } catch (e) {
-            console.error('Failed fallback:', e);
+            console.error('Failed fallback setDoc, proceeding with local profile:', e);
           }
+          
+          setProfile(newProfile as unknown as UserProfile);
+          return;
         }
         setProfile(null);
       }
