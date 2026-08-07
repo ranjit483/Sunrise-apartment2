@@ -14,7 +14,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Badge } from '@/components/ui/badge'
 import { Eye, EyeOff, Loader2, Building2 } from 'lucide-react'
 import { useAuth } from '@/context/AuthContext'
-
+import { logActivity } from '@/lib/logger'
 interface AuthModalProps {
   open: boolean
   onOpenChange: (open: boolean) => void
@@ -166,10 +166,12 @@ export function AuthModal({ open, onOpenChange }: AuthModalProps) {
         })
 
         await refreshProfile()
+        await logActivity(user.uid, user.email || 'Unknown', 'LOGIN', 'User registered and logged in')
         onOpenChange(false)
       } else {
-        await signInWithEmailAndPassword(auth, formData.email, formData.password)
+        const userCredential = await signInWithEmailAndPassword(auth, formData.email, formData.password)
         await refreshProfile()
+        await logActivity(userCredential.user.uid, userCredential.user.email || 'Unknown', 'LOGIN', 'User logged in via email')
         onOpenChange(false)
       }
     } catch (err: any) {
@@ -216,6 +218,7 @@ export function AuthModal({ open, onOpenChange }: AuthModalProps) {
       }
 
       await refreshProfile()
+      await logActivity(user.uid, user.email || 'Unknown', 'LOGIN', 'User logged in via Google')
       onOpenChange(false)
     } catch (err: any) {
       console.error('Google auth error:', err)

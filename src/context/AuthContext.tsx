@@ -4,6 +4,7 @@ import { createContext, useContext, useEffect, useState, ReactNode } from 'react
 import { User, onAuthStateChanged, signOut as firebaseSignOut } from 'firebase/auth'
 import { doc, getDoc, DocumentData } from 'firebase/firestore'
 import { auth, db } from '@/config/firebase'
+import { logActivity } from '@/lib/logger'
 
 export type UserRole = 
   | 'SUPER_ADMIN'
@@ -132,6 +133,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const signOut = async () => {
     try {
+      if (user) {
+        await logActivity(user.uid, user.email || 'Unknown', 'LOGOUT', 'User logged out')
+      }
       await firebaseSignOut(auth)
       setUser(null)
       setProfile(null)

@@ -23,6 +23,7 @@ import {
   Wallet,
   BookOpen,
   Zap,
+  Activity,
 } from 'lucide-react'
 import { useState } from 'react'
 import { useAuth } from '@/context/AuthContext'
@@ -59,6 +60,7 @@ const navItems: NavItem[] = [
   { title: 'Reports', href: '/reports', icon: BarChart3, minClearance: 2 },
   { title: 'Profile', href: '/profile', icon: UserCheck, excludeRoles: ['OWNER'] },
   { title: 'SLA Policy', href: '/sla', icon: FileText },
+  { title: 'Activity Logs', href: '/logs', icon: Activity, roles: ['SUPER_ADMIN'] },
   { title: 'Settings', href: '/settings', icon: Settings },
 ]
 
