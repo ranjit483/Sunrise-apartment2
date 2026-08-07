@@ -190,7 +190,7 @@ export default function PaymentsPage() {
       return
     }
 
-    const invoiceTotal = viewingInvoice.amount + (viewingInvoice.electricityAmount || 0) + (viewingInvoice.generatorAmount || 0) + (viewingInvoice.utilityAmount || 0) + (viewingInvoice.waterAmount || 0) + (viewingInvoice.insuranceAmount || 0) + (viewingInvoice.dieselAmount || 0) + (viewingInvoice.structureMaintenanceAmount || 0) + (viewingInvoice.otherAmount || 0)
+    const invoiceTotal = viewingInvoice.amount + (viewingInvoice.electricityAmount || 0) + (viewingInvoice.generatorAmount || 0) + (viewingInvoice.utilityAmount || 0) + (viewingInvoice.waterAmount || 0) + (viewingInvoice.insuranceAmount || 0) + (viewingInvoice.dieselAmount || 0) + (viewingInvoice.structureMaintenanceAmount || 0) + (viewingInvoice.otherAmount || 0) + (viewingInvoice.previousPendingOutstandingDue || 0) + (viewingInvoice.latePenaltyAmount || 0)
     const prevPaid = viewingInvoice.paidAmount || 0
     const remainingTotal = invoiceTotal - prevPaid
     const parsedAmount = parseFloat(payAmount)
@@ -603,7 +603,7 @@ export default function PaymentsPage() {
                           <div><strong>Previous Pending Outstanding Due</strong></div>
                           <span className="text-[10px] text-gray-600">Brought forward balance from previous cycles</span>
                         </td>
-                        <td className="border border-black p-2 text-right font-medium">₨ 0.00</td>
+                        <td className="border border-black p-2 text-right font-medium">₨ {(viewingInvoice.previousPendingOutstandingDue || 0).toLocaleString()}</td>
                       </tr>
                       <tr className="border-b border-black">
                         <td className="border border-black p-2 text-center">9.</td>
@@ -611,7 +611,7 @@ export default function PaymentsPage() {
                           <div><strong>Society Delay / Late Penalty Surcharges</strong></div>
                           <span className="text-[10px] text-gray-600">Applied delay penalty</span>
                         </td>
-                        <td className="border border-black p-2 text-right font-medium">₨ 0.00</td>
+                        <td className="border border-black p-2 text-right font-medium">₨ {(viewingInvoice.latePenaltyAmount || 0).toLocaleString()}</td>
                       </tr>
                       {viewingInvoice.amount > 0 && (
                         <tr className="border-b border-black">
@@ -626,7 +626,7 @@ export default function PaymentsPage() {
                       <tr className="bg-gray-100 font-extrabold text-[13px] border-t border-black text-gray-950">
                         <td colSpan={2} className="border border-black p-2 text-right uppercase tracking-wider">Grand Total:</td>
                         <td className="border border-black p-2 text-right font-black">
-                          ₨ {(viewingInvoice.amount + (viewingInvoice.electricityAmount || 0) + (viewingInvoice.generatorAmount || 0) + (viewingInvoice.utilityAmount || 0) + (viewingInvoice.waterAmount || 0) + (viewingInvoice.insuranceAmount || 0) + (viewingInvoice.dieselAmount || 0) + (viewingInvoice.structureMaintenanceAmount || 0) + (viewingInvoice.otherAmount || 0)).toLocaleString()}
+                          ₨ {(viewingInvoice.amount + (viewingInvoice.electricityAmount || 0) + (viewingInvoice.generatorAmount || 0) + (viewingInvoice.utilityAmount || 0) + (viewingInvoice.waterAmount || 0) + (viewingInvoice.insuranceAmount || 0) + (viewingInvoice.dieselAmount || 0) + (viewingInvoice.structureMaintenanceAmount || 0) + (viewingInvoice.otherAmount || 0) + (viewingInvoice.previousPendingOutstandingDue || 0) + (viewingInvoice.latePenaltyAmount || 0)).toLocaleString()}
                         </td>
                       </tr>
                     </tbody>
@@ -635,7 +635,7 @@ export default function PaymentsPage() {
                   <div className="border border-black p-3 rounded-sm bg-gray-50 text-[11px] mb-5">
                     <strong className="text-[9px] uppercase text-gray-600 block mb-0.5">Amount in Words:</strong>
                     <div className="font-bold text-gray-900 text-xs">
-                      {numberToWords(viewingInvoice.amount + (viewingInvoice.electricityAmount || 0) + (viewingInvoice.generatorAmount || 0) + (viewingInvoice.utilityAmount || 0) + (viewingInvoice.waterAmount || 0) + (viewingInvoice.insuranceAmount || 0) + (viewingInvoice.dieselAmount || 0) + (viewingInvoice.structureMaintenanceAmount || 0) + (viewingInvoice.otherAmount || 0))}
+                      {numberToWords(viewingInvoice.amount + (viewingInvoice.electricityAmount || 0) + (viewingInvoice.generatorAmount || 0) + (viewingInvoice.utilityAmount || 0) + (viewingInvoice.waterAmount || 0) + (viewingInvoice.insuranceAmount || 0) + (viewingInvoice.dieselAmount || 0) + (viewingInvoice.structureMaintenanceAmount || 0) + (viewingInvoice.otherAmount || 0) + (viewingInvoice.previousPendingOutstandingDue || 0) + (viewingInvoice.latePenaltyAmount || 0))}
                     </div>
                   </div>
 

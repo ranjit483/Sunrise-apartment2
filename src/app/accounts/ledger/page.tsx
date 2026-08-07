@@ -98,14 +98,15 @@ export default function TenantLedgerPage() {
     // Process Invoices (Debits)
     invoices.forEach(inv => {
       if (inv.status !== 'draft' && inv.status !== 'cancelled') {
-        billed += inv.amount
+        const totalAmount = inv.amount + (inv.electricityAmount || 0) + (inv.generatorAmount || 0) + (inv.utilityAmount || 0) + (inv.waterAmount || 0) + (inv.insuranceAmount || 0) + (inv.dieselAmount || 0) + (inv.structureMaintenanceAmount || 0) + (inv.otherAmount || 0) + (inv.previousPendingOutstandingDue || 0) + (inv.latePenaltyAmount || 0)
+        billed += totalAmount
         rawEntries.push({
           id: inv.id,
           date: inv.createdAt ? inv.createdAt.split('T')[0] : inv.month + '-01',
           timestamp: inv.createdAt || inv.month + '-01T00:00:00Z',
           type: 'invoice',
           description: `Invoice for ${inv.month} (${inv.unitNumber || 'Unit'})`,
-          debit: inv.amount,
+          debit: totalAmount,
           credit: 0,
           status: inv.status
         })
