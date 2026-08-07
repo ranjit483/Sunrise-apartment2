@@ -42,6 +42,7 @@ interface AuthContextType {
   user: any | null
   profile: UserProfile | null
   loading: boolean
+  error: string | null
   signOut: () => Promise<void>
   refreshProfile: () => Promise<void>
 }
@@ -52,9 +53,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<any | null>(null)
   const [profile, setProfile] = useState<UserProfile | null>(null)
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
 
   const fetchProfile = async (userId: string) => {
     try {
+      setError(null);
       const userDoc = await getDoc(doc(db, 'users', userId));
       
       if (userDoc.exists()) {
@@ -118,8 +121,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         }
         setProfile(null);
       }
-    } catch (error) {
-      console.error('Error fetching profile:', error);
+    } catch (err: any) {
+      console.error('Error fetching profile:', err);
+      setError(err.message || 'Failed to fetch user profile');
       setProfile(null);
     }
   };
@@ -163,7 +167,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }
 
   return (
-    <AuthContext.Provider value={{ user, profile, loading, signOut, refreshProfile }}>
+    <AuthContext.Provider value={{ user, profile, loading, error, signOut, refreshProfile }}>
       {children}
     </AuthContext.Provider>
   )

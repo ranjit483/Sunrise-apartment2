@@ -14,7 +14,7 @@ import { GuardView } from '@/components/dashboard/views/GuardView'
 
 export default function DashboardPage() {
   const router = useRouter()
-  const { user, profile, loading } = useAuth()
+  const { user, profile, loading, error } = useAuth()
 
   useEffect(() => {
     if (!loading) {
@@ -34,6 +34,27 @@ export default function DashboardPage() {
   }
 
   if (!user) return null;
+
+  if (error) {
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50 p-4">
+        <div className="bg-white p-8 rounded-xl shadow-sm text-center max-w-md">
+          <h2 className="text-2xl font-bold text-red-600 mb-2">Connection Error</h2>
+          <p className="text-gray-600 mb-4">{error}</p>
+          <p className="text-sm text-gray-500 mb-6">
+            Unable to connect to the Firestore database. This usually indicates a network connection issue, VPN blocker, or a strict ad-blocker (such as Brave Shields or uBlock Origin) blocking Google Firebase domains. Please try switching networks, disabling extensions, or changing your DNS settings (e.g. to Google DNS 8.8.8.8).
+          </p>
+          <button onClick={() => {
+            const { signOut } = require('firebase/auth');
+            const { auth } = require('@/config/firebase');
+            signOut(auth).then(() => window.location.href = '/');
+          }} className="px-6 py-2 bg-primary text-white font-medium rounded-lg hover:bg-primary/90 transition-colors">
+            Sign Out
+          </button>
+        </div>
+      </div>
+    )
+  }
 
   if (!profile) {
     return (
