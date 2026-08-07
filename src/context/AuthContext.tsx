@@ -2,8 +2,8 @@
 
 import { createContext, useContext, useEffect, useState, ReactNode } from 'react'
 import { User, onAuthStateChanged, signOut as firebaseSignOut } from 'firebase/auth'
-import { doc, getDoc, DocumentData } from 'firebase/firestore'
-import { auth, db } from '@/config/firebase'
+import { doc, getDoc, DocumentData, getFirestore } from 'firebase/firestore'
+import { auth, app } from '@/config/firebase'
 import { logActivity } from '@/lib/logger'
 
 export type UserRole = 
@@ -58,7 +58,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const fetchProfile = async (userId: string) => {
     try {
       setError(null);
-      const userDoc = await getDoc(doc(db, 'users', userId));
+      const firestoreDb = getFirestore(app);
+      const userDoc = await getDoc(doc(firestoreDb, 'users', userId));
       
       if (userDoc.exists()) {
         const data = userDoc.data() as UserProfile;
@@ -71,7 +72,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         if (data.email === 'ranjitmanaraja@gmail.com' && (data.status !== 'approved' || data.role !== 'SUPER_ADMIN')) {
           try {
             const { updateDoc } = await import('firebase/firestore');
-            await updateDoc(doc(db, 'users', userId), {
+            await updateDoc(doc(firestoreDb, 'users', userId), {
               status: 'approved',
               role: 'SUPER_ADMIN',
               clearance_level: 1
@@ -122,9 +123,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setProfile(null);
       }
     } catch (err: any) {
-      console.error('Error fetching profile:', err);
-      setError(err.message || 'Failed to fetch user profile');
-      setProfile(null);
+      console.error('Error fetching profile:', err)
+      const firestoreDb = getFirestore(app);
+      const debugInfo = `db is: ${typeof firestoreDb}, constructor: ${firestoreDb?.constructor?.name}, has type: ${firestoreDb?.type}`
+      setError(err.message + ' | ' + debugInfo)
+      setProfile(null)
     }
   };
 
