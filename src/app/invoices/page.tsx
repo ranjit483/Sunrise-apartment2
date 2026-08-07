@@ -636,9 +636,11 @@ export default function InvoicesPage() {
                 </DialogContent>
               </Dialog>
 
-              <Button onClick={handleClearAllInvoices} variant="destructive" className="gap-2">
-                Clear All Invoices
-              </Button>
+              {profile?.role === 'SUPER_ADMIN' && (
+                <Button onClick={handleClearAllInvoices} variant="destructive" className="gap-2">
+                  Clear All Invoices
+                </Button>
+              )}
             </div>
           )}
         </div>
