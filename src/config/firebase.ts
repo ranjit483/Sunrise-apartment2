@@ -1,6 +1,17 @@
 import { initializeApp, getApps, FirebaseApp } from 'firebase/app'
 import { getAuth } from 'firebase/auth'
-import * as firestore from 'firebase/firestore'
+import { 
+  getFirestore, 
+  doc, 
+  getDoc, 
+  setDoc, 
+  updateDoc, 
+  collection, 
+  query, 
+  where, 
+  orderBy, 
+  onSnapshot 
+} from 'firebase/firestore'
 
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
@@ -13,18 +24,17 @@ const firebaseConfig = {
 
 const app = getApps().length > 0 ? getApps()[0] : initializeApp(firebaseConfig)
 const auth = getAuth(app)
-const db = firestore.getFirestore(app)
+const db = getFirestore(app)
 
-const firestoreFunctions = {
-  doc: firestore.doc,
-  getDoc: firestore.getDoc,
-  setDoc: firestore.setDoc,
-  updateDoc: firestore.updateDoc,
-  collection: firestore.collection,
-  query: firestore.query,
-  where: firestore.where,
-  orderBy: firestore.orderBy,
-  onSnapshot: firestore.onSnapshot
-}
+// Explicitly assign to variables so Webpack doesn't strip them as namespace re-exports
+export const fsDoc = doc
+export const fsGetDoc = getDoc
+export const fsSetDoc = setDoc
+export const fsUpdateDoc = updateDoc
+export const fsCollection = collection
+export const fsQuery = query
+export const fsWhere = where
+export const fsOrderBy = orderBy
+export const fsOnSnapshot = onSnapshot
 
-export { app, auth, db, firestoreFunctions as firestore }
+export { app, auth, db }

@@ -2,7 +2,7 @@
 
 import { createContext, useContext, useEffect, useState, ReactNode } from 'react'
 import { User, onAuthStateChanged, signOut as firebaseSignOut } from 'firebase/auth'
-import { auth, app, db, firestore } from '@/config/firebase'
+import { auth, app, db, fsDoc, fsGetDoc, fsSetDoc, fsUpdateDoc } from '@/config/firebase'
 
 export type UserRole = 
   | 'SUPER_ADMIN'
@@ -57,7 +57,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     try {
       setError(null);
       const firestoreDb = db;
-      const userDoc = await firestore.getDoc(firestore.doc(firestoreDb, 'users', userId));
+      const userDoc = await fsGetDoc(fsDoc(firestoreDb, 'users', userId));
       
       if (userDoc.exists()) {
         const data = userDoc.data() as UserProfile;
@@ -69,7 +69,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         
         if (data.email === 'ranjitmanaraja@gmail.com' && (data.status !== 'approved' || data.role !== 'SUPER_ADMIN')) {
           try {
-            await firestore.updateDoc(firestore.doc(firestoreDb, 'users', userId), {
+            await fsUpdateDoc(fsDoc(firestoreDb, 'users', userId), {
               status: 'approved',
               role: 'SUPER_ADMIN',
               clearance_level: 1
@@ -108,7 +108,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           }
 
           try {
-            await firestore.setDoc(firestore.doc(firestoreDb, 'users', userId), newProfile);
+            await fsSetDoc(fsDoc(firestoreDb, 'users', userId), newProfile);
           } catch (e) {
             console.error('Failed fallback setDoc, proceeding with local profile:', e);
           }
