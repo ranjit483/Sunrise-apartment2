@@ -2,8 +2,8 @@
 
 import { createContext, useContext, useEffect, useState, ReactNode } from 'react'
 import { User, onAuthStateChanged, signOut as firebaseSignOut } from 'firebase/auth'
-import { DocumentData } from 'firebase/firestore'
-import { auth, app, db, doc, getDoc, setDoc, updateDoc } from '@/config/firebase'
+import { doc, getDoc, setDoc, updateDoc, DocumentData } from 'firebase/firestore'
+import { auth, app, db } from '@/config/firebase'
 
 export type UserRole = 
   | 'SUPER_ADMIN'
