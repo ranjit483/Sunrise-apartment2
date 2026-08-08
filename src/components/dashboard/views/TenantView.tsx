@@ -272,7 +272,7 @@ export function TenantView({ profile }: { profile: any }) {
                     </div>
                     <div className="flex items-center gap-4">
                       <div className="text-right">
-                        <p className="font-medium">₨{(invoice.amount + (invoice.electricityAmount || 0) + (invoice.utilityAmount || 0) + (invoice.waterAmount || 0) + (invoice.otherAmount || 0)).toLocaleString()}</p>
+                        <p className="font-medium">₨{(invoice.amount + (invoice.electricityAmount || 0) + (invoice.generatorAmount || 0) + (invoice.utilityAmount || 0) + (invoice.waterAmount || 0) + (invoice.insuranceAmount || 0) + (invoice.dieselAmount || 0) + (invoice.structureMaintenanceAmount || 0) + (invoice.otherAmount || 0) + (invoice.previousPendingOutstandingDue || 0) + (invoice.latePenaltyAmount || 0)).toLocaleString()}</p>
                         {invoice.paidAmount ? <p className="text-xs text-muted-foreground font-medium mb-1">Paid: ₨{invoice.paidAmount.toLocaleString()}</p> : null}
                         <Badge variant={invoice.status === 'paid' ? 'success' : (invoice.status === 'pending' || invoice.status === 'partial') ? 'warning' : 'destructive'}>{invoice.status.toUpperCase()}</Badge>
                       </div>
