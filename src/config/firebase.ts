@@ -15,4 +15,16 @@ const app = getApps().length > 0 ? getApps()[0] : initializeApp(firebaseConfig)
 const auth = getAuth(app)
 const db = firestore.getFirestore(app)
 
-export { app, auth, db, firestore }
+const firestoreFunctions = {
+  doc: firestore.doc,
+  getDoc: firestore.getDoc,
+  setDoc: firestore.setDoc,
+  updateDoc: firestore.updateDoc,
+  collection: firestore.collection,
+  query: firestore.query,
+  where: firestore.where,
+  orderBy: firestore.orderBy,
+  onSnapshot: firestore.onSnapshot
+}
+
+export { app, auth, db, firestoreFunctions as firestore }
