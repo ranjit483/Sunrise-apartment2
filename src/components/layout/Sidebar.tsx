@@ -45,6 +45,7 @@ const navItems: NavItem[] = [
   { title: 'Units', href: '/units', icon: Home, minClearance: 4, excludeRoles: ['RESIDENT', 'TENANT', 'OWNER'] },
   { title: 'Leases', href: '/leases', icon: FileText, minClearance: 4, excludeRoles: ['RESIDENT', 'TENANT', 'OWNER'] },
   { title: 'Users', href: '/users', icon: Users, minClearance: 3 },
+  { title: 'Activity Logs', href: '/activity-logs', icon: FileText, roles: ['SUPER_ADMIN'] },
   { title: 'Chart of Accounts', href: '/accounts/chart', icon: Wallet, minClearance: 3, excludeRoles: ['MANAGER', 'ACCOUNTANT', 'RESIDENT', 'TENANT', 'GUARD', 'OFFICE_ASSISTANT'] },
   { title: 'Resident/Tenant Ledger', href: '/accounts/ledger', icon: BookOpen, minClearance: 3, excludeRoles: ['RESIDENT', 'TENANT', 'GUARD', 'OFFICE_ASSISTANT'] },
   { title: 'Invoices', href: '/invoices', icon: FileText, minClearance: 4, excludeRoles: ['RESIDENT', 'TENANT'] },

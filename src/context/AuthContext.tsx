@@ -1,9 +1,10 @@
 'use client'
 
-import { createContext, useContext, useEffect, useState, ReactNode } from 'react'
+import { createContext, useContext, useEffect, useState, ReactNode, useRef } from 'react'
 import { onAuthStateChanged, signOut as firebaseSignOut } from 'firebase/auth'
 import { doc, getDoc, setDoc, updateDoc } from 'firebase/firestore'
 import { auth, app, db } from '@/config/firebase'
+import { logActivity } from '@/lib/activity-logger'
 
 export type UserRole = 
   | 'SUPER_ADMIN'
@@ -53,6 +54,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [profile, setProfile] = useState<UserProfile | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const hasLoggedLoginRef = useRef(false)
 
   const fetchProfile = async (userId: string) => {
     try {
@@ -60,6 +62,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const firestoreDb = db;
       const userDoc = await getDoc(doc(firestoreDb, 'users', userId));
       
+      let currentProfile: UserProfile | null = null;
+
       if (userDoc.exists()) {
         const data = userDoc.data() as UserProfile;
         
@@ -86,6 +90,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           }
         }
         
+        currentProfile = data;
         setProfile(data);
       } else {
         const currentUser = auth.currentUser;
@@ -114,10 +119,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             console.error('Failed fallback setDoc, proceeding with local profile:', e);
           }
           
+          currentProfile = newProfile as unknown as UserProfile;
           setProfile(newProfile as unknown as UserProfile);
-          return;
+        } else {
+          setProfile(null);
         }
-        setProfile(null);
+      }
+
+      if (currentProfile && !hasLoggedLoginRef.current) {
+        logActivity(currentProfile, 'LOGIN', 'User successfully authenticated and loaded profile')
+        hasLoggedLoginRef.current = true
       }
     } catch (err: any) {
       console.error('Error fetching profile:', err)
@@ -136,6 +147,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         await fetchProfile(currentUser.uid)
       } else {
         setProfile(null)
+        hasLoggedLoginRef.current = false
       }
       setLoading(false)
     })
@@ -145,14 +157,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const signOut = async () => {
     try {
+      if (profile) {
+        await logActivity(profile, 'LOGOUT', 'User signed out manually')
+      }
       await firebaseSignOut(auth)
       setUser(null)
       setProfile(null)
+      hasLoggedLoginRef.current = false
       window.location.href = '/'
     } catch (error) {
       console.error('Sign out error:', error)
       setUser(null)
       setProfile(null)
+      hasLoggedLoginRef.current = false
       window.location.href = '/'
     }
   }
