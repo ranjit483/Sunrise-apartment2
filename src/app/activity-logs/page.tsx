@@ -34,14 +34,14 @@ export default function ActivityLogsPage() {
 
     const q = query(collection(db, 'activityLogs'), orderBy('timestamp', 'desc'), limit(100))
     
-    const unsubscribe = onSnapshot(q, (snapshot) => {
+    const unsubscribe = onSnapshot(q, (snapshot: any) => {
       const logsData: ActivityLog[] = []
-      snapshot.forEach((doc) => {
+      snapshot.forEach((doc: any) => {
         logsData.push({ id: doc.id, ...doc.data() } as ActivityLog)
       })
       setLogs(logsData)
       setLoading(false)
-    }, (error) => {
+    }, (error: any) => {
       console.error("Error fetching logs:", error)
       setLoading(false)
     })
