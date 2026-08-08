@@ -292,7 +292,7 @@ export default function PaymentsPage() {
     window.print()
   }
 
-  const isResident = profile?.role === 'RESIDENT' || profile?.role === 'TENANT'
+  const isResident = profile?.role === 'RESIDENT' || profile?.role === 'TENANT' || profile?.role === 'OWNER'
   const totalCollected = payments.filter(p => p.status === 'completed').reduce((acc, p) => acc + p.amount, 0)
   
   const currentMonth = new Date().getMonth()
