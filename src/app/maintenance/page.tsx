@@ -155,7 +155,7 @@ export default function MaintenancePage() {
   const isAdminOrManager = profile ? ['SUPER_ADMIN', 'MANAGER', 'ACCOUNTANT'].includes(profile.role) : false
   const staffListToDisplay = staff.length > 0 ? staff : DEFAULT_STAFF
 
-  const filteredTickets = tickets.filter(t => {
+  const baseTickets = tickets.filter(t => {
     // 1. Role boundaries
     if (isStaffOrTech) {
       // Techs only see tickets assigned to them
@@ -164,7 +164,10 @@ export default function MaintenancePage() {
       // Residents/Tenants only see their own reported tickets
       if (t.reportedBy !== profile?.uid && t.reportedBy !== profile?.fullName) return false
     }
+    return true
+  })
 
+  const filteredTickets = baseTickets.filter(t => {
     // 2. Status filter
     if (statusFilter !== 'all' && t.status !== statusFilter) return false
 
@@ -328,10 +331,10 @@ export default function MaintenancePage() {
   }
 
   // Count summaries
-  const openCount = tickets.filter(t => t.status === 'open').length
-  const inProgressCount = tickets.filter(t => t.status === 'in_progress').length
-  const completedCount = tickets.filter(t => t.status === 'resolved' || t.status === 'closed').length
-  const slaAlertCount = tickets.filter(t => checkSlaAlert(t)).length
+  const openCount = baseTickets.filter(t => t.status === 'open').length
+  const inProgressCount = baseTickets.filter(t => t.status === 'in_progress').length
+  const completedCount = baseTickets.filter(t => t.status === 'resolved' || t.status === 'closed').length
+  const slaAlertCount = baseTickets.filter(t => checkSlaAlert(t)).length
 
   return (
     <DashboardLayout title="Maintenance Management">
