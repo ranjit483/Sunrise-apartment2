@@ -586,9 +586,9 @@ export default function MaintenancePage() {
                   </CardTitle>
                   <CardDescription>Filter and search maintenance logs</CardDescription>
                 </div>
-                <div className="flex flex-wrap gap-2 items-center">
+                <div className="flex flex-col sm:flex-row gap-2 items-stretch sm:items-center w-full sm:w-auto">
                   <Select value={statusFilter} onValueChange={(v: any) => setStatusFilter(v)}>
-                    <SelectTrigger className="w-[130px] h-9"><SelectValue placeholder="All Status" /></SelectTrigger>
+                    <SelectTrigger className="w-full sm:w-[130px] h-9"><SelectValue placeholder="All Status" /></SelectTrigger>
                     <SelectContent>
                       <SelectItem value="all">All Status</SelectItem>
                       <SelectItem value="open">Open</SelectItem>
@@ -599,7 +599,7 @@ export default function MaintenancePage() {
                   </Select>
                   <Input 
                     placeholder="Search query..." 
-                    className="w-[180px] h-9" 
+                    className="w-full sm:w-[180px] h-9" 
                     value={searchQuery}
                     onChange={e => setSearchQuery(e.target.value)}
                   />
@@ -619,12 +619,12 @@ export default function MaintenancePage() {
                       <div 
                         key={t.id} 
                         onClick={() => setSelectedTicket(t)}
-                        className={`p-4 hover:bg-indigo-50/20 cursor-pointer transition-all flex items-start justify-between gap-4 ${
+                        className={`p-3 sm:p-4 hover:bg-indigo-50/20 cursor-pointer transition-all flex items-start justify-between gap-2 sm:gap-4 ${
                           selectedTicket?.id === t.id ? 'bg-indigo-50/40 border-l-4 border-l-indigo-600' : ''
                         }`}
                       >
                         <div className="space-y-1.5 flex-1 min-w-0">
-                          <div className="flex items-center gap-2">
+                          <div className="flex items-center gap-2 flex-wrap">
                             <span className="text-xs font-mono bg-gray-100 px-2 py-0.5 rounded text-gray-600 font-semibold">
                               {(t as any).ticketNo || t.id.substring(0, 8)}
                             </span>
