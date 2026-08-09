@@ -51,7 +51,7 @@ export function AdminView({ profile }: { profile: any }) {
   const occupiedUnits = myUnits.filter(u => u.status === 'occupied').length
   const occupancyRate = myUnits.length > 0 ? Math.round((occupiedUnits / myUnits.length) * 100) : 0
   
-  const monthlyRevenue = myInvoices.filter(i => i.status === 'paid').reduce((acc, i) => acc + i.amount + (i.electricityAmount || 0) + (i.generatorAmount || 0) + (i.utilityAmount || 0) + (i.waterAmount || 0) + (i.insuranceAmount || 0) + (i.dieselAmount || 0) + (i.structureMaintenanceAmount || 0) + (i.otherAmount || 0) + (i.previousPendingOutstandingDue || 0) + (i.latePenaltyAmount || 0), 0)
+  const monthlyRevenue = myInvoices.reduce((acc, i) => acc + (i.paidAmount || 0), 0)
   const totalExpenses = myExpenses.filter(e => e.status === 'approved' || e.status === 'paid' || !e.status).reduce((acc, e) => acc + e.amount, 0)
   const netProfit = monthlyRevenue - totalExpenses
 
