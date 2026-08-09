@@ -598,7 +598,7 @@ export default function PaymentsPage() {
 
               <div className="grid grid-cols-2 gap-4 border-t pt-3 mt-2">
                 <div><strong>Payment Mode:</strong> <span className="font-bold uppercase text-indigo-600">{activeReceipt.method}</span></div>
-                <div className="text-right"><strong>Status:</strong> <span className="font-bold uppercase text-emerald-600">COMPLETED</span></div>
+                <div className="text-right"><strong>Status:</strong> <span className={`font-bold uppercase ${activeReceipt.status === 'pending_verification' ? 'text-amber-600' : 'text-emerald-600'}`}>{activeReceipt.status === 'pending_verification' ? 'PENDING VERIFICATION' : 'COMPLETED'}</span></div>
                 
                 {activeReceipt.method === 'cheque' && (
                   <>
@@ -964,7 +964,7 @@ export default function PaymentsPage() {
 
                 <div className="grid grid-cols-2 gap-2 border-t pt-2.5 mt-1.5">
                   <div><strong>Payment Mode:</strong> <span className="font-bold uppercase text-indigo-600">{activeReceipt.method}</span></div>
-                  <div className="text-right"><strong>Status:</strong> <span className="font-bold uppercase text-emerald-600">COMPLETED</span></div>
+                  <div className="text-right"><strong>Status:</strong> <span className={`font-bold uppercase ${activeReceipt.status === 'pending_verification' ? 'text-amber-600' : 'text-emerald-600'}`}>{activeReceipt.status === 'pending_verification' ? 'PENDING VERIFICATION' : 'COMPLETED'}</span></div>
                   
                   {activeReceipt.method === 'cheque' && (
                     <>
