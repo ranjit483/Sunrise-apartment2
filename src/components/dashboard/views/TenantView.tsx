@@ -267,7 +267,7 @@ export function TenantView({ profile }: { profile: any }) {
                       <FileText className="h-5 w-5 text-muted-foreground" />
                       <div>
                         <p className="font-medium">{invoice.month}</p>
-                        <p className="text-sm text-muted-foreground">Rent & Utilities</p>
+                        <p className="text-sm text-muted-foreground">Service Charge & Utilities</p>
                       </div>
                     </div>
                     <div className="flex items-center gap-4">
