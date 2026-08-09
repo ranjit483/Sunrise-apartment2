@@ -576,7 +576,7 @@ export default function MaintenancePage() {
         <div className="grid gap-6 lg:grid-cols-3">
           
           {/* Left panel - Work orders list */}
-          <div className={`lg:col-span-2 space-y-4 ${currentTicket ? 'hidden lg:block' : 'block'}`}>
+          <div className={`lg:col-span-2 space-y-4 min-w-0 ${currentTicket ? 'hidden lg:block' : 'block'}`}>
             <Card className="shadow-sm border-gray-200">
               <CardHeader className="pb-3 border-b flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div>
@@ -662,7 +662,7 @@ export default function MaintenancePage() {
           </div>
 
           {/* Right panel - Active details dashboard */}
-          <div className={`lg:col-span-1 ${!currentTicket ? 'hidden lg:block' : 'block'}`}>
+          <div className={`lg:col-span-1 min-w-0 ${!currentTicket ? 'hidden lg:block' : 'block'}`}>
             {currentTicket ? (
               <Card className="shadow-md border-indigo-100 sticky top-6">
                 <CardHeader className="bg-indigo-50/30 border-b pb-4">
