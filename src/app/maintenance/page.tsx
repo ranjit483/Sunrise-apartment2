@@ -576,7 +576,7 @@ export default function MaintenancePage() {
         <div className="grid gap-6 lg:grid-cols-3">
           
           {/* Left panel - Work orders list */}
-          <div className="lg:col-span-2 space-y-4">
+          <div className={`lg:col-span-2 space-y-4 ${currentTicket ? 'hidden lg:block' : 'block'}`}>
             <Card className="shadow-sm border-gray-200">
               <CardHeader className="pb-3 border-b flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div>
@@ -647,8 +647,8 @@ export default function MaintenancePage() {
                           </div>
                         </div>
 
-                        <div className="flex flex-col gap-2 items-end justify-between self-stretch flex-shrink-0">
-                          <Badge variant="outline" className={`capitalize text-xs font-semibold ${statusColors[t.status]}`}>
+                        <div className="flex flex-col gap-2 items-end justify-between self-stretch flex-shrink-0 ml-2">
+                          <Badge variant="outline" className={`capitalize text-xs font-semibold whitespace-nowrap ${statusColors[t.status]}`}>
                             {t.status.replace('_', ' ')}
                           </Badge>
                           <ChevronRight className="h-5 w-5 text-gray-400" />
@@ -662,7 +662,7 @@ export default function MaintenancePage() {
           </div>
 
           {/* Right panel - Active details dashboard */}
-          <div className="lg:col-span-1">
+          <div className={`lg:col-span-1 ${!currentTicket ? 'hidden lg:block' : 'block'}`}>
             {currentTicket ? (
               <Card className="shadow-md border-indigo-100 sticky top-6">
                 <CardHeader className="bg-indigo-50/30 border-b pb-4">
