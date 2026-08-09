@@ -6,7 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { db } from '@/config/firebase'
-import { collection, onSnapshot, query, where, doc, writeBatch, getDoc, getDocs } from 'firebase/firestore'
+import { collection, onSnapshot, query, where, doc, writeBatch, getDoc, getDocs, updateDoc } from 'firebase/firestore'
 import { Payment, Invoice } from '@/types/models'
 import { Loader2, DollarSign, Eye, Printer, FileText, QrCode, CheckCircle2, AlertCircle } from 'lucide-react'
 import { useAuth } from '@/context/AuthContext'
@@ -213,6 +213,8 @@ export default function PaymentsPage() {
       const generatedTrxId = 'TRX-' + Math.random().toString(36).substring(2, 10).toUpperCase()
       const transactionId = checkoutStep === 'qr' ? qrTransactionId.trim() : generatedTrxId
       
+      const isResidentPayment = isResident
+      
       const newPayment: Payment = {
         id: paymentRef.id,
         invoiceId: viewingInvoice.id,
@@ -220,8 +222,8 @@ export default function PaymentsPage() {
         amount: parsedAmount,
         method: checkoutStep === 'qr' ? 'qr' : 'online',
         transactionId: transactionId,
-        status: 'completed',
-        paidAt: new Date().toISOString(),
+        status: isResidentPayment ? 'pending_verification' : 'completed',
+        paidAt: isResidentPayment ? undefined : new Date().toISOString(),
         createdAt: new Date().toISOString(),
         receiptNo: 'No.: ' + Math.floor(1000 + Math.random() * 9000),
         receivedFor: `Monthly Bill - ${viewingInvoice.month}`
@@ -229,17 +231,19 @@ export default function PaymentsPage() {
 
       batch.set(paymentRef, newPayment)
 
-      const newPaidAmount = prevPaid + parsedAmount
-      const newRemaining = invoiceTotal - newPaidAmount
-      const newStatus = newRemaining <= 0 ? 'paid' : 'partial'
+      if (!isResidentPayment) {
+        const newPaidAmount = prevPaid + parsedAmount
+        const newRemaining = invoiceTotal - newPaidAmount
+        const newStatus = newRemaining <= 0 ? 'paid' : 'partial'
 
-      // Update invoice status
-      const invoiceRef = doc(db, 'invoices', viewingInvoice.id)
-      batch.update(invoiceRef, {
-        paidAmount: newPaidAmount,
-        status: newStatus,
-        updatedAt: new Date().toISOString()
-      })
+        // Update invoice status
+        const invoiceRef = doc(db, 'invoices', viewingInvoice.id)
+        batch.update(invoiceRef, {
+          paidAmount: newPaidAmount,
+          status: newStatus,
+          updatedAt: new Date().toISOString()
+        })
+      }
 
       await batch.commit()
       
@@ -247,15 +251,70 @@ export default function PaymentsPage() {
       setIsInvoiceModalOpen(false)
       setQrTransactionId('')
       
-      // Show official printable receipt
-      setReceiptInvoice(viewingInvoice)
-      setActiveReceipt(newPayment)
-      setIsReceiptModalOpen(true)
+      if (isResidentPayment) {
+        alert('Your payment has been submitted and is awaiting Admin verification.')
+      } else {
+        // Show official printable receipt
+        setReceiptInvoice(viewingInvoice)
+        setActiveReceipt(newPayment)
+        setIsReceiptModalOpen(true)
+      }
     } catch (error: any) {
       console.error('Error confirming payment:', error)
       alert('Payment confirmation failed: ' + error.message)
     } finally {
       setIsPaying(false)
+    }
+  }
+
+  const handleApprovePayment = async (payment: Payment) => {
+    try {
+      const invRef = doc(db, 'invoices', payment.invoiceId)
+      const invSnap = await getDoc(invRef)
+      if (!invSnap.exists()) {
+        alert("Original invoice not found!")
+        return
+      }
+      
+      const invoice = invSnap.data() as Invoice
+      const invoiceTotal = invoice.amount + (invoice.electricityAmount || 0) + (invoice.generatorAmount || 0) + (invoice.utilityAmount || 0) + (invoice.waterAmount || 0) + (invoice.insuranceAmount || 0) + (invoice.dieselAmount || 0) + (invoice.structureMaintenanceAmount || 0) + (invoice.otherAmount || 0) + (invoice.previousPendingOutstandingDue || 0) + (invoice.latePenaltyAmount || 0)
+      const prevPaid = invoice.paidAmount || 0
+      const newPaidAmount = prevPaid + payment.amount
+      const newRemaining = invoiceTotal - newPaidAmount
+      const newStatus = newRemaining <= 0 ? 'paid' : 'partial'
+      
+      const batch = writeBatch(db)
+      
+      batch.update(doc(db, 'payments', payment.id), {
+        status: 'completed',
+        paidAt: new Date().toISOString()
+      })
+      
+      batch.update(invRef, {
+        paidAmount: newPaidAmount,
+        status: newStatus,
+        updatedAt: new Date().toISOString()
+      })
+      
+      await batch.commit()
+      alert("Payment approved successfully!")
+    } catch (error: any) {
+      console.error('Error approving payment:', error)
+      alert("Failed to approve payment: " + error.message)
+    }
+  }
+
+  const handleRejectPayment = async (paymentId: string) => {
+    if (!confirm("Are you sure you want to reject this payment? The resident will need to submit it again.")) return;
+    try {
+      await updateDoc(doc(db, 'payments', paymentId), {
+        status: 'rejected',
+        updatedAt: new Date().toISOString()
+      })
+      alert("Payment rejected.")
+    } catch (error: any) {
+      console.error('Error rejecting payment:', error)
+      alert("Failed to reject payment: " + error.message)
     }
   }
 
@@ -389,6 +448,61 @@ export default function PaymentsPage() {
           </div>
         )}
 
+        {!isResident && payments.filter(p => p.status === 'pending_verification').length > 0 && (
+          <Card className="border-amber-200 shadow-sm mb-6">
+            <CardHeader className="bg-amber-50 border-b border-amber-100">
+              <CardTitle className="text-amber-800 flex items-center gap-2">
+                <AlertCircle className="h-5 w-5" />
+                Pending Verifications
+              </CardTitle>
+              <CardDescription className="text-amber-700">Resident payments waiting for your approval.</CardDescription>
+            </CardHeader>
+            <CardContent className="pt-4">
+              <div className="overflow-x-auto overflow-y-hidden">
+                <table className="w-full min-w-[800px] text-sm">
+                  <thead>
+                    <tr className="border-b">
+                      <th className="pb-3 text-left">Transaction ID</th>
+                      <th className="pb-3 text-left">Tenant ID</th>
+                      <th className="pb-3 text-left">Amount</th>
+                      <th className="pb-3 text-left">Method</th>
+                      <th className="pb-3 text-left">Date (AD)</th>
+                      <th className="pb-3 text-left">Status</th>
+                      <th className="pb-3 text-left">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {payments.filter(p => p.status === 'pending_verification').map((p) => (
+                      <tr key={p.id} className="border-b hover:bg-amber-50/30">
+                        <td className="py-3 font-mono text-xs">{p.transactionId || p.id.substring(0, 10).toUpperCase()}</td>
+                        <td className="py-3 font-mono text-xs">{p.tenantId.substring(0, 10)}...</td>
+                        <td className="py-3 font-bold text-emerald-600">₨ {p.amount.toLocaleString()}</td>
+                        <td className="py-3 font-semibold text-xs uppercase text-indigo-700">{p.method.replace('_', ' ')}</td>
+                        <td className="py-3">{getNepaliDate(p.createdAt).ad}</td>
+                        <td className="py-3">
+                          <Badge variant="warning" className="uppercase font-semibold text-xs px-2 py-0.5 rounded-full bg-amber-100 text-amber-800">
+                            PENDING VERIFICATION
+                          </Badge>
+                        </td>
+                        <td className="py-3">
+                          <div className="flex gap-2">
+                            <Button size="sm" className="h-8 bg-emerald-600 hover:bg-emerald-700 text-white" onClick={() => handleApprovePayment(p)}>
+                              Approve
+                            </Button>
+                            <Button size="sm" variant="destructive" className="h-8" onClick={() => handleRejectPayment(p.id)}>
+                              Reject
+                            </Button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
         <Card>
           <CardHeader><CardTitle>Payment History</CardTitle></CardHeader>
           <CardContent>
@@ -421,8 +535,15 @@ export default function PaymentsPage() {
                         <td className="py-3 font-semibold text-xs uppercase text-indigo-700">{p.method.replace('_', ' ')}</td>
                         <td className="py-3">{getNepaliDate(p.paidAt || p.createdAt).ad}</td>
                         <td className="py-3">
-                          <Badge variant="success" className="bg-green-100 text-green-800 uppercase font-semibold text-xs px-2 py-0.5 rounded-full">
-                            {p.status}
+                          <Badge 
+                            variant={p.status === 'completed' ? 'success' : p.status === 'rejected' ? 'destructive' : 'warning'} 
+                            className={`uppercase font-semibold text-xs px-2 py-0.5 rounded-full ${
+                              p.status === 'completed' ? 'bg-green-100 text-green-800' :
+                              p.status === 'rejected' ? 'bg-red-100 text-red-800' :
+                              'bg-amber-100 text-amber-800'
+                            }`}
+                          >
+                            {p.status.replace('_', ' ')}
                           </Badge>
                         </td>
                         <td className="py-3">
