@@ -215,7 +215,7 @@ export default function PaymentsPage() {
       
       const isResidentPayment = isResident
       
-      const newPayment: Payment = {
+      const newPayment: any = {
         id: paymentRef.id,
         invoiceId: viewingInvoice.id,
         tenantId: viewingInvoice.tenantId || user?.uid || '',
@@ -223,10 +223,13 @@ export default function PaymentsPage() {
         method: checkoutStep === 'qr' ? 'qr' : 'online',
         transactionId: transactionId,
         status: isResidentPayment ? 'pending_verification' : 'completed',
-        paidAt: isResidentPayment ? undefined : new Date().toISOString(),
         createdAt: new Date().toISOString(),
         receiptNo: 'No.: ' + Math.floor(1000 + Math.random() * 9000),
         receivedFor: `Monthly Bill - ${viewingInvoice.month}`
+      }
+
+      if (!isResidentPayment) {
+        newPayment.paidAt = new Date().toISOString()
       }
 
       batch.set(paymentRef, newPayment)
