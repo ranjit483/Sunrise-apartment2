@@ -68,26 +68,29 @@ export default function ProfitLossPage() {
     })
 
     // Compute Revenues
-    let totalRent = 0
+    let totalServiceCharge = 0
     let totalElectricity = 0
     let totalUtility = 0
     let totalWater = 0
+    let totalDiesel = 0
+    let totalInsurance = 0
+    let totalStructureMaintenance = 0
+    let totalLatePenalty = 0
     let totalOther = 0
 
     filteredInvoices.forEach(inv => {
-      // If we don't have broken down amounts, it's all rent
-      if (!inv.electricityAmount && !inv.utilityAmount && !inv.waterAmount && !inv.otherAmount) {
-        totalRent += inv.amount
-      } else {
-        totalRent += (inv.amount - ((inv.electricityAmount||0) + (inv.utilityAmount||0) + (inv.waterAmount||0) + (inv.otherAmount||0)))
-        totalElectricity += (inv.electricityAmount || 0)
-        totalUtility += (inv.utilityAmount || 0)
-        totalWater += (inv.waterAmount || 0)
-        totalOther += (inv.otherAmount || 0)
-      }
+      totalServiceCharge += (inv.amount || 0)
+      totalElectricity += (inv.electricityAmount || 0)
+      totalUtility += (inv.utilityAmount || 0)
+      totalWater += (inv.waterAmount || 0)
+      totalDiesel += (inv.generatorAmount || 0) + (inv.dieselAmount || 0)
+      totalInsurance += (inv.insuranceAmount || 0)
+      totalStructureMaintenance += (inv.structureMaintenanceAmount || 0)
+      totalLatePenalty += (inv.latePenaltyAmount || 0)
+      totalOther += (inv.otherAmount || 0)
     })
 
-    const totalRevenue = totalRent + totalElectricity + totalUtility + totalWater + totalOther
+    const totalRevenue = totalServiceCharge + totalElectricity + totalUtility + totalWater + totalDiesel + totalInsurance + totalStructureMaintenance + totalLatePenalty + totalOther
 
     // Compute Expenses
     const expensesByCategory: Record<string, number> = {}
@@ -103,10 +106,14 @@ export default function ProfitLossPage() {
     const sortedExpenseCategories = Object.keys(expensesByCategory).sort()
 
     return {
-      totalRent,
+      totalServiceCharge,
       totalElectricity,
       totalUtility,
       totalWater,
+      totalDiesel,
+      totalInsurance,
+      totalStructureMaintenance,
+      totalLatePenalty,
       totalOther,
       totalRevenue,
       expensesByCategory,
@@ -158,10 +165,10 @@ export default function ProfitLossPage() {
                 <div className="mb-8">
                   <h3 className="font-bold text-lg border-b pb-2 mb-4 text-emerald-800">REVENUE (INCOME)</h3>
                   <div className="space-y-3 px-4">
-                    {filteredData.totalRent > 0 && (
+                    {filteredData.totalServiceCharge > 0 && (
                       <div className="flex justify-between">
-                        <span className="text-muted-foreground">Rent Income</span>
-                        <span>₨ {filteredData.totalRent.toLocaleString()}</span>
+                        <span className="text-muted-foreground">Service Charge & Rent Income</span>
+                        <span>₨ {filteredData.totalServiceCharge.toLocaleString()}</span>
                       </div>
                     )}
                     {filteredData.totalElectricity > 0 && (
@@ -180,6 +187,30 @@ export default function ProfitLossPage() {
                       <div className="flex justify-between">
                         <span className="text-muted-foreground">Water Income</span>
                         <span>₨ {filteredData.totalWater.toLocaleString()}</span>
+                      </div>
+                    )}
+                    {filteredData.totalDiesel > 0 && (
+                      <div className="flex justify-between">
+                        <span className="text-muted-foreground">Diesel Cost Sharing</span>
+                        <span>₨ {filteredData.totalDiesel.toLocaleString()}</span>
+                      </div>
+                    )}
+                    {filteredData.totalInsurance > 0 && (
+                      <div className="flex justify-between">
+                        <span className="text-muted-foreground">Insurance Sharing</span>
+                        <span>₨ {filteredData.totalInsurance.toLocaleString()}</span>
+                      </div>
+                    )}
+                    {filteredData.totalStructureMaintenance > 0 && (
+                      <div className="flex justify-between">
+                        <span className="text-muted-foreground">Structure Maintenance</span>
+                        <span>₨ {filteredData.totalStructureMaintenance.toLocaleString()}</span>
+                      </div>
+                    )}
+                    {filteredData.totalLatePenalty > 0 && (
+                      <div className="flex justify-between">
+                        <span className="text-muted-foreground">Late Penalties</span>
+                        <span>₨ {filteredData.totalLatePenalty.toLocaleString()}</span>
                       </div>
                     )}
                     {filteredData.totalOther > 0 && (
