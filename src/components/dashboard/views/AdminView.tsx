@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/button'
 import { Building2, Home, Users, CreditCard, Wrench, TrendingUp, TrendingDown, DollarSign } from 'lucide-react'
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, Legend } from 'recharts'
 import { db } from '@/config/firebase'
-import { collection, onSnapshot } from 'firebase/firestore'
+import { collection, onSnapshot, query, limit, orderBy } from 'firebase/firestore'
 import { Building, Unit, Invoice, MaintenanceTicket } from '@/types/models'
 
 export function AdminView({ profile }: { profile: any }) {
@@ -21,9 +21,9 @@ export function AdminView({ profile }: { profile: any }) {
   useEffect(() => {
     const unsubBuildings = onSnapshot(collection(db, 'buildings'), (snap: any) => setBuildings(snap.docs.map((d: any) => d.data() as Building)))
     const unsubUnits = onSnapshot(collection(db, 'units'), (snap: any) => setUnits(snap.docs.map((d: any) => d.data() as Unit)))
-    const unsubInvoices = onSnapshot(collection(db, 'invoices'), (snap: any) => setInvoices(snap.docs.map((d: any) => d.data() as Invoice)))
-    const unsubTickets = onSnapshot(collection(db, 'maintenance_tickets'), (snap: any) => setTickets(snap.docs.map((d: any) => d.data() as MaintenanceTicket)))
-    const unsubExpenses = onSnapshot(collection(db, 'expenses'), (snap: any) => setExpenses(snap.docs.map((d: any) => d.data() as any)))
+    const unsubInvoices = onSnapshot(query(collection(db, 'invoices'), orderBy('createdAt', 'desc'), limit(200)), (snap: any) => setInvoices(snap.docs.map((d: any) => d.data() as Invoice)))
+    const unsubTickets = onSnapshot(query(collection(db, 'maintenance_tickets'), orderBy('createdAt', 'desc'), limit(100)), (snap: any) => setTickets(snap.docs.map((d: any) => d.data() as MaintenanceTicket)))
+    const unsubExpenses = onSnapshot(query(collection(db, 'expenses'), orderBy('date', 'desc'), limit(100)), (snap: any) => setExpenses(snap.docs.map((d: any) => d.data() as any)))
 
     return () => {
       unsubBuildings()

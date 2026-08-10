@@ -11,7 +11,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogDescription } from '@/components/ui/dialog'
 import { useAuth } from '@/context/AuthContext'
 import { db } from '@/config/firebase'
-import { collection, onSnapshot, query, orderBy, addDoc, updateDoc, doc } from 'firebase/firestore'
+import { collection, onSnapshot, query, orderBy, addDoc, updateDoc, doc, limit, where } from 'firebase/firestore'
 import { MaintenanceTicket } from '@/types/models'
 import { 
   Wrench, CheckCircle, Clock, AlertTriangle, Plus, User, MapPin, 
@@ -128,7 +128,20 @@ export default function MaintenancePage() {
   const [actualCost, setActualCost] = useState('0')
 
   useEffect(() => {
-    const q = query(collection(db, 'maintenance'), orderBy('createdAt', 'desc'))
+    let q;
+    const isAdminOrManager = profile ? ['SUPER_ADMIN', 'MANAGER', 'ACCOUNTANT'].includes(profile.role) : false
+    
+    if (isAdminOrManager) {
+      q = query(collection(db, 'maintenance'), orderBy('createdAt', 'desc'), limit(100))
+    } else {
+      q = query(
+        collection(db, 'maintenance'), 
+        where('reportedBy', '==', profile?.uid || ''),
+        orderBy('createdAt', 'desc'),
+        limit(100)
+      )
+    }
+
     const unsubscribe = onSnapshot(q, (snapshot: any) => {
       const tData: MaintenanceTicket[] = []
       snapshot.forEach((doc: any) => {

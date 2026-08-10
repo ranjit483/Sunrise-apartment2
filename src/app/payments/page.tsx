@@ -6,7 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { db } from '@/config/firebase'
-import { collection, onSnapshot, query, where, doc, writeBatch, getDoc, getDocs, updateDoc } from 'firebase/firestore'
+import { collection, onSnapshot, query, where, doc, writeBatch, getDoc, getDocs, updateDoc, orderBy, limit } from 'firebase/firestore'
 import { Payment, Invoice } from '@/types/models'
 import { Loader2, DollarSign, Eye, Printer, FileText, QrCode, CheckCircle2, AlertCircle } from 'lucide-react'
 import { useAuth } from '@/context/AuthContext'
@@ -112,11 +112,13 @@ export default function PaymentsPage() {
     if (!profile?.role) return;
     
     const isResident = profile.role === 'RESIDENT' || profile.role === 'TENANT' || profile.role === 'OWNER'
+    const canManagePayments = profile.role === 'SUPER_ADMIN' || profile.role === 'MANAGER' || profile.role === 'ACCOUNTANT'
 
-    // Fetch payments without index-dependent orderBy to prevent empty history lists
     let q = query(collection(db, 'payments'))
-    if (isResident && user?.uid) {
-      q = query(collection(db, 'payments'), where('tenantId', '==', user.uid))
+    if (canManagePayments) {
+      q = query(collection(db, 'payments'), orderBy('createdAt', 'desc'), limit(100))
+    } else {
+      q = query(collection(db, 'payments'), where('tenantId', '==', user?.uid || ''), orderBy('createdAt', 'desc'), limit(100))
     }
     
     const unsubscribePayments = onSnapshot(q, (snapshot: any) => {

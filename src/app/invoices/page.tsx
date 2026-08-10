@@ -6,7 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { db } from '@/config/firebase'
-import { collection, onSnapshot, query, orderBy, getDocs, doc, writeBatch, where, updateDoc, getDoc } from 'firebase/firestore'
+import { collection, onSnapshot, query, orderBy, getDocs, doc, writeBatch, where, updateDoc, getDoc, limit } from 'firebase/firestore'
 import { Invoice, Unit, Payment } from '@/types/models'
 import { Loader2, Plus, Send, Edit2, CheckCircle2, Eye, Printer, FileText, Check, DollarSign, Search } from 'lucide-react'
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
@@ -170,9 +170,9 @@ export default function InvoicesPage() {
 
     let q;
     if (canManageInvoices) {
-      q = query(collection(db, 'invoices'), orderBy('createdAt', 'desc'))
+      q = query(collection(db, 'invoices'), orderBy('createdAt', 'desc'), limit(100))
     } else {
-      q = query(collection(db, 'invoices'), where('tenantId', '==', profile?.uid || ''))
+      q = query(collection(db, 'invoices'), where('tenantId', '==', profile?.uid || ''), orderBy('createdAt', 'desc'), limit(100))
     }
 
     const unsubscribe = onSnapshot(q, (snapshot: any) => {

@@ -9,7 +9,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog'
 import { db } from '@/config/firebase'
-import { collection, onSnapshot, query, orderBy, doc, setDoc, updateDoc } from 'firebase/firestore'
+import { collection, onSnapshot, query, orderBy, doc, setDoc, updateDoc, limit } from 'firebase/firestore'
 import { Expense, ChartOfAccount, Building } from '@/types/models'
 import { Loader2, Plus, CheckCircle2, XCircle } from 'lucide-react'
 import { useAuth } from '@/context/AuthContext'
@@ -32,7 +32,7 @@ export default function ExpensesPage() {
   })
 
   useEffect(() => {
-    const unsubExp = onSnapshot(query(collection(db, 'expenses'), orderBy('date', 'desc')), (snapshot: any) => {
+    const unsubExp = onSnapshot(query(collection(db, 'expenses'), orderBy('date', 'desc'), limit(100)), (snapshot: any) => {
       const eData: Expense[] = []
       snapshot.forEach((doc: any) => eData.push({ id: doc.id, ...doc.data() } as Expense))
       setExpenses(eData)
