@@ -19,8 +19,8 @@ export default function ProfitLossPage() {
   useEffect(() => {
     setLoading(true)
     
-    // Fetch all paid invoices for revenue
-    const qInvoices = query(collection(db, 'invoices'), where('status', '==', 'paid'))
+    // Fetch all paid and partial invoices for revenue
+    const qInvoices = query(collection(db, 'invoices'), where('status', 'in', ['paid', 'partial']))
     const unsubInvoices = onSnapshot(qInvoices, (snap: any) => {
       const invs: any[] = []
       snap.forEach((doc: any) => invs.push({ id: doc.id, ...doc.data() }))
@@ -77,20 +77,27 @@ export default function ProfitLossPage() {
     let totalStructureMaintenance = 0
     let totalLatePenalty = 0
     let totalOther = 0
+    let totalPartialPayment = 0
 
     filteredInvoices.forEach(inv => {
-      totalServiceCharge += (inv.amount || 0)
-      totalElectricity += (inv.electricityAmount || 0)
-      totalUtility += (inv.utilityAmount || 0)
-      totalWater += (inv.waterAmount || 0)
-      totalDiesel += (inv.generatorAmount || 0) + (inv.dieselAmount || 0)
-      totalInsurance += (inv.insuranceAmount || 0)
-      totalStructureMaintenance += (inv.structureMaintenanceAmount || 0)
-      totalLatePenalty += (inv.latePenaltyAmount || 0)
-      totalOther += (inv.otherAmount || 0)
+      if (inv.status === 'partial') {
+        // Log all collected cash for partial invoices under 'Partial Payment'
+        totalPartialPayment += (inv.paidAmount || 0)
+      } else {
+        // Once fully paid, split into respective heads
+        totalServiceCharge += (inv.amount || 0)
+        totalElectricity += (inv.electricityAmount || 0)
+        totalUtility += (inv.utilityAmount || 0)
+        totalWater += (inv.waterAmount || 0)
+        totalDiesel += (inv.generatorAmount || 0) + (inv.dieselAmount || 0)
+        totalInsurance += (inv.insuranceAmount || 0)
+        totalStructureMaintenance += (inv.structureMaintenanceAmount || 0)
+        totalLatePenalty += (inv.latePenaltyAmount || 0)
+        totalOther += (inv.otherAmount || 0)
+      }
     })
 
-    const totalRevenue = totalServiceCharge + totalElectricity + totalUtility + totalWater + totalDiesel + totalInsurance + totalStructureMaintenance + totalLatePenalty + totalOther
+    const totalRevenue = totalServiceCharge + totalElectricity + totalUtility + totalWater + totalDiesel + totalInsurance + totalStructureMaintenance + totalLatePenalty + totalOther + totalPartialPayment
 
     // Compute Expenses
     const expensesByCategory: Record<string, number> = {}
@@ -115,6 +122,7 @@ export default function ProfitLossPage() {
       totalStructureMaintenance,
       totalLatePenalty,
       totalOther,
+      totalPartialPayment,
       totalRevenue,
       expensesByCategory,
       sortedExpenseCategories,
@@ -217,6 +225,12 @@ export default function ProfitLossPage() {
                       <div className="flex justify-between">
                         <span className="text-muted-foreground">Other Income</span>
                         <span>₨ {filteredData.totalOther.toLocaleString()}</span>
+                      </div>
+                    )}
+                    {filteredData.totalPartialPayment > 0 && (
+                      <div className="flex justify-between font-medium text-emerald-700">
+                        <span>Partial Payments (Unallocated)</span>
+                        <span>₨ {filteredData.totalPartialPayment.toLocaleString()}</span>
                       </div>
                     )}
                   </div>
