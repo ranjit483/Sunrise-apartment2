@@ -136,9 +136,7 @@ export default function MaintenancePage() {
     } else {
       q = query(
         collection(db, 'maintenance'), 
-        where('reportedBy', '==', profile?.uid || ''),
-        orderBy('createdAt', 'desc'),
-        limit(100)
+        where('reportedBy', '==', profile?.uid || '')
       )
     }
 

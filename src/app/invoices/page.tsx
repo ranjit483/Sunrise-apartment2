@@ -172,7 +172,8 @@ export default function InvoicesPage() {
     if (canManageInvoices) {
       q = query(collection(db, 'invoices'), orderBy('createdAt', 'desc'), limit(100))
     } else {
-      q = query(collection(db, 'invoices'), where('tenantId', '==', profile?.uid || ''), orderBy('createdAt', 'desc'), limit(100))
+      // Fetch without orderBy to prevent Firestore missing composite index error. Sort in memory.
+      q = query(collection(db, 'invoices'), where('tenantId', '==', profile?.uid || ''))
     }
 
     const unsubscribe = onSnapshot(q, (snapshot: any) => {

@@ -118,7 +118,7 @@ export default function PaymentsPage() {
     if (canManagePayments) {
       q = query(collection(db, 'payments'), orderBy('createdAt', 'desc'), limit(100))
     } else {
-      q = query(collection(db, 'payments'), where('tenantId', '==', user?.uid || ''), orderBy('createdAt', 'desc'), limit(100))
+      q = query(collection(db, 'payments'), where('tenantId', '==', user?.uid || ''))
     }
     
     const unsubscribePayments = onSnapshot(q, (snapshot: any) => {
