@@ -14,6 +14,7 @@ export default function ProfitLossPage() {
   const [loading, setLoading] = useState(true)
   const [invoices, setInvoices] = useState<any[]>([])
   const [expenses, setExpenses] = useState<any[]>([])
+  const [payments, setPayments] = useState<any[]>([])
   const [dateFilter, setDateFilter] = useState<string>('this_month')
 
   useEffect(() => {
@@ -32,7 +33,16 @@ export default function ProfitLossPage() {
         const exps: any[] = []
         expSnap.forEach((doc: any) => exps.push({ id: doc.id, ...doc.data() }))
         setExpenses(exps.filter(e => e.status === 'approved' || e.status === 'paid' || !e.status))
-        setLoading(false)
+        
+        // Fetch all completed payments
+        const qPayments = query(collection(db, 'payments'))
+        getDocs(qPayments).then((paySnap: any) => {
+          const pays: any[] = []
+          paySnap.forEach((doc: any) => pays.push({ id: doc.id, ...doc.data() }))
+          // Payments that actually resulted in cash/bank balance
+          setPayments(pays.filter(p => p.status === 'completed'))
+          setLoading(false)
+        })
       })
     })
 
@@ -105,8 +115,36 @@ export default function ProfitLossPage() {
 
     filteredExpenses.forEach(exp => {
       const cat = exp.category || 'Uncategorized'
+      if (cat.toLowerCase().includes('bank') || cat.toLowerCase().includes('goble')) {
+        // Exclude Bank Deposits from Operating Expenses in P&L
+        return;
+      }
       expensesByCategory[cat] = (expensesByCategory[cat] || 0) + Number(exp.amount)
       totalExpense += Number(exp.amount)
+    })
+
+    // Compute Global Balances (independent of date filter)
+    let globalCashBalance = 0
+    let globalBankBalance = 0
+
+    payments.forEach(p => {
+      if (p.method === 'cash') {
+        globalCashBalance += Number(p.amount || 0)
+      } else {
+        globalBankBalance += Number(p.amount || 0) // qr, online, cheque
+      }
+    })
+
+    expenses.forEach(exp => {
+      const cat = (exp.category || '').toLowerCase()
+      if (cat.includes('bank') || cat.includes('goble')) {
+        // This is a deposit from Cash to Bank
+        globalCashBalance -= Number(exp.amount || 0)
+        globalBankBalance += Number(exp.amount || 0)
+      } else {
+        // Normal expense. Default to paying from Bank Account.
+        globalBankBalance -= Number(exp.amount || 0)
+      }
     })
 
     // Sort categories alphabetically
@@ -127,9 +165,11 @@ export default function ProfitLossPage() {
       expensesByCategory,
       sortedExpenseCategories,
       totalExpense,
-      netProfit: totalRevenue - totalExpense
+      netProfit: totalRevenue - totalExpense,
+      globalCashBalance,
+      globalBankBalance
     }
-  }, [invoices, expenses, dateFilter])
+  }, [invoices, expenses, payments, dateFilter])
 
   return (
     <DashboardLayout title="Profit & Loss Statement">
@@ -267,6 +307,21 @@ export default function ProfitLossPage() {
                 }`}>
                   <span>NET {filteredData.netProfit >= 0 ? 'PROFIT' : 'LOSS'}</span>
                   <span>₨ {Math.abs(filteredData.netProfit).toLocaleString()}</span>
+                </div>
+                
+                {/* Bank & Cash Balances Section */}
+                <div className="mt-8 border-t pt-8">
+                  <h3 className="font-bold text-lg border-b pb-2 mb-4 text-blue-800">BANK & CASH BALANCES</h3>
+                  <div className="space-y-3 px-4">
+                    <div className="flex justify-between">
+                      <span className="text-muted-foreground font-medium">Goble Bank LTD</span>
+                      <span className="font-medium text-blue-900">₨ {filteredData.globalBankBalance.toLocaleString()}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-muted-foreground font-medium">Cash</span>
+                      <span className="font-medium text-blue-900">₨ {filteredData.globalCashBalance.toLocaleString()}</span>
+                    </div>
+                  </div>
                 </div>
 
               </div>
