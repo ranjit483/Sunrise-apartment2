@@ -21,9 +21,9 @@ export function AdminView({ profile }: { profile: any }) {
   useEffect(() => {
     const unsubBuildings = onSnapshot(collection(db, 'buildings'), (snap: any) => setBuildings(snap.docs.map((d: any) => d.data() as Building)))
     const unsubUnits = onSnapshot(collection(db, 'units'), (snap: any) => setUnits(snap.docs.map((d: any) => d.data() as Unit)))
-    const unsubInvoices = onSnapshot(query(collection(db, 'invoices'), orderBy('createdAt', 'desc'), limit(200)), (snap: any) => setInvoices(snap.docs.map((d: any) => d.data() as Invoice)))
-    const unsubTickets = onSnapshot(query(collection(db, 'maintenance_tickets'), orderBy('createdAt', 'desc'), limit(100)), (snap: any) => setTickets(snap.docs.map((d: any) => d.data() as MaintenanceTicket)))
-    const unsubExpenses = onSnapshot(query(collection(db, 'expenses'), orderBy('date', 'desc'), limit(100)), (snap: any) => setExpenses(snap.docs.map((d: any) => d.data() as any)))
+    const unsubInvoices = onSnapshot(query(collection(db, 'invoices'), orderBy('createdAt', 'desc')), (snap: any) => setInvoices(snap.docs.map((d: any) => d.data() as Invoice)))
+    const unsubTickets = onSnapshot(query(collection(db, 'maintenance_tickets'), orderBy('createdAt', 'desc')), (snap: any) => setTickets(snap.docs.map((d: any) => d.data() as MaintenanceTicket)))
+    const unsubExpenses = onSnapshot(query(collection(db, 'expenses'), orderBy('date', 'desc')), (snap: any) => setExpenses(snap.docs.map((d: any) => d.data() as any)))
 
     return () => {
       unsubBuildings()

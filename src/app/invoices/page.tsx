@@ -170,7 +170,7 @@ export default function InvoicesPage() {
 
     let q;
     if (canManageInvoices) {
-      q = query(collection(db, 'invoices'), orderBy('createdAt', 'desc'), limit(100))
+      q = query(collection(db, 'invoices'), orderBy('createdAt', 'desc'))
     } else {
       // Fetch without orderBy to prevent Firestore missing composite index error. Sort in memory.
       q = query(collection(db, 'invoices'), where('tenantId', '==', profile?.uid || ''))

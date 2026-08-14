@@ -32,7 +32,7 @@ export default function ExpensesPage() {
   })
 
   useEffect(() => {
-    const unsubExp = onSnapshot(query(collection(db, 'expenses'), orderBy('date', 'desc'), limit(100)), (snapshot: any) => {
+    const unsubExp = onSnapshot(query(collection(db, 'expenses'), orderBy('date', 'desc')), (snapshot: any) => {
       const eData: Expense[] = []
       snapshot.forEach((doc: any) => eData.push({ id: doc.id, ...doc.data() } as Expense))
       setExpenses(eData)

@@ -132,7 +132,7 @@ export default function MaintenancePage() {
     const isAdminOrManager = profile ? ['SUPER_ADMIN', 'MANAGER', 'ACCOUNTANT'].includes(profile.role) : false
     
     if (isAdminOrManager) {
-      q = query(collection(db, 'maintenance'), orderBy('createdAt', 'desc'), limit(100))
+      q = query(collection(db, 'maintenance'), orderBy('createdAt', 'desc'))
     } else {
       q = query(
         collection(db, 'maintenance'), 

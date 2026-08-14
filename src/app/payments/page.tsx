@@ -116,7 +116,7 @@ export default function PaymentsPage() {
 
     let q = query(collection(db, 'payments'))
     if (canManagePayments) {
-      q = query(collection(db, 'payments'), orderBy('createdAt', 'desc'), limit(100))
+      q = query(collection(db, 'payments'), orderBy('createdAt', 'desc'))
     } else {
       q = query(collection(db, 'payments'), where('tenantId', '==', user?.uid || ''))
     }
