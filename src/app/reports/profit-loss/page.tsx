@@ -115,7 +115,8 @@ export default function ProfitLossPage() {
 
     filteredExpenses.forEach(exp => {
       const cat = exp.category || 'Uncategorized'
-      if (cat.toLowerCase().includes('bank') || cat.toLowerCase().includes('goble')) {
+      const catLower = cat.toLowerCase()
+      if (catLower.includes('bank') || catLower.includes('goble') || catLower.includes('globle') || catLower.includes('ime')) {
         // Exclude Bank Deposits from Operating Expenses in P&L
         return;
       }
@@ -137,7 +138,7 @@ export default function ProfitLossPage() {
 
     expenses.forEach(exp => {
       const cat = (exp.category || '').toLowerCase()
-      if (cat.includes('bank') || cat.includes('goble')) {
+      if (cat.includes('bank') || cat.includes('goble') || cat.includes('globle') || cat.includes('ime')) {
         // This is a deposit from Cash to Bank
         globalCashBalance -= Number(exp.amount || 0)
         globalBankBalance += Number(exp.amount || 0)
@@ -314,7 +315,7 @@ export default function ProfitLossPage() {
                   <h3 className="font-bold text-lg border-b pb-2 mb-4 text-blue-800">BANK & CASH BALANCES</h3>
                   <div className="space-y-3 px-4">
                     <div className="flex justify-between">
-                      <span className="text-muted-foreground font-medium">Goble Bank LTD</span>
+                      <span className="text-muted-foreground font-medium">IME Globle Bank</span>
                       <span className="font-medium text-blue-900">₨ {filteredData.globalBankBalance.toLocaleString()}</span>
                     </div>
                     <div className="flex justify-between">
