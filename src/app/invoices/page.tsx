@@ -836,7 +836,7 @@ export default function InvoicesPage() {
           }
         `}} />
         {/* If viewing invoice details */}
-        {viewingInvoice && (
+        {viewingInvoice && !isReceiptModalOpen && (
           <div className="bg-white p-1.5 w-full h-full mx-auto text-black border-2 border-black rounded-sm print-sheet shadow-none">
             <div className="text-center border-b-2 border-black pb-1.5 mb-1.5">
               <h1 className="text-sm font-black tracking-tight text-gray-900">SUNRISE APARTMENT WELFARE SOCIETY</h1>
@@ -984,7 +984,7 @@ export default function InvoicesPage() {
         )}
 
         {/* If viewing payment receipt slip */}
-        {activeReceipt && receiptInvoice && (
+        {isReceiptModalOpen && activeReceipt && receiptInvoice && (
           <div className="bg-white p-6 max-w-[650px] mx-auto text-black border border-black rounded-sm print-sheet shadow-none my-8">
             <div className="border-b pb-3 mb-4 text-center">
               <h1 className="text-xl font-black tracking-tight text-gray-950">SUNRISE APARTMENT WELFARE SOCIETY</h1>
