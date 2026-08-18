@@ -790,7 +790,7 @@ export default function InvoicesPage() {
         <style dangerouslySetInnerHTML={{__html: `
           @media print {
             @page {
-              size: 105mm 148mm portrait !important; /* Force A6 Portrait */
+              size: ${isReceiptModalOpen ? 'A6 landscape' : 'A6 portrait'} !important;
               margin: 0mm !important;
             }
             body, html {
@@ -798,15 +798,15 @@ export default function InvoicesPage() {
               print-color-adjust: exact;
               margin: 0 !important;
               padding: 0 !important;
-              width: 105mm !important;
-              height: 148mm !important;
+              width: ${isReceiptModalOpen ? '148mm' : '105mm'} !important;
+              height: ${isReceiptModalOpen ? '105mm' : '148mm'} !important;
               overflow: hidden !important;
             }
             .print-sheet {
-              width: 105mm !important;
-              height: 147mm !important;
+              width: ${isReceiptModalOpen ? '148mm' : '105mm'} !important;
+              height: ${isReceiptModalOpen ? '104mm' : '147mm'} !important;
               margin: 0 !important;
-              padding: 3mm !important;
+              padding: ${isReceiptModalOpen ? '5mm' : '3mm'} !important;
               box-sizing: border-box;
               display: flex;
               flex-direction: column;
@@ -985,8 +985,9 @@ export default function InvoicesPage() {
 
         {/* If viewing payment receipt slip */}
         {isReceiptModalOpen && activeReceipt && receiptInvoice && (
-          <div className="bg-white p-6 max-w-[650px] mx-auto text-black border border-black rounded-sm print-sheet shadow-none my-8">
-            <div className="border-b pb-3 mb-4 text-center">
+          <div className="bg-white w-full h-full text-black border-2 border-black rounded-sm print-sheet shadow-none flex flex-col justify-between">
+            <div>
+              <div className="border-b-2 border-black pb-2 mb-3 text-center">
               <h1 className="text-xl font-black tracking-tight text-gray-950">SUNRISE APARTMENT WELFARE SOCIETY</h1>
               <p className="text-[11px] font-semibold text-gray-600">Nakkhu-13, Lalitpur, Phone: 01-5185110</p>
               <div className="inline-block border border-black px-2 py-0.5 rounded-sm bg-gray-50 text-[10px] font-bold mt-1.5 tracking-widest uppercase">
@@ -1023,8 +1024,9 @@ export default function InvoicesPage() {
                 )}
               </div>
             </div>
+            </div>
 
-            <div className="flex justify-between items-center mt-6 pt-4">
+            <div className="flex justify-between items-end mt-4 pt-2">
               <div className="border border-black bg-gray-100 px-4 py-2 text-center rounded-sm">
                 <span className="text-[10px] text-gray-600 block uppercase font-bold">Total Amount Paid</span>
                 <strong className="text-lg font-black text-gray-950 font-mono">₨ {activeReceipt.amount.toLocaleString()}.00</strong>
