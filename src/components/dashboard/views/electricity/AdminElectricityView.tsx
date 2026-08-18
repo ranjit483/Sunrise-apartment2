@@ -27,6 +27,7 @@ export default function AdminElectricityView() {
   const [generatorPricePerUnit, setGeneratorPricePerUnit] = useState(25)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [currentReadingInput, setCurrentReadingInput] = useState('')
+  const [readingMonth, setReadingMonth] = useState('')
 
   // Edit State
   const [isEditModalOpen, setIsEditModalOpen] = useState(false)
@@ -142,6 +143,11 @@ export default function AdminElectricityView() {
       return
     }
 
+    if (!readingMonth.trim()) {
+      alert("Please enter the Reading Month (e.g. Asadh 2083)")
+      return
+    }
+
     const unitObj = units.find(u => u.id === selectedUnit)
     if (!unitObj) return
 
@@ -149,7 +155,7 @@ export default function AdminElectricityView() {
     try {
       const consumed = currentVal - previousReading
       const total = consumed * currentPricePerUnit
-      const monthStr = new Date().toISOString().substring(0, 7)
+      
 
       const reading: ElectricityReading = {
         id: doc(collection(db, 'electricity_readings')).id,
@@ -164,7 +170,7 @@ export default function AdminElectricityView() {
         readingDate: new Date().toISOString(),
         status: 'approved',
         photoUrl: '',
-        month: monthStr,
+        month: readingMonth.trim(),
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString()
       }
@@ -174,6 +180,7 @@ export default function AdminElectricityView() {
       alert("Reading recorded successfully.")
       setCurrentReadingInput('')
       setSelectedUnit('')
+      setReadingMonth('')
     } catch (error: any) {
       console.error(error)
       alert("Error recording reading: " + error.message)
@@ -314,6 +321,16 @@ export default function AdminElectricityView() {
                   disabled={!selectedUnit}
                 />
               </div>
+              <div className="space-y-2">
+                <Label>Reading Month *</Label>
+                <Input 
+                  required 
+                  value={readingMonth}
+                  onChange={(e) => setReadingMonth(e.target.value)}
+                  placeholder="e.g. Asadh 2083"
+                  disabled={!selectedUnit}
+                />
+              </div>
             </div>
 
             {selectedUnit && currentReadingInput && !isNaN(parseFloat(currentReadingInput)) && (
@@ -374,6 +391,7 @@ export default function AdminElectricityView() {
               <TableHeader>
                 <TableRow>
                   <TableHead>Date</TableHead>
+                  <TableHead>Reading Month</TableHead>
                   <TableHead>Resident/Tenant ID</TableHead>
                   <TableHead>Meter Type</TableHead>
                   <TableHead>Readings (Prev → Curr)</TableHead>

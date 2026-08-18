@@ -22,6 +22,7 @@ export default function ResidentElectricityView() {
   
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [currentReadingInput, setCurrentReadingInput] = useState('')
+  const [readingMonth, setReadingMonth] = useState('')
   const [photoUrl, setPhotoUrl] = useState('')
   const [pricePerUnit, setPricePerUnit] = useState(15) // Default to 15
 
@@ -128,11 +129,16 @@ export default function ResidentElectricityView() {
       return
     }
 
+    if (!readingMonth.trim()) {
+      alert("Please enter the Reading Month (e.g. Asadh 2083)")
+      return
+    }
+
     setIsSubmitting(true)
     try {
       const consumed = currentVal - previousReading
       const total = consumed * pricePerUnit
-      const monthStr = new Date().toISOString().substring(0, 7) // YYYY-MM
+      
 
       const newRef = doc(collection(db, 'electricity_readings'))
       const reading: ElectricityReading = {
@@ -147,7 +153,7 @@ export default function ResidentElectricityView() {
         readingDate: new Date().toISOString(),
         status: 'pending_verification',
         photoUrl: photoUrl || '',
-        month: monthStr,
+        month: readingMonth.trim(),
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString()
       }
@@ -156,6 +162,7 @@ export default function ResidentElectricityView() {
       alert("Reading submitted successfully. Waiting for Admin verification.")
       setCurrentReadingInput('')
       setPhotoUrl('')
+      setReadingMonth('')
     } catch (error: any) {
       console.error(error)
       alert("Error submitting reading: " + error.message)
@@ -231,7 +238,7 @@ export default function ResidentElectricityView() {
                   <div key={reading.id} className="flex items-center justify-between p-3 border rounded-lg bg-gray-50/50">
                     <div className="space-y-1">
                       <p className="font-semibold text-sm">
-                        {new Date(reading.readingDate).toLocaleDateString()}
+                        {new Date(reading.readingDate).toLocaleDateString()} - <span className="text-blue-600">{reading.month}</span>
                       </p>
                       <p className="text-xs text-muted-foreground">
                         {reading.previousReading} → {reading.currentReading} ({reading.totalConsumed} Units)
