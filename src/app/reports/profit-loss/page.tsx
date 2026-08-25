@@ -88,6 +88,7 @@ export default function ProfitLossPage() {
     let totalLatePenalty = 0
     let totalOther = 0
     let totalPartialPayment = 0
+    let totalElectricityVat = 0
 
     filteredInvoices.forEach(inv => {
       if (inv.status === 'partial') {
@@ -97,6 +98,7 @@ export default function ProfitLossPage() {
         // Once fully paid, split into respective heads
         totalServiceCharge += (inv.amount || 0)
         totalElectricity += (inv.electricityAmount || 0)
+        totalElectricityVat += (inv.electricityVatAmount || 0)
         totalUtility += (inv.utilityAmount || 0)
         totalWater += (inv.waterAmount || 0)
         totalDiesel += (inv.generatorAmount || 0) + (inv.dieselAmount || 0)
@@ -107,7 +109,7 @@ export default function ProfitLossPage() {
       }
     })
 
-    const totalRevenue = totalServiceCharge + totalElectricity + totalUtility + totalWater + totalDiesel + totalInsurance + totalStructureMaintenance + totalLatePenalty + totalOther + totalPartialPayment
+    const totalRevenue = totalServiceCharge + totalElectricity + totalElectricityVat + totalUtility + totalWater + totalDiesel + totalInsurance + totalStructureMaintenance + totalLatePenalty + totalOther + totalPartialPayment
 
     // Compute Expenses
     const expensesByCategory: Record<string, number> = {}
@@ -154,6 +156,7 @@ export default function ProfitLossPage() {
     return {
       totalServiceCharge,
       totalElectricity,
+      totalElectricityVat,
       totalUtility,
       totalWater,
       totalDiesel,
@@ -224,6 +227,12 @@ export default function ProfitLossPage() {
                       <div className="flex justify-between">
                         <span className="text-muted-foreground">Electricity Income</span>
                         <span>₨ {filteredData.totalElectricity.toLocaleString()}</span>
+                      </div>
+                    )}
+                    {filteredData.totalElectricityVat > 0 && (
+                      <div className="flex justify-between">
+                        <span className="text-muted-foreground">Electricity Vat 13%</span>
+                        <span>₨ {filteredData.totalElectricityVat.toLocaleString()}</span>
                       </div>
                     )}
                     {filteredData.totalUtility > 0 && (
