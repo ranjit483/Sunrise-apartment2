@@ -21,6 +21,7 @@ const statusColors: Record<string, string> = {
   pending: 'bg-yellow-100 text-yellow-800',
   partial: 'bg-blue-100 text-blue-800',
   overdue: 'bg-red-100 text-red-800',
+  carried_forward: 'bg-purple-100 text-purple-800',
 }
 
 // Approximation for 2026 AD -> 2083 BS Nepalese date
@@ -305,7 +306,22 @@ export default function InvoicesPage() {
         const gReading = readingData?.generator ? readingData.generator.currentReading : 0;
         const gAmount = readingData?.generator ? readingData.generator.totalBill : 0;
 
-        const prevDue = user.previousPendingOutstandingDue || 0;
+        const userInvoices = invoices.filter(i => i.tenantId === user.uid || i.tenantId === user.id);
+        const unpaidInvoices = userInvoices.filter(i => i.status === 'pending' || i.status === 'overdue' || i.status === 'partial');
+        
+        let prevDueCalculated = 0;
+        for (const oldInv of unpaidInvoices) {
+          const iTotal = oldInv.amount + (oldInv.electricityAmount || 0) + (oldInv.generatorAmount || 0) + (oldInv.utilityAmount || 0) + (oldInv.waterAmount || 0) + (oldInv.insuranceAmount || 0) + (oldInv.dieselAmount || 0) + (oldInv.structureMaintenanceAmount || 0) + (oldInv.otherAmount || 0) + (oldInv.previousPendingOutstandingDue || 0) + (oldInv.latePenaltyAmount || 0) + (oldInv.electricityVatAmount || 0);
+          prevDueCalculated += (iTotal - (oldInv.paidAmount || 0));
+          
+          // Mark old invoice as carried forward so it doesn't double count in the dashboard
+          batch.update(doc(db, 'invoices', oldInv.id), {
+            status: 'carried_forward',
+            updatedAt: new Date().toISOString()
+          });
+        }
+
+        const prevDue = prevDueCalculated + (user.previousPendingOutstandingDue || 0);
         const latePenaltyAmount = Math.round(prevDue * (lateFeePercent / 100));
 
         const invoiceRef = doc(collection(db, 'invoices'))
