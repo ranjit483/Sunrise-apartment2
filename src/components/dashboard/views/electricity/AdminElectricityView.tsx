@@ -34,11 +34,13 @@ export default function AdminElectricityView() {
   const [editingReading, setEditingReading] = useState<ElectricityReading | null>(null)
   const [editPrev, setEditPrev] = useState('')
   const [editCurr, setEditCurr] = useState('')
+  const [editMonth, setEditMonth] = useState('')
 
   const handleEditClick = (reading: ElectricityReading) => {
     setEditingReading(reading)
     setEditPrev(reading.previousReading.toString())
     setEditCurr(reading.currentReading.toString())
+    setEditMonth(reading.month || '')
     setIsEditModalOpen(true)
   }
 
@@ -54,6 +56,10 @@ export default function AdminElectricityView() {
       alert("Current reading cannot be less than previous.")
       return
     }
+    if (!editMonth.trim()) {
+      alert("Please enter a reading month.")
+      return
+    }
     
     try {
       const consumed = curr - prev
@@ -62,7 +68,8 @@ export default function AdminElectricityView() {
         previousReading: prev,
         currentReading: curr,
         totalConsumed: consumed,
-        totalBill: total
+        totalBill: total,
+        month: editMonth.trim()
       })
       setIsEditModalOpen(false)
       setEditingReading(null)
@@ -503,6 +510,15 @@ export default function AdminElectricityView() {
             <DialogTitle>Edit Meter Reading</DialogTitle>
           </DialogHeader>
           <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <Label>Reading Month</Label>
+              <Input 
+                type="text" 
+                value={editMonth} 
+                onChange={e => setEditMonth(e.target.value)} 
+                placeholder="e.g. Asadh 2083"
+              />
+            </div>
             <div className="space-y-2">
               <Label>Previous Reading</Label>
               <Input 
