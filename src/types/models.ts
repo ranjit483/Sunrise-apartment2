@@ -36,6 +36,7 @@ export interface Invoice {
   electricityReading?: number
   electricityConsumed?: number
   electricityAmount?: number
+  electricityVatAmount?: number
   generatorReading?: number
   generatorAmount?: number
   utilityAmount?: number
