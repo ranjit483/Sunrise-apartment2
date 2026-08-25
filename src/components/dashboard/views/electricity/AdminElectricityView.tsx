@@ -419,6 +419,7 @@ export default function AdminElectricityView() {
                     return (
                     <TableRow key={reading.id}>
                       <TableCell>{new Date(reading.readingDate).toLocaleDateString()}</TableCell>
+                      <TableCell>{reading.month || 'N/A'}</TableCell>
                       <TableCell>
                         <div className="flex flex-col">
                           <span className="font-medium text-gray-900">{tenantName}</span>
