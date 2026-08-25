@@ -762,7 +762,7 @@ export default function InvoicesPage() {
                                 </Button>
                               )}
 
-                              {inv.status === 'draft' && profile?.role === 'SUPER ADMIN' && (
+                              {inv.status === 'draft' && profile?.role === 'SUPER_ADMIN' && (
                                 <Button 
                                   variant="ghost" 
                                   size="sm" 
