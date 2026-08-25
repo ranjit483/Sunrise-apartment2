@@ -521,16 +521,23 @@ export default function InvoicesPage() {
     if (!editingInvoice) return
     setIsUpdating(true)
     try {
+      const eVatAmount = Math.round(Number(editingInvoice.electricityAmount || 0) * 0.13);
+      
       const ref = doc(db, 'invoices', editingInvoice.id)
       await updateDoc(ref, {
         amount: Number(editingInvoice.amount),
+        electricityPreviousReading: Number(editingInvoice.electricityPreviousReading || 0),
         electricityReading: Number(editingInvoice.electricityReading || 0),
+        electricityConsumed: Number(editingInvoice.electricityConsumed || 0),
         electricityAmount: Number(editingInvoice.electricityAmount || 0),
+        electricityVatAmount: eVatAmount,
         generatorReading: Number(editingInvoice.generatorReading || 0),
         generatorAmount: Number(editingInvoice.generatorAmount || 0),
         utilityAmount: Number(editingInvoice.utilityAmount || 0),
         waterAmount: Number(editingInvoice.waterAmount || 0),
         insuranceAmount: Number(editingInvoice.insuranceAmount || 0),
+        dieselAmount: Number(editingInvoice.dieselAmount || 0),
+        structureMaintenanceAmount: Number(editingInvoice.structureMaintenanceAmount || 0),
         otherAmount: Number(editingInvoice.otherAmount || 0),
         dueDate: editingInvoice.dueDate,
         updatedAt: new Date().toISOString()
@@ -1121,7 +1128,23 @@ export default function InvoicesPage() {
                   <Input 
                     type="number" 
                     value={editingInvoice.electricityReading || 0} 
-                    onChange={e => setEditingInvoice({...editingInvoice, electricityReading: Number(e.target.value)})} 
+                    onChange={e => {
+                      const curr = Number(e.target.value);
+                      const prev = editingInvoice.electricityPreviousReading || 0;
+                      const consumed = Math.max(0, curr - prev);
+                      
+                      let rate = 15;
+                      if (editingInvoice.electricityConsumed && editingInvoice.electricityConsumed > 0) {
+                        rate = (editingInvoice.electricityAmount || 0) / editingInvoice.electricityConsumed;
+                      }
+                      
+                      setEditingInvoice({
+                        ...editingInvoice, 
+                        electricityReading: curr, 
+                        electricityConsumed: consumed,
+                        electricityAmount: Math.round(consumed * rate)
+                      });
+                    }} 
                   />
                 </div>
                 <div className="space-y-2">
@@ -1129,7 +1152,18 @@ export default function InvoicesPage() {
                   <Input 
                     type="number" 
                     value={editingInvoice.electricityConsumed || 0} 
-                    onChange={e => setEditingInvoice({...editingInvoice, electricityConsumed: Number(e.target.value)})} 
+                    onChange={e => {
+                      const consumed = Number(e.target.value);
+                      let rate = 15;
+                      if (editingInvoice.electricityConsumed && editingInvoice.electricityConsumed > 0) {
+                        rate = (editingInvoice.electricityAmount || 0) / editingInvoice.electricityConsumed;
+                      }
+                      setEditingInvoice({
+                        ...editingInvoice, 
+                        electricityConsumed: consumed,
+                        electricityAmount: Math.round(consumed * rate)
+                      });
+                    }} 
                   />
                 </div>
                 <div className="space-y-2">
