@@ -6,9 +6,9 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { db } from '@/config/firebase'
-import { collection, onSnapshot, query, orderBy, getDocs, doc, writeBatch, where, updateDoc, getDoc, limit } from 'firebase/firestore'
+import { collection, onSnapshot, query, orderBy, getDocs, doc, writeBatch, where, updateDoc, getDoc, limit, deleteDoc } from 'firebase/firestore'
 import { Invoice, Unit, Payment } from '@/types/models'
-import { Loader2, Plus, Send, Edit2, CheckCircle2, Eye, Printer, FileText, Check, DollarSign, Search } from 'lucide-react'
+import { Loader2, Plus, Send, Edit2, CheckCircle2, Eye, Printer, FileText, Check, DollarSign, Search, Trash2 } from 'lucide-react'
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -545,6 +545,16 @@ export default function InvoicesPage() {
     }
   }
 
+  const handleDeleteDraft = async (invoiceId: string) => {
+    if (!window.confirm('Are you sure you want to delete this draft invoice?')) return;
+    try {
+      await deleteDoc(doc(db, 'invoices', invoiceId));
+    } catch (error: any) {
+      console.error('Error deleting draft invoice:', error);
+      alert('Failed to delete invoice: ' + error.message);
+    }
+  }
+
   const openEditModal = (inv: Invoice) => {
     setEditingInvoice(inv)
     setIsEditModalOpen(true)
@@ -749,6 +759,18 @@ export default function InvoicesPage() {
                                   title="Edit Draft"
                                 >
                                   <Edit2 className="h-4 w-4 text-blue-500 hover:text-blue-700" />
+                                </Button>
+                              )}
+
+                              {inv.status === 'draft' && profile?.role === 'SUPER ADMIN' && (
+                                <Button 
+                                  variant="ghost" 
+                                  size="sm" 
+                                  className="h-8 w-8 p-0" 
+                                  onClick={() => handleDeleteDraft(inv.id)} 
+                                  title="Delete Draft"
+                                >
+                                  <Trash2 className="h-4 w-4 text-red-500 hover:text-red-700" />
                                 </Button>
                               )}
 
