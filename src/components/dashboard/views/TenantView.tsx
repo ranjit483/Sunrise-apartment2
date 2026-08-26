@@ -65,15 +65,15 @@ export function TenantView({ profile }: { profile: any }) {
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
           <div className="flex items-center gap-3">
-            <h2 className="text-3xl font-bold">Welcome, {profile?.fullName || 'Resident'}!</h2>
+            <h2 className="text-xl md:text-2xl font-bold tracking-tight">Welcome, {profile?.fullName || 'Resident'}!</h2>
             <Badge variant="secondary" className="hidden sm:inline-flex">{profile?.role}</Badge>
           </div>
-          <p className="text-muted-foreground mt-1">Here is the summary for your unit: {profile?.unitNumber || 'N/A'}</p>
+          <p className="text-muted-foreground mt-1 text-sm md:text-base">Here is the summary for your unit: {profile?.unitNumber || 'N/A'}</p>
         </div>
         <div className="flex gap-2">
           {totalBalance > 0 && (
             <Link href="/payments">
-              <Button>Pay Due Balance</Button>
+              <Button size="sm">Pay Due Balance</Button>
             </Link>
           )}
         </div>
@@ -81,56 +81,56 @@ export function TenantView({ profile }: { profile: any }) {
 
       <div className="grid gap-4 md:grid-cols-4">
         <Card>
-          <CardContent className="p-6 flex items-center justify-between">
+          <CardContent className="p-4 flex items-center justify-between">
             <div>
-              <p className="text-sm text-muted-foreground">Current Balance</p>
-              <p className={`text-3xl font-bold mt-1 ${totalBalance > 0 ? 'text-red-500' : 'text-green-500'}`}>₨ {totalBalance.toLocaleString()}</p>
-              {totalBalance > 0 && <p className="text-xs text-muted-foreground mt-1">Please pay at earliest</p>}
+              <p className="text-xs text-muted-foreground font-medium">Current Balance</p>
+              <p className={`text-xl md:text-2xl font-bold mt-0.5 ${totalBalance > 0 ? 'text-red-500' : 'text-green-500'}`}>₨ {totalBalance.toLocaleString()}</p>
+              {totalBalance > 0 && <p className="text-[10px] text-muted-foreground mt-1">Please pay at earliest</p>}
             </div>
-            <div className={`p-3 rounded-full ${totalBalance > 0 ? 'bg-red-100' : 'bg-green-100'}`}>
-              <CreditCard className={`h-6 w-6 ${totalBalance > 0 ? 'text-red-500' : 'text-green-500'}`} />
+            <div className={`p-2 rounded-full ${totalBalance > 0 ? 'bg-red-100' : 'bg-green-100'}`}>
+              <CreditCard className={`h-5 w-5 ${totalBalance > 0 ? 'text-red-500' : 'text-green-500'}`} />
             </div>
           </CardContent>
         </Card>
 
         <Card>
-          <CardContent className="p-6 flex items-center justify-between">
+          <CardContent className="p-4 flex items-center justify-between">
             <div>
-              <p className="text-sm text-muted-foreground">Active Tickets</p>
-              <p className="text-3xl font-bold mt-1">{activeTickets}</p>
+              <p className="text-xs text-muted-foreground font-medium">Active Tickets</p>
+              <p className="text-xl md:text-2xl font-bold mt-0.5">{activeTickets}</p>
             </div>
-            <div className="p-3 bg-blue-100 rounded-full">
-              <Wrench className="h-6 w-6 text-blue-500" />
+            <div className="p-2 bg-blue-100 rounded-full">
+              <Wrench className="h-5 w-5 text-blue-500" />
             </div>
           </CardContent>
         </Card>
 
         <Card>
-          <CardContent className="p-6 flex items-center justify-between">
+          <CardContent className="p-4 flex items-center justify-between">
             <div>
-              <p className="text-sm text-muted-foreground">My Lease</p>
-              <p className="text-xl font-bold mt-1">{activeLease ? 'Active' : 'No Active Lease'}</p>
-              {activeLease && <p className="text-xs text-muted-foreground mt-1">Valid until {activeLease.endDate}</p>}
+              <p className="text-xs text-muted-foreground font-medium">My Lease</p>
+              <p className="text-base md:text-lg font-bold mt-0.5">{activeLease ? 'Active' : 'No Active Lease'}</p>
+              {activeLease && <p className="text-[10px] text-muted-foreground mt-1">Valid until {activeLease.endDate}</p>}
             </div>
-            <div className="p-3 bg-green-100 rounded-full">
-              <Home className="h-6 w-6 text-green-500" />
+            <div className="p-2 bg-green-100 rounded-full">
+              <Home className="h-5 w-5 text-green-500" />
             </div>
           </CardContent>
         </Card>
 
         <Card>
-          <CardContent className="p-6 flex items-center justify-between">
+          <CardContent className="p-4 flex items-center justify-between">
             <div>
-              <p className="text-sm text-muted-foreground">My Parking Spot</p>
-              <p className="text-xl font-bold mt-1">
+              <p className="text-xs text-muted-foreground font-medium">My Parking Spot</p>
+              <p className="text-base md:text-lg font-bold mt-0.5">
                 {loadingParking ? 'Loading...' : (parkingSlot ? parkingSlot.slotNumber : 'No Spot')}
               </p>
               {!loadingParking && parkingSlot && (
-                <p className="text-xs text-muted-foreground mt-1 capitalize">{parkingSlot.category} Spot</p>
+                <p className="text-[10px] text-muted-foreground mt-1 capitalize">{parkingSlot.category} Spot</p>
               )}
             </div>
-            <div className="p-3 bg-indigo-100 rounded-full">
-              <Car className="h-6 w-6 text-indigo-600" />
+            <div className="p-2 bg-indigo-100 rounded-full">
+              <Car className="h-5 w-5 text-indigo-600" />
             </div>
           </CardContent>
         </Card>
