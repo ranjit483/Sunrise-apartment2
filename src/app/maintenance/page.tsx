@@ -392,12 +392,12 @@ export default function MaintenancePage() {
                   {/* Scope Selector */}
                   <div className="space-y-2">
                     <Label className="text-sm font-semibold">Scope of Issue *</Label>
-                    <div className="grid grid-cols-2 gap-2">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                       <Button 
                         type="button" 
                         variant={scope === 'Internal_Unit' ? 'default' : 'outline'}
                         onClick={() => setScope('Internal_Unit')}
-                        className={`w-full justify-center ${scope === 'Internal_Unit' ? 'bg-indigo-600 hover:bg-indigo-700 text-white' : ''}`}
+                        className={`w-full justify-center h-auto py-2 whitespace-normal ${scope === 'Internal_Unit' ? 'bg-indigo-600 hover:bg-indigo-700 text-white' : ''}`}
                       >
                         In-Apartment (Private Unit)
                       </Button>
@@ -405,14 +405,14 @@ export default function MaintenancePage() {
                         type="button" 
                         variant={scope === 'Common_Area' ? 'default' : 'outline'}
                         onClick={() => setScope('Common_Area')}
-                        className={`w-full justify-center ${scope === 'Common_Area' ? 'bg-indigo-600 hover:bg-indigo-700 text-white' : ''}`}
+                        className={`w-full justify-center h-auto py-2 whitespace-normal ${scope === 'Common_Area' ? 'bg-indigo-600 hover:bg-indigo-700 text-white' : ''}`}
                       >
                         Common Area (Infrastructure)
                       </Button>
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     {/* Category Selector */}
                     <div className="space-y-2">
                       <Label className="text-sm font-semibold">Category *</Label>
