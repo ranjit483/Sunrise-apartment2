@@ -283,7 +283,7 @@ export default function TenantLedgerPage() {
 
   return (
     <DashboardLayout title="Resident/Tenant Ledger">
-      <div className="space-y-6">
+      <div className="space-y-6 pb-[300px]">
         <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
           <div>
             <h2 className="text-3xl font-bold">Resident/Tenant Ledger</h2>
@@ -301,7 +301,7 @@ export default function TenantLedgerPage() {
             <CardTitle className="text-lg">Select Tenant</CardTitle>
           </CardHeader>
           <CardContent className="overflow-visible">
-            <div className="relative">
+            <div className="relative z-50">
               <div 
                 className="flex items-center justify-between p-3 border rounded-md cursor-pointer bg-white hover:bg-gray-50"
                 onClick={() => setIsDropdownOpen(!isDropdownOpen)}
