@@ -1101,7 +1101,7 @@ export default function InvoicesPage() {
 
       {/* EDIT MODAL DIALOG */}
       <Dialog open={isEditModalOpen} onOpenChange={setIsEditModalOpen}>
-        <DialogContent className="no-print">
+        <DialogContent className="max-w-2xl max-h-[85vh] overflow-y-auto no-print">
           <DialogHeader>
             <DialogTitle>Edit Draft Invoice</DialogTitle>
             <DialogDescription>Update the invoice details, including electricity readings and charges.</DialogDescription>
@@ -1112,7 +1112,7 @@ export default function InvoicesPage() {
                 <p><strong>Unit:</strong> {editingInvoice.unitNumber || editingInvoice.unitId}</p>
                 <p><strong>Tenant:</strong> {formatTenantName(editingInvoice.tenantName || editingInvoice.tenantId, editingInvoice.tenantId)}</p>
               </div>
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label>Service Charge Amount (₨)</Label>
                   <Input 
@@ -1130,7 +1130,7 @@ export default function InvoicesPage() {
                   />
                 </div>
               </div>
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label>Prev Elect. Reading</Label>
                   <Input 
@@ -1207,7 +1207,7 @@ export default function InvoicesPage() {
                   />
                 </div>
               </div>
-              <div className="grid grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
                 <div className="space-y-2">
                   <Label>Utility Amount (₨)</Label>
                   <Input 
