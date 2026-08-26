@@ -277,6 +277,10 @@ export default function TenantLedgerPage() {
     return name.includes(q) || unit.includes(q);
   });
 
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false)
+
+  const selectedTenantObj = tenants.find(t => t.uid === selectedTenant)
+
   return (
     <DashboardLayout title="Resident/Tenant Ledger">
       <div className="space-y-6">
@@ -292,35 +296,63 @@ export default function TenantLedgerPage() {
           )}
         </div>
 
-        <Card className="max-w-md">
+        <Card className="max-w-md overflow-visible">
           <CardHeader>
             <CardTitle className="text-lg">Select Tenant</CardTitle>
           </CardHeader>
-          <CardContent className="space-y-4">
+          <CardContent className="overflow-visible">
             <div className="relative">
-              <Input 
-                placeholder="Search by name or unit..." 
-                value={tenantSearch}
-                onChange={e => setTenantSearch(e.target.value)}
-                className="w-full"
-              />
+              <div 
+                className="flex items-center justify-between p-3 border rounded-md cursor-pointer bg-white hover:bg-gray-50"
+                onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+              >
+                <span className={selectedTenantObj ? 'text-black font-medium' : 'text-gray-500'}>
+                  {selectedTenantObj 
+                    ? `${selectedTenantObj.fullName} ${selectedTenantObj.unitNumber ? `(${selectedTenantObj.unitNumber})` : ''}` 
+                    : 'Search and select a tenant...'}
+                </span>
+                <Search className="h-4 w-4 text-gray-400" />
+              </div>
+              
+              {isDropdownOpen && (
+                <div className="absolute top-full left-0 right-0 mt-1 z-50 bg-white border rounded-md shadow-xl overflow-hidden">
+                  <div className="p-2 border-b bg-gray-50">
+                    <Input 
+                      placeholder="Type name or unit no..." 
+                      value={tenantSearch}
+                      onChange={e => setTenantSearch(e.target.value)}
+                      className="w-full bg-white"
+                      autoFocus
+                    />
+                  </div>
+                  <div className="max-h-60 overflow-y-auto">
+                    {filteredTenants.length === 0 ? (
+                      <div className="p-4 text-sm text-gray-500 text-center">No tenants found matching "{tenantSearch}"</div>
+                    ) : (
+                      <div className="p-1">
+                        {filteredTenants.map(t => (
+                          <div 
+                            key={t.uid}
+                            className={`p-2 px-3 text-sm rounded-sm cursor-pointer hover:bg-indigo-50 hover:text-indigo-900 ${selectedTenant === t.uid ? 'bg-indigo-100 font-semibold' : ''}`}
+                            onClick={() => {
+                              setSelectedTenant(t.uid);
+                              setIsDropdownOpen(false);
+                              setTenantSearch(''); // Reset search after selection
+                            }}
+                          >
+                            {t.fullName} <span className="text-gray-500 text-xs ml-1">{t.unitNumber ? `(${t.unitNumber})` : ''}</span>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
             </div>
-            <Select value={selectedTenant} onValueChange={setSelectedTenant}>
-              <SelectTrigger>
-                <SelectValue placeholder="Select a tenant from the list..." />
-              </SelectTrigger>
-              <SelectContent>
-                {filteredTenants.length === 0 ? (
-                  <div className="p-2 text-sm text-gray-500 text-center">No tenants found</div>
-                ) : (
-                  filteredTenants.map(t => (
-                    <SelectItem key={t.uid} value={t.uid}>
-                      {t.fullName} {t.unitNumber ? `(${t.unitNumber})` : ''}
-                    </SelectItem>
-                  ))
-                )}
-              </SelectContent>
-            </Select>
+            {/* Hidden overlay to close dropdown when clicking outside */}
+            {isDropdownOpen && (
+              <div className="fixed inset-0 z-40" onClick={() => setIsDropdownOpen(false)} />
+            )}
           </CardContent>
         </Card>
 
