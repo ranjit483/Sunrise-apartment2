@@ -354,8 +354,8 @@ export default function MaintenancePage() {
         {/* Header Section */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
-            <h2 className="text-3xl font-extrabold tracking-tight text-gray-900 flex items-center gap-2">
-              <Wrench className="h-8 w-8 text-indigo-600 animate-pulse" />
+            <h2 className="text-xl md:text-3xl font-extrabold tracking-tight text-gray-900 flex items-center gap-2">
+              <Wrench className="h-6 w-6 md:h-8 md:w-8 text-indigo-600 animate-pulse" />
               Repair & Maintenance
             </h2>
             <p className="text-muted-foreground mt-1">
@@ -523,14 +523,14 @@ export default function MaintenancePage() {
         {/* Dashboard Metric summary cards */}
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           <Card className="hover:shadow-md transition-all duration-300 border-l-4 border-l-blue-500 overflow-hidden relative">
-            <CardContent className="p-6">
+            <CardContent className="p-4">
               <div className="flex justify-between items-center">
                 <div>
-                  <p className="text-sm font-medium text-gray-500 uppercase tracking-wider">Open / Triage</p>
-                  <p className="text-3xl font-extrabold text-gray-900 mt-1">{openCount}</p>
+                  <p className="text-xs font-medium text-gray-500 uppercase tracking-wider">Open / Triage</p>
+                  <p className="text-xl md:text-2xl font-extrabold text-gray-900 mt-0.5">{openCount}</p>
                 </div>
-                <div className="p-3 rounded-full bg-blue-50 text-blue-600">
-                  <Clock className="h-6 w-6" />
+                <div className="p-2 rounded-full bg-blue-50 text-blue-600">
+                  <Clock className="h-5 w-5" />
                 </div>
               </div>
               <div className="absolute bottom-0 right-0 w-24 h-1 bg-gradient-to-r from-blue-500 to-indigo-500" />
@@ -538,14 +538,14 @@ export default function MaintenancePage() {
           </Card>
 
           <Card className="hover:shadow-md transition-all duration-300 border-l-4 border-l-indigo-500 overflow-hidden relative">
-            <CardContent className="p-6">
+            <CardContent className="p-4">
               <div className="flex justify-between items-center">
                 <div>
-                  <p className="text-sm font-medium text-gray-500 uppercase tracking-wider">In Progress</p>
-                  <p className="text-3xl font-extrabold text-gray-900 mt-1">{inProgressCount}</p>
+                  <p className="text-xs font-medium text-gray-500 uppercase tracking-wider">In Progress</p>
+                  <p className="text-xl md:text-2xl font-extrabold text-gray-900 mt-0.5">{inProgressCount}</p>
                 </div>
-                <div className="p-3 rounded-full bg-indigo-50 text-indigo-600">
-                  <Wrench className="h-6 w-6 animate-spin-slow" />
+                <div className="p-2 rounded-full bg-indigo-50 text-indigo-600">
+                  <Wrench className="h-5 w-5 animate-spin-slow" />
                 </div>
               </div>
               <div className="absolute bottom-0 right-0 w-24 h-1 bg-gradient-to-r from-indigo-500 to-purple-500" />
@@ -553,14 +553,14 @@ export default function MaintenancePage() {
           </Card>
 
           <Card className="hover:shadow-md transition-all duration-300 border-l-4 border-l-emerald-500 overflow-hidden relative">
-            <CardContent className="p-6">
+            <CardContent className="p-4">
               <div className="flex justify-between items-center">
                 <div>
-                  <p className="text-sm font-medium text-gray-500 uppercase tracking-wider">Completed</p>
-                  <p className="text-3xl font-extrabold text-gray-900 mt-1">{completedCount}</p>
+                  <p className="text-xs font-medium text-gray-500 uppercase tracking-wider">Completed</p>
+                  <p className="text-xl md:text-2xl font-extrabold text-gray-900 mt-0.5">{completedCount}</p>
                 </div>
-                <div className="p-3 rounded-full bg-emerald-50 text-emerald-600">
-                  <CheckCircle className="h-6 w-6" />
+                <div className="p-2 rounded-full bg-emerald-50 text-emerald-600">
+                  <CheckCircle className="h-5 w-5" />
                 </div>
               </div>
               <div className="absolute bottom-0 right-0 w-24 h-1 bg-gradient-to-r from-emerald-500 to-teal-500" />
@@ -568,14 +568,14 @@ export default function MaintenancePage() {
           </Card>
 
           <Card className="hover:shadow-md transition-all duration-300 border-l-4 border-l-rose-500 overflow-hidden relative bg-rose-50/10">
-            <CardContent className="p-6">
+            <CardContent className="p-4">
               <div className="flex justify-between items-center">
                 <div>
-                  <p className="text-sm font-medium text-gray-500 uppercase tracking-wider">SLA Breaches</p>
-                  <p className="text-3xl font-extrabold text-rose-600 mt-1">{slaAlertCount}</p>
+                  <p className="text-xs font-medium text-gray-500 uppercase tracking-wider">SLA Breaches</p>
+                  <p className="text-xl md:text-2xl font-extrabold text-rose-600 mt-0.5">{slaAlertCount}</p>
                 </div>
-                <div className="p-3 rounded-full bg-rose-50 text-rose-600">
-                  <AlertTriangle className="h-6 w-6 animate-bounce" />
+                <div className="p-2 rounded-full bg-rose-50 text-rose-600">
+                  <AlertTriangle className="h-5 w-5 animate-bounce" />
                 </div>
               </div>
               <div className="absolute bottom-0 right-0 w-24 h-1 bg-gradient-to-r from-rose-500 to-red-500" />
