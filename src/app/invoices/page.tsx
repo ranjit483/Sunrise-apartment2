@@ -611,16 +611,16 @@ export default function InvoicesPage() {
   return (
     <DashboardLayout title="Invoices & Billing">
       <div className="space-y-6 no-print">
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
           <div>
             <h2 className="text-3xl font-bold">Invoices</h2>
             <p className="text-muted-foreground">Manage monthly invoices and billing</p>
           </div>
           
           {canManageInvoices && (
-            <div className="flex gap-3">
+            <div className="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
               {draftCount > 0 && (
-                <Button onClick={handlePostAllDrafts} disabled={isPostingDrafts} className="gap-2 bg-indigo-600 hover:bg-indigo-700">
+                <Button onClick={handlePostAllDrafts} disabled={isPostingDrafts} className="w-full sm:w-auto gap-2 bg-indigo-600 hover:bg-indigo-700">
                   {isPostingDrafts ? <Loader2 className="h-4 w-4 animate-spin" /> : <CheckCircle2 className="h-4 w-4" />}
                   Post All Drafts ({draftCount})
                 </Button>
@@ -628,7 +628,7 @@ export default function InvoicesPage() {
               
               <Dialog open={isGenerateModalOpen} onOpenChange={setIsGenerateModalOpen}>
                 <DialogTrigger asChild>
-                  <Button className="gap-2 bg-[#95DBAE] hover:bg-[#7BC98E] text-[#1E293B] font-semibold">
+                  <Button className="w-full sm:w-auto gap-2 bg-[#95DBAE] hover:bg-[#7BC98E] text-[#1E293B] font-semibold">
                     <Plus className="h-4 w-4" />
                     Generate Draft Invoices
                   </Button>
@@ -673,7 +673,7 @@ export default function InvoicesPage() {
               </Dialog>
 
               {profile?.role === 'SUPER_ADMIN' && (
-                <Button onClick={handleClearAllInvoices} variant="destructive" className="gap-2">
+                <Button onClick={handleClearAllInvoices} variant="destructive" className="w-full sm:w-auto gap-2">
                   Clear All Invoices
                 </Button>
               )}
