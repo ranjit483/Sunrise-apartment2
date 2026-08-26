@@ -96,48 +96,48 @@ export function AdminView({ profile }: { profile: any }) {
     <div className="space-y-6">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
-          <h2 className="text-3xl font-bold tracking-tight">
+          <h2 className="text-xl md:text-2xl font-bold tracking-tight">
             Welcome back, {profile?.fullName?.split(' ')[0] || 'Admin'}!
             <Badge variant="secondary" className="ml-2 align-middle bg-green-100 text-green-800 hover:bg-green-100">
               {profile?.role}
             </Badge>
           </h2>
-          <p className="text-muted-foreground mt-1">
+          <p className="text-muted-foreground mt-1 text-sm md:text-base">
             Here's the current overview of Sunrise Apartment.
           </p>
         </div>
         <div className="flex flex-wrap gap-2 w-full md:w-auto mt-2 md:mt-0">
           {profile?.role === 'SUPER_ADMIN' && <SeedButton />}
-          <Button variant="outline" className="flex-1 md:flex-none">Export Reports</Button>
-          <Button className="flex-1 md:flex-none bg-emerald-400 hover:bg-emerald-500 text-black">Generate Invoice</Button>
+          <Button variant="outline" className="flex-1 md:flex-none h-9 text-sm">Export Reports</Button>
+          <Button className="flex-1 md:flex-none bg-emerald-400 hover:bg-emerald-500 text-black h-9 text-sm">Generate Invoice</Button>
         </div>
       </div>
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-8">
         {kpis.map((kpi, index) => (
           <Card key={index} className="col-span-2">
-            <CardContent className="p-6">
+            <CardContent className="p-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-muted-foreground">{kpi.title}</p>
-                  <p className="text-2xl font-bold mt-1">{kpi.value}</p>
-                  <div className="flex items-center gap-1 mt-2">
+                  <p className="text-xs text-muted-foreground font-medium">{kpi.title}</p>
+                  <p className="text-lg md:text-xl font-bold mt-0.5">{kpi.value}</p>
+                  <div className="flex items-center gap-1 mt-1">
                     {kpi.change && (
                       <>
                         {kpi.trend === 'up' ? (
-                          <TrendingUp className="h-4 w-4 text-green-500" />
+                          <TrendingUp className="h-3 w-3 text-green-500" />
                         ) : (
-                          <TrendingDown className="h-4 w-4 text-red-500" />
+                          <TrendingDown className="h-3 w-3 text-red-500" />
                         )}
-                        <span className={`text-xs ${kpi.trend === 'up' ? 'text-green-500' : 'text-red-500'}`}>
+                        <span className={`text-[10px] ${kpi.trend === 'up' ? 'text-green-500' : 'text-red-500'}`}>
                           {kpi.change}
                         </span>
                       </>
                     )}
                   </div>
                 </div>
-                <div className={`p-3 rounded-lg ${kpi.color}`}>
-                  <kpi.icon className="h-6 w-6 text-white" />
+                <div className={`p-2 rounded-lg ${kpi.color}`}>
+                  <kpi.icon className="h-5 w-5 text-white" />
                 </div>
               </div>
             </CardContent>
