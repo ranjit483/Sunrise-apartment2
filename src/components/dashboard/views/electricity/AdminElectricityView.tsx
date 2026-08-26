@@ -362,22 +362,22 @@ export default function AdminElectricityView() {
       </Card>
 
       <Card>
-        <CardHeader className="flex flex-row items-center justify-between pb-2">
+        <CardHeader className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-2">
           <div>
             <CardTitle>Meter Readings Management</CardTitle>
             <CardDescription>Review and approve resident submissions</CardDescription>
           </div>
-          <div className="flex gap-2">
-            <div className="relative">
+          <div className="flex flex-col sm:flex-row gap-2 w-full md:w-auto">
+            <div className="relative w-full sm:w-auto">
               <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
               <Input
                 placeholder="Search tenant or unit..."
-                className="pl-9 w-[220px]"
+                className="pl-9 w-full sm:w-[220px]"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
               />
             </div>
-            <div className="w-[180px]">
+            <div className="w-full sm:w-[180px]">
               <Select value={filter} onValueChange={setFilter}>
                 <SelectTrigger>
                   <SelectValue placeholder="Filter by status" />
