@@ -5,10 +5,11 @@ import { DashboardLayout } from '@/components/layout/DashboardLayout'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
 import { db } from '@/config/firebase'
 import { collection, onSnapshot, query, where, doc, writeBatch, getDoc, getDocs, updateDoc, orderBy, limit } from 'firebase/firestore'
 import { Payment, Invoice } from '@/types/models'
-import { Loader2, DollarSign, Eye, Printer, FileText, QrCode, CheckCircle2, AlertCircle } from 'lucide-react'
+import { Loader2, DollarSign, Eye, Printer, FileText, QrCode, CheckCircle2, AlertCircle, Search } from 'lucide-react'
 import { useAuth } from '@/context/AuthContext'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog'
 import { numberToWords } from '@/lib/utils'
@@ -99,6 +100,8 @@ export default function PaymentsPage() {
   const [viewingInvoice, setViewingInvoice] = useState<Invoice | null>(null)
   const [isInvoiceModalOpen, setIsInvoiceModalOpen] = useState(false)
   const [usersMap, setUsersMap] = useState<Record<string, string>>({})
+  const [unitsMap, setUnitsMap] = useState<Record<string, string>>({})
+  const [searchQuery, setSearchQuery] = useState('')
 
   const formatTenantName = (name: string | null | undefined, tenantId?: string) => {
     if (tenantId && usersMap[tenantId]) return usersMap[tenantId]
@@ -137,14 +140,17 @@ export default function PaymentsPage() {
       try {
         const snap = await getDocs(collection(db, 'users'))
         const map: Record<string, string> = {}
+        const uMap: Record<string, string> = {}
         snap.forEach((doc: any) => {
           const data = doc.data()
           const nameToUse = data.fullName || data.name
           if (nameToUse) {
             map[data.uid || doc.id] = nameToUse
+            uMap[data.uid || doc.id] = data.unitNumber || 'N/A'
           }
         })
         setUsersMap(map)
+        setUnitsMap(uMap)
       } catch (err) {
         console.error('Error fetching users:', err)
       }
@@ -370,6 +376,17 @@ export default function PaymentsPage() {
   const pendingTotal = pendingInvoices.reduce((acc, i) => acc + i.amount + (i.electricityAmount || 0) + (i.generatorAmount || 0) + (i.utilityAmount || 0) + (i.waterAmount || 0) + (i.insuranceAmount || 0) + (i.dieselAmount || 0) + (i.structureMaintenanceAmount || 0) + (i.otherAmount || 0) + (i.previousPendingOutstandingDue || 0) + (i.latePenaltyAmount || 0) - (i.paidAmount || 0), 0)
   const transactionsCount = payments.length
 
+  const filteredPayments = payments.filter(p => {
+    if (!searchQuery) return true
+    const q = searchQuery.toLowerCase()
+    const name = formatTenantName(null, p.tenantId).toLowerCase()
+    const unit = (unitsMap[p.tenantId] || '').toLowerCase()
+    const receipt = (p.receiptNo || '').toLowerCase()
+    const method = (p.method || '').toLowerCase()
+    const tx = (p.transactionId || '').toLowerCase()
+    return name.includes(q) || unit.includes(q) || receipt.includes(q) || method.includes(q) || tx.includes(q)
+  })
+
   return (
     <DashboardLayout title="Payments">
       <div className="space-y-6 no-print">
@@ -509,11 +526,23 @@ export default function PaymentsPage() {
         )}
 
         <Card>
-          <CardHeader><CardTitle>Payment History</CardTitle></CardHeader>
+          <CardHeader className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <CardTitle>Payment History</CardTitle>
+            <div className="relative w-full sm:w-64">
+              <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+              <Input
+                type="text"
+                placeholder="Search payments..."
+                className="pl-8 bg-white"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+              />
+            </div>
+          </CardHeader>
           <CardContent>
             {loading ? (
               <div className="flex justify-center py-8"><Loader2 className="h-8 w-8 animate-spin text-muted-foreground" /></div>
-            ) : payments.length === 0 ? (
+            ) : filteredPayments.length === 0 ? (
               <div className="text-center py-8 text-muted-foreground">No payment history found.</div>
             ) : (
               <div className="overflow-x-auto overflow-y-hidden">
@@ -522,7 +551,7 @@ export default function PaymentsPage() {
                     <tr className="border-b">
                       <th className="pb-3 text-left">Receipt Number</th>
                       <th className="pb-3 text-left">Transaction ID</th>
-                      {!isResident && <th className="pb-3 text-left">Tenant ID</th>}
+                      {!isResident && <th className="pb-3 text-left">Tenant Details</th>}
                       <th className="pb-3 text-left">Amount</th>
                       <th className="pb-3 text-left">Method</th>
                       <th className="pb-3 text-left">Date (AD)</th>
@@ -531,11 +560,16 @@ export default function PaymentsPage() {
                     </tr>
                   </thead>
                   <tbody>
-                    {payments.map((p) => (
+                    {filteredPayments.map((p) => (
                       <tr key={p.id} className="border-b hover:bg-gray-50/50">
                         <td className="py-3 font-semibold text-gray-700">{p.receiptNo || 'N/A'}</td>
                         <td className="py-3 font-mono text-xs">{p.transactionId || p.id.substring(0, 10).toUpperCase()}</td>
-                        {!isResident && <td className="py-3 font-mono text-xs">{p.tenantId.substring(0, 10)}...</td>}
+                        {!isResident && (
+                          <td className="py-3">
+                            <div className="font-medium">{formatTenantName(null, p.tenantId)}</div>
+                            <div className="text-xs text-muted-foreground">Unit: {unitsMap[p.tenantId] || 'N/A'}</div>
+                          </td>
+                        )}
                         <td className="py-3 font-bold text-emerald-600">₨ {p.amount.toLocaleString()}</td>
                         <td className="py-3 font-semibold text-xs uppercase text-indigo-700">{p.method.replace('_', ' ')}</td>
                         <td className="py-3">{getNepaliDate(p.paidAt || p.createdAt).ad}</td>
