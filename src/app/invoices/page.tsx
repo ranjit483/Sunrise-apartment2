@@ -307,7 +307,15 @@ export default function InvoicesPage() {
         const gAmount = readingData?.generator ? readingData.generator.totalBill : 0;
 
         const userInvoices = invoices.filter(i => i.tenantId === user.uid || i.tenantId === user.id);
-        const unpaidInvoices = userInvoices.filter(i => i.status === 'pending' || i.status === 'overdue' || i.status === 'partial');
+        const unpaidInvoices = userInvoices.filter(i => {
+          if (i.status === 'pending' || i.status === 'overdue' || i.status === 'partial') return true;
+          if (i.status === 'paid') {
+            const iTotal = i.amount + (i.electricityAmount || 0) + (i.generatorAmount || 0) + (i.utilityAmount || 0) + (i.waterAmount || 0) + (i.insuranceAmount || 0) + (i.dieselAmount || 0) + (i.structureMaintenanceAmount || 0) + (i.otherAmount || 0) + (i.previousPendingOutstandingDue || 0) + (i.latePenaltyAmount || 0) + (i.electricityVatAmount || 0);
+            // Include if it's overpaid (advance payment)
+            return (i.paidAmount || 0) > iTotal;
+          }
+          return false;
+        });
         
         let prevDueCalculated = 0;
         for (const oldInv of unpaidInvoices) {
@@ -457,11 +465,7 @@ export default function InvoicesPage() {
         return
       }
 
-      if (paymentAmount > remainingTotal) {
-        alert('Payment amount cannot be greater than the remaining balance.')
-        setIsPaying(false)
-        return
-      }
+      // Removed the check that prevents overpayment to allow advance payments
       
       const newPayment: Payment = {
         id: paymentRef.id,
@@ -595,8 +599,11 @@ export default function InvoicesPage() {
   const draftCount = invoices.filter(i => i.status === 'draft').length
   const pendingCount = invoices.filter(i => i.status === 'pending').length
   const overdueCount = invoices.filter(i => i.status === 'overdue').length
-  const collectedAmount = invoices.filter(i => i.status === 'paid').reduce((acc, i) => acc + i.amount + (i.electricityAmount || 0) + (i.generatorAmount || 0) + (i.utilityAmount || 0) + (i.waterAmount || 0) + (i.insuranceAmount || 0) + (i.dieselAmount || 0) + (i.structureMaintenanceAmount || 0) + (i.otherAmount || 0) + (i.previousPendingOutstandingDue || 0) + (i.latePenaltyAmount || 0) + (i.electricityVatAmount || 0), 0)
-  const outstandingAmount = invoices.filter(i => i.status === 'pending' || i.status === 'overdue').reduce((acc, i) => acc + i.amount + (i.electricityAmount || 0) + (i.generatorAmount || 0) + (i.utilityAmount || 0) + (i.waterAmount || 0) + (i.insuranceAmount || 0) + (i.dieselAmount || 0) + (i.structureMaintenanceAmount || 0) + (i.otherAmount || 0) + (i.previousPendingOutstandingDue || 0) + (i.latePenaltyAmount || 0) + (i.electricityVatAmount || 0), 0)
+  const collectedAmount = invoices.reduce((acc, i) => acc + (i.paidAmount || 0), 0)
+  const outstandingAmount = invoices.filter(i => i.status !== 'draft' && i.status !== 'carried_forward').reduce((acc, i) => {
+    const total = i.amount + (i.electricityAmount || 0) + (i.generatorAmount || 0) + (i.utilityAmount || 0) + (i.waterAmount || 0) + (i.insuranceAmount || 0) + (i.dieselAmount || 0) + (i.structureMaintenanceAmount || 0) + (i.otherAmount || 0) + (i.previousPendingOutstandingDue || 0) + (i.latePenaltyAmount || 0) + (i.electricityVatAmount || 0);
+    return acc + (total - (i.paidAmount || 0));
+  }, 0)
 
   const filteredInvoices = invoices.filter(inv => {
     if (!searchQuery) return true

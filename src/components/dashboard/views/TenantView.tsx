@@ -54,8 +54,12 @@ export function TenantView({ profile }: { profile: any }) {
     }
   }, [profile?.uid, profile?.buildingId, profile?.unitNumber, profile?.fullName])
 
-  const pendingInvoices = invoices.filter(i => i.status === 'pending' || i.status === 'partial' || i.status === 'overdue')
-  const totalBalance = pendingInvoices.reduce((acc, i) => acc + i.amount + (i.electricityAmount || 0) + (i.generatorAmount || 0) + (i.utilityAmount || 0) + (i.waterAmount || 0) + (i.insuranceAmount || 0) + (i.dieselAmount || 0) + (i.structureMaintenanceAmount || 0) + (i.otherAmount || 0) + (i.previousPendingOutstandingDue || 0) + (i.latePenaltyAmount || 0) - (i.paidAmount || 0), 0)
+  const pendingInvoices = invoices.filter(i => {
+    if (i.status === 'draft' || i.status === 'carried_forward') return false;
+    const total = i.amount + (i.electricityAmount || 0) + (i.generatorAmount || 0) + (i.utilityAmount || 0) + (i.waterAmount || 0) + (i.insuranceAmount || 0) + (i.dieselAmount || 0) + (i.structureMaintenanceAmount || 0) + (i.otherAmount || 0) + (i.previousPendingOutstandingDue || 0) + (i.latePenaltyAmount || 0) + (i.electricityVatAmount || 0);
+    return (total - (i.paidAmount || 0)) !== 0;
+  });
+  const totalBalance = pendingInvoices.reduce((acc, i) => acc + i.amount + (i.electricityAmount || 0) + (i.generatorAmount || 0) + (i.utilityAmount || 0) + (i.waterAmount || 0) + (i.insuranceAmount || 0) + (i.dieselAmount || 0) + (i.structureMaintenanceAmount || 0) + (i.otherAmount || 0) + (i.previousPendingOutstandingDue || 0) + (i.latePenaltyAmount || 0) + (i.electricityVatAmount || 0) - (i.paidAmount || 0), 0)
   
   const activeTickets = tickets.filter(t => t.status === 'open' || t.status === 'in_progress').length
   const activeLease = leases.find(l => l.status === 'active')
