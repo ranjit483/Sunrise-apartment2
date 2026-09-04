@@ -1052,20 +1052,20 @@ export default function InvoicesPage() {
         {isReceiptModalOpen && activeReceipt && receiptInvoice && (
           <div className="bg-white w-full h-full text-black border-2 border-black rounded-sm print-sheet shadow-none flex flex-col justify-between">
             <div>
-              <div className="border-b-2 border-black pb-2 mb-3 text-center">
+              <div className="border-b-2 border-black pb-1 mb-2 text-center">
               <h1 className="text-xl font-black tracking-tight text-gray-950">SUNRISE APARTMENT WELFARE SOCIETY</h1>
-              <p className="text-[11px] font-semibold text-gray-600">Nakkhu-13, Lalitpur, Phone: 01-5185110</p>
-              <div className="inline-block border border-black px-2 py-0.5 rounded-sm bg-gray-50 text-[10px] font-bold mt-1.5 tracking-widest uppercase">
+              <p className="text-[10px] font-semibold text-gray-600">Nakkhu-13, Lalitpur, Phone: 01-5185110</p>
+              <div className="inline-block border border-black px-2 py-0.5 rounded-sm bg-gray-50 text-[9px] font-bold mt-1 tracking-widest uppercase">
                 OFFICIAL PAYMENT RECEIPT SLIP
               </div>
             </div>
 
-            <div className="flex justify-between items-center text-xs mb-4 px-2">
+            <div className="flex justify-between items-center text-xs mb-2 px-2">
               <div><strong>Receipt No:</strong> <span className="font-mono font-bold text-sm text-indigo-700">{activeReceipt.receiptNo}</span></div>
               <div className="text-right"><strong>Date:</strong> <span className="font-bold">{getNepaliDate(activeReceipt.createdAt).ad} ({getNepaliDate(activeReceipt.createdAt).bs.split(' (')[0]})</span></div>
             </div>
 
-            <div className="border border-black p-4 rounded-sm bg-gray-50/50 space-y-3.5 text-xs text-gray-900 relative overflow-hidden leading-relaxed">
+            <div className="border border-black p-3 rounded-sm bg-gray-50/50 space-y-2 text-xs text-gray-900 relative overflow-hidden leading-snug">
               <div>
                 Received with thanks from Mr./Mrs./Ms. <strong className="text-sm underline px-1 text-gray-950 font-bold">{formatTenantName(receiptInvoice.tenantName, receiptInvoice.tenantId)}</strong>, 
                 Unit No. <strong className="underline px-1 text-gray-950 font-bold">{receiptInvoice.unitNumber}</strong>, a total sum of 
@@ -1074,7 +1074,7 @@ export default function InvoicesPage() {
                 for the billing period of <strong className="underline px-1 font-bold">{receiptInvoice.month}</strong>.
               </div>
 
-              <div className="grid grid-cols-2 gap-4 border-t pt-3 mt-2">
+              <div className="grid grid-cols-2 gap-2 border-t pt-2 mt-1">
                 <div><strong>Payment Mode:</strong> <span className="font-bold uppercase text-indigo-600">{activeReceipt.method}</span></div>
                 <div className="text-right"><strong>Status:</strong> <span className="font-bold uppercase text-emerald-600">COMPLETED</span></div>
                 
@@ -1085,21 +1085,21 @@ export default function InvoicesPage() {
                   </>
                 )}
                 {activeReceipt.method === 'qr' && (
-                  <div className="col-span-2"><strong>Trans ID:</strong> <span className="font-mono text-[11px] font-bold text-indigo-800">{activeReceipt.transactionId}</span></div>
+                  <div className="col-span-2"><strong>Trans ID:</strong> <span className="font-mono text-[10px] font-bold text-indigo-800">{activeReceipt.transactionId}</span></div>
                 )}
               </div>
             </div>
             </div>
 
-            <div className="flex justify-between items-end mt-4 pt-2">
-              <div className="border border-black bg-gray-100 px-4 py-2 text-center rounded-sm">
-                <span className="text-[10px] text-gray-600 block uppercase font-bold">Total Amount Paid</span>
-                <strong className="text-lg font-black text-gray-950 font-mono">₨ {activeReceipt.amount.toLocaleString()}.00</strong>
+            <div className="flex justify-between items-end mt-2 pt-1">
+              <div className="border border-black bg-gray-100 px-3 py-1.5 text-center rounded-sm">
+                <span className="text-[9px] text-gray-600 block uppercase font-bold">Total Amount Paid</span>
+                <strong className="text-base font-black text-gray-950 font-mono">₨ {activeReceipt.amount.toLocaleString()}.00</strong>
               </div>
 
-              <div className="text-center w-40">
-                <div className="border-b border-black h-10 w-full mx-auto"></div>
-                <p className="text-[10px] font-bold uppercase mt-1 text-gray-600">Authorized Signature</p>
+              <div className="text-center w-36">
+                <div className="border-b border-black h-8 w-full mx-auto"></div>
+                <p className="text-[9px] font-bold uppercase mt-1 text-gray-600">Authorized Signature</p>
               </div>
             </div>
           </div>
