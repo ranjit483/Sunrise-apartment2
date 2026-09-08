@@ -10,8 +10,8 @@ export default function AppInstallPage() {
             <ArrowLeft className="h-5 w-5" />
           </Link>
           <div className="flex items-center gap-2">
-            <div className="bg-[#95DBAE] p-1.5 rounded-lg">
-              <Building2 className="h-5 w-5 text-[#1E293B]" />
+            <div className="h-9 w-9 rounded-lg overflow-hidden border shadow-sm flex items-center justify-center bg-white">
+              <img src="/logo.jpg" alt="Sunrise Logo" className="h-full w-full object-cover" />
             </div>
             <span className="text-xl font-bold text-gray-900 tracking-tight">Sunrise AMS</span>
           </div>

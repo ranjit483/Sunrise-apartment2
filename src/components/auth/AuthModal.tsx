@@ -240,8 +240,8 @@ export function AuthModal({ open, onOpenChange }: AuthModalProps) {
       <DialogContent className="sm:max-w-md max-h-[95vh] overflow-y-auto">
         <DialogHeader>
           <div className="flex items-center gap-2">
-            <div className="p-2 rounded-lg bg-primary">
-              <Building2 className="h-5 w-5 text-primary-foreground" />
+            <div className="h-9 w-9 rounded-lg overflow-hidden border shadow-sm flex items-center justify-center bg-white">
+              <img src="/logo.jpg" alt="Sunrise Logo" className="h-full w-full object-cover" />
             </div>
             <DialogTitle>{mode === 'signin' ? 'Welcome Back' : 'Create Account'}</DialogTitle>
           </div>

@@ -62,8 +62,8 @@ function LandingContent() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             <div className="flex items-center gap-2">
-              <div className="p-2 rounded-xl bg-gradient-to-br from-primary to-primary/80">
-                <Building2 className="h-6 w-6 text-white" />
+              <div className="h-10 w-10 rounded-xl overflow-hidden border shadow-sm flex items-center justify-center bg-white">
+                <img src="/logo.jpg" alt="Sunrise Logo" className="h-full w-full object-cover" />
               </div>
               <span className="text-xl font-bold text-gray-900">Sunrise AMS</span>
             </div>
