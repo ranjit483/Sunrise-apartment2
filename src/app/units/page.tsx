@@ -194,13 +194,13 @@ export default function UnitsPage() {
       <div className="space-y-6">
         <div className="flex items-center justify-between">
           <div>
-            <h2 className="text-3xl font-bold">Units</h2>
-            <p className="text-muted-foreground">Manage apartment units</p>
+            <h2 className="text-lg sm:text-xl font-bold">Units</h2>
+            <p className="text-xs text-muted-foreground">Manage apartment units</p>
           </div>
           {isAuthorized('manage_apartments') && (
             <Dialog open={isAddModalOpen} onOpenChange={setIsAddModalOpen}>
               <DialogTrigger asChild>
-                <Button>Add Unit</Button>
+                <Button size="sm">Add Unit</Button>
               </DialogTrigger>
               <DialogContent>
                 <DialogHeader>

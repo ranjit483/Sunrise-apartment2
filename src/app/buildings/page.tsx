@@ -143,13 +143,13 @@ export default function BuildingsPage() {
       <div className="space-y-6">
         <div className="flex items-center justify-between">
           <div>
-            <h2 className="text-3xl font-bold">Buildings</h2>
-            <p className="text-muted-foreground">Manage apartment buildings and floors</p>
+            <h2 className="text-lg sm:text-xl font-bold">Buildings</h2>
+            <p className="text-xs text-muted-foreground">Manage apartment buildings and floors</p>
           </div>
           {isAuthorized('manage_apartments') && (
             <Dialog open={isAddModalOpen} onOpenChange={setIsAddModalOpen}>
               <DialogTrigger asChild>
-                <Button>Add Building</Button>
+                <Button size="sm">Add Building</Button>
               </DialogTrigger>
               <DialogContent>
                 <DialogHeader>
@@ -199,11 +199,11 @@ export default function BuildingsPage() {
           )}
         </div>
 
-        <div className="grid gap-4 md:grid-cols-4">
-          <Card><CardContent className="p-6"><p className="text-sm text-muted-foreground">Total Buildings</p><p className="text-2xl font-bold">{totalBuildings}</p></CardContent></Card>
-          <Card><CardContent className="p-6"><p className="text-sm text-muted-foreground">Total Units</p><p className="text-2xl font-bold">{totalUnits}</p></CardContent></Card>
-          <Card><CardContent className="p-6"><p className="text-sm text-muted-foreground">Occupied</p><p className="text-2xl font-bold">{occupiedUnits}</p></CardContent></Card>
-          <Card><CardContent className="p-6"><p className="text-sm text-muted-foreground">Vacant</p><p className="text-2xl font-bold">{vacantUnits}</p></CardContent></Card>
+        <div className="grid gap-3 md:grid-cols-4">
+          <Card><CardContent className="p-3"><p className="text-xs text-muted-foreground">Total Buildings</p><p className="text-base font-bold">{totalBuildings}</p></CardContent></Card>
+          <Card><CardContent className="p-3"><p className="text-xs text-muted-foreground">Total Units</p><p className="text-base font-bold">{totalUnits}</p></CardContent></Card>
+          <Card><CardContent className="p-3"><p className="text-xs text-muted-foreground">Occupied</p><p className="text-base font-bold">{occupiedUnits}</p></CardContent></Card>
+          <Card><CardContent className="p-3"><p className="text-xs text-muted-foreground">Vacant</p><p className="text-base font-bold">{vacantUnits}</p></CardContent></Card>
         </div>
 
         <Card>

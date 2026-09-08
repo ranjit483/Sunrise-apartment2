@@ -241,13 +241,13 @@ export default function UsersPage() {
       <div className="space-y-6">
         <div className="flex items-center justify-between">
           <div>
-            <h2 className="text-3xl font-bold">Users</h2>
-            <p className="text-muted-foreground">Manage system users and roles</p>
+            <h2 className="text-lg sm:text-xl font-bold">Users</h2>
+            <p className="text-xs text-muted-foreground">Manage system users and roles</p>
           </div>
           {isAuthorized('manage_users') && (
             <Dialog>
               <DialogTrigger asChild>
-                <Button>Add User</Button>
+                <Button size="sm">Add User</Button>
               </DialogTrigger>
               <DialogContent>
                 <DialogHeader>
@@ -264,12 +264,12 @@ export default function UsersPage() {
           )}
         </div>
 
-        <div className="grid gap-4 md:grid-cols-5">
-          <Card><CardContent className="p-6"><p className="text-sm text-muted-foreground">Total Users</p><p className="text-2xl font-bold">{filteredUsers.length}</p></CardContent></Card>
-          <Card><CardContent className="p-6"><p className="text-sm text-muted-foreground">Active Users</p><p className="text-2xl font-bold">{activeUsers.length}</p></CardContent></Card>
-          <Card><CardContent className="p-6"><p className="text-sm text-muted-foreground">Resident</p><p className="text-2xl font-bold">{residents.length}</p></CardContent></Card>
-          <Card><CardContent className="p-6"><p className="text-sm text-muted-foreground">Tenants</p><p className="text-2xl font-bold">{tenants.length}</p></CardContent></Card>
-          <Card><CardContent className="p-6"><p className="text-sm text-muted-foreground">Staff</p><p className="text-2xl font-bold">{staff.length}</p></CardContent></Card>
+        <div className="grid gap-3 md:grid-cols-5">
+          <Card><CardContent className="p-3"><p className="text-xs text-muted-foreground">Total Users</p><p className="text-base font-bold">{filteredUsers.length}</p></CardContent></Card>
+          <Card><CardContent className="p-3"><p className="text-xs text-muted-foreground">Active Users</p><p className="text-base font-bold">{activeUsers.length}</p></CardContent></Card>
+          <Card><CardContent className="p-3"><p className="text-xs text-muted-foreground">Resident</p><p className="text-base font-bold">{residents.length}</p></CardContent></Card>
+          <Card><CardContent className="p-3"><p className="text-xs text-muted-foreground">Tenants</p><p className="text-base font-bold">{tenants.length}</p></CardContent></Card>
+          <Card><CardContent className="p-3"><p className="text-xs text-muted-foreground">Staff</p><p className="text-base font-bold">{staff.length}</p></CardContent></Card>
         </div>
 
         <Card>

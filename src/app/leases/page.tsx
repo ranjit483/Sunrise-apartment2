@@ -39,16 +39,16 @@ export default function LeasesPage() {
       <div className="space-y-6">
         <div className="flex items-center justify-between">
           <div>
-            <h2 className="text-3xl font-bold">Leases</h2>
-            <p className="text-muted-foreground">Manage lease agreements and contracts</p>
+            <h2 className="text-lg sm:text-xl font-bold">Leases</h2>
+            <p className="text-xs text-muted-foreground">Manage lease agreements and contracts</p>
           </div>
         </div>
 
-        <div className="grid gap-4 md:grid-cols-4">
-          <Card><CardContent className="p-6"><p className="text-sm text-muted-foreground">Active Leases</p><p className="text-2xl font-bold">{activeLeases}</p></CardContent></Card>
-          <Card><CardContent className="p-6"><p className="text-sm text-muted-foreground">Expiring Soon</p><p className="text-2xl font-bold">{pendingRenewal}</p></CardContent></Card>
-          <Card><CardContent className="p-6"><p className="text-sm text-muted-foreground">Pending Renewal</p><p className="text-2xl font-bold">{pendingRenewal}</p></CardContent></Card>
-          <Card><CardContent className="p-6"><p className="text-sm text-muted-foreground">Total Deposits</p><p className="text-2xl font-bold">₨ {totalDeposits.toLocaleString()}</p></CardContent></Card>
+        <div className="grid gap-3 md:grid-cols-4">
+          <Card><CardContent className="p-3"><p className="text-xs text-muted-foreground">Active Leases</p><p className="text-base font-bold">{activeLeases}</p></CardContent></Card>
+          <Card><CardContent className="p-3"><p className="text-xs text-muted-foreground">Expiring Soon</p><p className="text-base font-bold">{pendingRenewal}</p></CardContent></Card>
+          <Card><CardContent className="p-3"><p className="text-xs text-muted-foreground">Pending Renewal</p><p className="text-base font-bold">{pendingRenewal}</p></CardContent></Card>
+          <Card><CardContent className="p-3"><p className="text-xs text-muted-foreground">Total Deposits</p><p className="text-base font-bold">₨ {totalDeposits.toLocaleString()}</p></CardContent></Card>
         </div>
 
         <Card>
