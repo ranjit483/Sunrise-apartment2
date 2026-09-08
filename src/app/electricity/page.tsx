@@ -26,8 +26,8 @@ export default function ElectricityPage() {
     <DashboardLayout title="Electricity Billing">
       <div className="space-y-6">
         <div>
-          <h2 className="text-lg sm:text-xl font-bold tracking-tight">Electricity Billing</h2>
-          <p className="text-xs text-muted-foreground">Manage and view electricity meter readings and billing.</p>
+          <h2 className="text-xl sm:text-3xl font-bold tracking-tight">Electricity Billing</h2>
+          <p className="text-xs sm:text-sm text-muted-foreground">Manage and view electricity meter readings and billing.</p>
         </div>
         {isAdmin ? <AdminElectricityView /> : <ResidentElectricityView />}
       </div>

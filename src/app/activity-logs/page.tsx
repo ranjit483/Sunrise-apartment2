@@ -112,17 +112,17 @@ export default function ActivityLogsPage() {
     <DashboardLayout title="System Activity Logs">
       <div className="space-y-6">
         <div>
-          <h2 className="text-3xl font-bold tracking-tight">Activity Logs</h2>
-          <p className="text-muted-foreground">Monitor system-wide user actions and authentications in real-time.</p>
+          <h2 className="text-xl sm:text-3xl font-bold tracking-tight">Activity Logs</h2>
+          <p className="text-xs sm:text-sm text-muted-foreground">Monitor system-wide user actions and authentications in real-time.</p>
         </div>
 
         <Card>
-          <CardHeader className="bg-slate-50 border-b">
+          <CardHeader className="bg-slate-50 border-b p-3 sm:p-6">
             <div className="flex items-center gap-2">
-              <Activity className="h-5 w-5 text-indigo-600" />
+              <Activity className="h-4 w-4 sm:h-5 sm:w-5 text-indigo-600" />
               <div>
-                <CardTitle>Recent Activity</CardTitle>
-                <CardDescription>Showing the last 100 system events</CardDescription>
+                <CardTitle className="text-base sm:text-xl">Recent Activity</CardTitle>
+                <CardDescription className="text-xs sm:text-sm">Showing the last 100 system events</CardDescription>
               </div>
             </div>
           </CardHeader>
@@ -138,44 +138,44 @@ export default function ActivityLogsPage() {
               </div>
             ) : (
               <div className="overflow-x-auto">
-                <table className="w-full text-sm text-left">
-                  <thead className="text-xs text-gray-500 bg-gray-50 uppercase border-b">
+                <table className="w-full text-xs sm:text-sm text-left">
+                  <thead className="text-[10px] sm:text-xs text-gray-500 bg-gray-50 uppercase border-b">
                     <tr>
-                      <th className="px-6 py-3 font-semibold">User</th>
-                      <th className="px-6 py-3 font-semibold">Role</th>
-                      <th className="px-6 py-3 font-semibold">Action</th>
-                      <th className="px-6 py-3 font-semibold">Details</th>
-                      <th className="px-6 py-3 font-semibold">Timestamp</th>
+                      <th className="px-3 py-2 sm:px-6 sm:py-3 font-semibold">User</th>
+                      <th className="px-3 py-2 sm:px-6 sm:py-3 font-semibold">Role</th>
+                      <th className="px-3 py-2 sm:px-6 sm:py-3 font-semibold">Action</th>
+                      <th className="px-3 py-2 sm:px-6 sm:py-3 font-semibold">Details</th>
+                      <th className="px-3 py-2 sm:px-6 sm:py-3 font-semibold">Timestamp</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-gray-100">
                     {logs.map((log) => (
                       <tr key={log.id} className="hover:bg-gray-50/50 transition-colors">
-                        <td className="px-6 py-4">
+                        <td className="px-3 py-2.5 sm:px-6 sm:py-4">
                           <div className="flex items-center gap-2">
-                            <div className="h-8 w-8 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-700 font-bold">
-                              {log.userName ? log.userName.charAt(0).toUpperCase() : <User className="h-4 w-4" />}
+                            <div className="h-6 w-6 sm:h-8 sm:w-8 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-700 font-bold text-xs sm:text-sm">
+                              {log.userName ? log.userName.charAt(0).toUpperCase() : <User className="h-3 w-3 sm:h-4 sm:w-4" />}
                             </div>
                             <div>
-                              <div className="font-medium text-gray-900">{log.userName}</div>
-                              <div className="text-xs text-gray-500">{log.userEmail}</div>
+                              <div className="font-medium text-gray-900 text-xs sm:text-sm">{log.userName}</div>
+                              <div className="text-[10px] sm:text-xs text-gray-500">{log.userEmail}</div>
                             </div>
                           </div>
                         </td>
-                        <td className="px-6 py-4">
-                          <span className="text-xs font-medium text-gray-600 border px-2 py-1 rounded bg-white">
+                        <td className="px-3 py-2.5 sm:px-6 sm:py-4">
+                          <span className="text-[9px] sm:text-xs font-medium text-gray-600 border px-1.5 py-0.5 sm:px-2 sm:py-1 rounded bg-white">
                             {log.userRole.replace('_', ' ')}
                           </span>
                         </td>
-                        <td className="px-6 py-4">
-                          <Badge variant="outline" className={`${getActionColor(log.action)} border-none shadow-sm`}>
+                        <td className="px-3 py-2.5 sm:px-6 sm:py-4">
+                          <Badge variant="outline" className={`${getActionColor(log.action)} border-none shadow-sm text-[9px] sm:text-xs px-1.5 py-0.5 sm:px-2.5`}>
                             {log.action.replace('_', ' ')}
                           </Badge>
                         </td>
-                        <td className="px-6 py-4 text-gray-600 max-w-xs truncate" title={log.details}>
+                        <td className="px-3 py-2.5 sm:px-6 sm:py-4 text-gray-600 max-w-xs truncate text-xs sm:text-sm" title={log.details}>
                           {log.details}
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-gray-500 text-xs flex items-center gap-1.5">
+                        <td className="px-3 py-2.5 sm:px-6 sm:py-4 whitespace-nowrap text-gray-500 text-[10px] sm:text-xs flex items-center gap-1.5">
                           <Clock className="h-3 w-3" />
                           {formatDate(log.timestamp)}
                         </td>

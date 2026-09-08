@@ -279,46 +279,46 @@ export default function AdminElectricityView() {
     <>
     <div className="space-y-6">
       <Card>
-        <CardHeader>
-          <CardTitle>Record Meter Reading</CardTitle>
-          <CardDescription>Enter the current electricity meter reading for a unit</CardDescription>
+        <CardHeader className="p-3 sm:p-6">
+          <CardTitle className="text-base sm:text-xl">Record Meter Reading</CardTitle>
+          <CardDescription className="text-xs sm:text-sm">Enter the current electricity meter reading for a unit</CardDescription>
         </CardHeader>
-        <CardContent>
-          <form onSubmit={handleRecordReading} className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div className="space-y-2">
-                <Label>Select Unit</Label>
+        <CardContent className="p-3 pt-0 sm:p-6 sm:pt-0">
+          <form onSubmit={handleRecordReading} className="space-y-3 sm:space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-3 sm:gap-4">
+              <div className="space-y-1.5 sm:space-y-2">
+                <Label className="text-xs sm:text-sm">Select Unit</Label>
                 <Select value={selectedUnit} onValueChange={setSelectedUnit}>
-                  <SelectTrigger>
+                  <SelectTrigger className="h-8 text-xs sm:h-10 sm:text-sm">
                     <SelectValue placeholder="Select a unit" />
                   </SelectTrigger>
-                  <SelectContent>
+                  <SelectContent className="text-xs sm:text-sm">
                     {units.map(u => (
-                      <SelectItem key={u.id} value={u.id}>
+                      <SelectItem key={u.id} value={u.id} className="text-xs sm:text-sm">
                         {u.unitNumber} {u.tenantName ? `(${u.tenantName})` : ''}
                       </SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
               </div>
-              <div className="space-y-2">
-                <Label>Meter Type</Label>
+              <div className="space-y-1.5 sm:space-y-2">
+                <Label className="text-xs sm:text-sm">Meter Type</Label>
                 <Select value={meterType} onValueChange={(v: 'city' | 'generator') => setMeterType(v)}>
-                  <SelectTrigger>
+                  <SelectTrigger className="h-8 text-xs sm:h-10 sm:text-sm">
                     <SelectValue placeholder="Select meter type" />
                   </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="city">City Electricity</SelectItem>
-                    <SelectItem value="generator">Generator (DG)</SelectItem>
+                  <SelectContent className="text-xs sm:text-sm">
+                    <SelectItem value="city" className="text-xs sm:text-sm">City Electricity</SelectItem>
+                    <SelectItem value="generator" className="text-xs sm:text-sm">Generator (DG)</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
-              <div className="space-y-2">
-                <Label>Previous Reading</Label>
-                <Input value={selectedUnit ? previousReading : '-'} disabled className="bg-muted" />
+              <div className="space-y-1.5 sm:space-y-2">
+                <Label className="text-xs sm:text-sm">Previous Reading</Label>
+                <Input value={selectedUnit ? previousReading : '-'} disabled className="bg-muted h-8 text-xs sm:h-10 sm:text-sm" />
               </div>
-              <div className="space-y-2">
-                <Label>Current Reading *</Label>
+              <div className="space-y-1.5 sm:space-y-2">
+                <Label className="text-xs sm:text-sm">Current Reading *</Label>
                 <Input 
                   type="number" 
                   required 
@@ -326,35 +326,37 @@ export default function AdminElectricityView() {
                   onChange={(e) => setCurrentReadingInput(e.target.value)}
                   placeholder="e.g. 1540"
                   disabled={!selectedUnit}
+                  className="h-8 text-xs sm:h-10 sm:text-sm"
                 />
               </div>
-              <div className="space-y-2">
-                <Label>Reading Month *</Label>
+              <div className="space-y-1.5 sm:space-y-2">
+                <Label className="text-xs sm:text-sm">Reading Month *</Label>
                 <Input 
                   required 
                   value={readingMonth}
                   onChange={(e) => setReadingMonth(e.target.value)}
                   placeholder="e.g. Asadh 2083"
                   disabled={!selectedUnit}
+                  className="h-8 text-xs sm:h-10 sm:text-sm"
                 />
               </div>
             </div>
 
             {selectedUnit && currentReadingInput && !isNaN(parseFloat(currentReadingInput)) && (
-              <div className="bg-blue-50 p-3 rounded-lg border border-blue-100 flex gap-6">
-                <p className="text-sm text-blue-800">
+              <div className="bg-blue-50 p-2.5 sm:p-3 rounded-lg border border-blue-100 flex flex-col sm:flex-row gap-2 sm:gap-6 text-xs sm:text-sm">
+                <p className="text-blue-800">
                   <span>Consumption: </span>
                   <strong>{Math.max(0, parseFloat(currentReadingInput) - previousReading)} Units</strong>
                 </p>
-                <p className="text-sm text-blue-800">
+                <p className="text-blue-800">
                   <span>Est. Bill (at Rs. {currentPricePerUnit}/unit): </span>
                   <strong>Rs. {(Math.max(0, parseFloat(currentReadingInput) - previousReading) * currentPricePerUnit).toLocaleString()}</strong>
                 </p>
               </div>
             )}
 
-            <Button type="submit" className="w-full md:w-auto" disabled={isSubmitting || !selectedUnit}>
-              {isSubmitting ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <Zap className="h-4 w-4 mr-2" />}
+            <Button type="submit" className="w-full md:w-auto h-8 text-xs sm:h-10 sm:text-sm" disabled={isSubmitting || !selectedUnit}>
+              {isSubmitting ? <Loader2 className="h-3.5 w-3.5 sm:h-4 sm:w-4 animate-spin mr-2" /> : <Zap className="h-3.5 w-3.5 sm:h-4 sm:w-4 mr-2" />}
               Submit Reading & Auto-Approve
             </Button>
           </form>
@@ -362,56 +364,56 @@ export default function AdminElectricityView() {
       </Card>
 
       <Card>
-        <CardHeader className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-2">
+        <CardHeader className="flex flex-col md:flex-row md:items-center justify-between gap-4 p-3 sm:p-6 pb-2">
           <div>
-            <CardTitle>Meter Readings Management</CardTitle>
-            <CardDescription>Review and approve resident submissions</CardDescription>
+            <CardTitle className="text-base sm:text-xl">Meter Readings Management</CardTitle>
+            <CardDescription className="text-xs sm:text-sm">Review and approve resident submissions</CardDescription>
           </div>
           <div className="flex flex-col sm:flex-row gap-2 w-full md:w-auto">
             <div className="relative w-full sm:w-auto">
-              <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+              <Search className="absolute left-2.5 top-2 sm:top-2.5 h-3.5 w-3.5 sm:h-4 sm:w-4 text-muted-foreground" />
               <Input
                 placeholder="Search tenant or unit..."
-                className="pl-9 w-full sm:w-[220px]"
+                className="pl-8 sm:pl-9 w-full sm:w-[220px] h-8 text-xs sm:h-10 sm:text-sm"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
               />
             </div>
             <div className="w-full sm:w-[180px]">
               <Select value={filter} onValueChange={setFilter}>
-                <SelectTrigger>
+                <SelectTrigger className="h-8 text-xs sm:h-10 sm:text-sm">
                   <SelectValue placeholder="Filter by status" />
                 </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Statuses</SelectItem>
-                  <SelectItem value="pending_verification">Pending Verification</SelectItem>
-                  <SelectItem value="approved">Approved</SelectItem>
-                  <SelectItem value="rejected">Rejected</SelectItem>
+                <SelectContent className="text-xs sm:text-sm">
+                  <SelectItem value="all" className="text-xs sm:text-sm">All Statuses</SelectItem>
+                  <SelectItem value="pending_verification" className="text-xs sm:text-sm">Pending Verification</SelectItem>
+                  <SelectItem value="approved" className="text-xs sm:text-sm">Approved</SelectItem>
+                  <SelectItem value="rejected" className="text-xs sm:text-sm">Rejected</SelectItem>
                 </SelectContent>
               </Select>
             </div>
           </div>
         </CardHeader>
-        <CardContent>
-          <div className="rounded-md border">
-            <Table>
+        <CardContent className="p-3 pt-0 sm:p-6 sm:pt-0">
+          <div className="rounded-md border overflow-x-auto">
+            <Table className="w-full text-xs sm:text-sm">
               <TableHeader>
                 <TableRow>
-                  <TableHead>Date</TableHead>
-                  <TableHead>Reading Month</TableHead>
-                  <TableHead>Resident/Tenant ID</TableHead>
-                  <TableHead>Meter Type</TableHead>
-                  <TableHead>Readings (Prev → Curr)</TableHead>
-                  <TableHead>Consumed</TableHead>
-                  <TableHead>Total Bill</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead className="text-right">Actions</TableHead>
+                  <TableHead className="text-[10px] sm:text-xs h-8 sm:h-10 px-2 sm:px-4">Date</TableHead>
+                  <TableHead className="text-[10px] sm:text-xs h-8 sm:h-10 px-2 sm:px-4">Reading Month</TableHead>
+                  <TableHead className="text-[10px] sm:text-xs h-8 sm:h-10 px-2 sm:px-4">Resident/Tenant ID</TableHead>
+                  <TableHead className="text-[10px] sm:text-xs h-8 sm:h-10 px-2 sm:px-4">Meter Type</TableHead>
+                  <TableHead className="text-[10px] sm:text-xs h-8 sm:h-10 px-2 sm:px-4">Readings (Prev → Curr)</TableHead>
+                  <TableHead className="text-[10px] sm:text-xs h-8 sm:h-10 px-2 sm:px-4">Consumed</TableHead>
+                  <TableHead className="text-[10px] sm:text-xs h-8 sm:h-10 px-2 sm:px-4">Total Bill</TableHead>
+                  <TableHead className="text-[10px] sm:text-xs h-8 sm:h-10 px-2 sm:px-4">Status</TableHead>
+                  <TableHead className="text-[10px] sm:text-xs h-8 sm:h-10 px-2 sm:px-4 text-right">Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {filteredReadings.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={7} className="h-24 text-center">
+                    <TableCell colSpan={7} className="h-24 text-center text-xs sm:text-sm">
                       No readings found.
                     </TableCell>
                   </TableRow>
@@ -425,28 +427,28 @@ export default function AdminElectricityView() {
                     const tenantName = rUser?.fullName || rUnit?.tenantName || 'Unknown Tenant';
                     return (
                     <TableRow key={reading.id}>
-                      <TableCell>{new Date(reading.readingDate).toLocaleDateString()}</TableCell>
-                      <TableCell>{reading.month || 'N/A'}</TableCell>
-                      <TableCell>
+                      <TableCell className="py-2 px-2 sm:py-4 sm:px-4 text-xs sm:text-sm">{new Date(reading.readingDate).toLocaleDateString()}</TableCell>
+                      <TableCell className="py-2 px-2 sm:py-4 sm:px-4 text-xs sm:text-sm">{reading.month || 'N/A'}</TableCell>
+                      <TableCell className="py-2 px-2 sm:py-4 sm:px-4">
                         <div className="flex flex-col">
-                          <span className="font-medium text-gray-900">{tenantName}</span>
-                          <span className="text-xs text-muted-foreground">{rUnit ? rUnit.unitNumber : 'Unknown Unit'}</span>
+                          <span className="font-medium text-gray-900 text-xs sm:text-sm">{tenantName}</span>
+                          <span className="text-[10px] sm:text-xs text-muted-foreground">{rUnit ? rUnit.unitNumber : 'Unknown Unit'}</span>
                         </div>
                       </TableCell>
-                      <TableCell>
-                        <div className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold ${
+                      <TableCell className="py-2 px-2 sm:py-4 sm:px-4">
+                        <div className={`inline-flex items-center px-1.5 py-0.5 sm:px-2 sm:py-0.5 rounded text-[10px] sm:text-xs font-semibold ${
                           (!reading.meterType || reading.meterType === 'city') ? 'bg-blue-100 text-blue-800' : 'bg-orange-100 text-orange-800'
                         }`}>
                           {(!reading.meterType || reading.meterType === 'city') ? 'City' : 'DG'}
                         </div>
                       </TableCell>
-                      <TableCell>
+                      <TableCell className="py-2 px-2 sm:py-4 sm:px-4 text-xs sm:text-sm">
                         {reading.previousReading} → <strong>{reading.currentReading}</strong>
                       </TableCell>
-                      <TableCell>{reading.totalConsumed} Units</TableCell>
-                      <TableCell className="font-bold">Rs. {reading.totalBill.toLocaleString()}</TableCell>
-                      <TableCell>
-                        <div className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium uppercase ${
+                      <TableCell className="py-2 px-2 sm:py-4 sm:px-4 text-xs sm:text-sm">{reading.totalConsumed} Units</TableCell>
+                      <TableCell className="py-2 px-2 sm:py-4 sm:px-4 text-xs sm:text-sm font-bold">Rs. {reading.totalBill.toLocaleString()}</TableCell>
+                      <TableCell className="py-2 px-2 sm:py-4 sm:px-4">
+                        <div className={`inline-flex items-center gap-1 px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-full text-[10px] sm:text-xs font-medium uppercase ${
                           reading.status === 'approved' ? 'bg-emerald-100 text-emerald-800' :
                           reading.status === 'rejected' ? 'bg-red-100 text-red-800' :
                           'bg-amber-100 text-amber-800'
@@ -457,11 +459,11 @@ export default function AdminElectricityView() {
                           {reading.status.replace('_', ' ')}
                         </div>
                       </TableCell>
-                      <TableCell className="text-right space-x-2 whitespace-nowrap">
+                      <TableCell className="py-2 px-2 sm:py-4 sm:px-4 text-right space-x-1 sm:space-x-2 whitespace-nowrap">
                         <Button 
                           size="sm" 
                           variant="outline" 
-                          className="mr-2"
+                          className="mr-1 sm:mr-2 h-7 text-[10px] px-2 sm:h-8 sm:text-xs sm:px-3"
                           onClick={() => handleEditClick(reading)}
                         >
                           <Edit2 className="h-3 w-3 mr-1" />
@@ -472,7 +474,7 @@ export default function AdminElectricityView() {
                             <Button 
                               size="sm" 
                               variant="outline" 
-                              className="bg-emerald-50 text-emerald-600 hover:bg-emerald-100 hover:text-emerald-700"
+                              className="h-7 text-[10px] px-2 sm:h-8 sm:text-xs sm:px-3 bg-emerald-50 text-emerald-600 hover:bg-emerald-100 hover:text-emerald-700"
                               onClick={() => handleApprove(reading)}
                             >
                               Approve
@@ -480,7 +482,7 @@ export default function AdminElectricityView() {
                             <Button 
                               size="sm" 
                               variant="outline" 
-                              className="bg-red-50 text-red-600 hover:bg-red-100 hover:text-red-700"
+                              className="h-7 text-[10px] px-2 sm:h-8 sm:text-xs sm:px-3 bg-red-50 text-red-600 hover:bg-red-100 hover:text-red-700"
                               onClick={() => handleReject(reading)}
                             >
                               Reject
@@ -488,7 +490,7 @@ export default function AdminElectricityView() {
                           </>
                         )}
                         {reading.photoUrl && (
-                          <Button size="sm" variant="ghost" asChild>
+                          <Button size="sm" variant="ghost" className="h-7 text-[10px] px-2 sm:h-8 sm:text-xs sm:px-3" asChild>
                             <a href={reading.photoUrl} target="_blank" rel="noreferrer">View Photo</a>
                           </Button>
                         )}

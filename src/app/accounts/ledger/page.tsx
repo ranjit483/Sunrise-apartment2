@@ -286,24 +286,24 @@ export default function TenantLedgerPage() {
       <div className="space-y-6 pb-[300px]">
         <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
           <div>
-            <h2 className="text-3xl font-bold">Resident/Tenant Ledger</h2>
-            <p className="text-muted-foreground">Detailed statement of account for individual tenants</p>
+            <h2 className="text-xl sm:text-3xl font-bold">Resident/Tenant Ledger</h2>
+            <p className="text-xs sm:text-sm text-muted-foreground">Detailed statement of account for individual tenants</p>
           </div>
           {selectedTenant && (
-            <Button variant="outline" className="gap-2" onClick={() => window.print()}>
-              <Download className="h-4 w-4" /> Export PDF
+            <Button variant="outline" className="gap-2 h-8 text-xs sm:h-9 sm:text-sm" onClick={() => window.print()}>
+              <Download className="h-3.5 w-3.5 sm:h-4 sm:w-4" /> Export PDF
             </Button>
           )}
         </div>
 
         <Card className="max-w-md overflow-visible">
-          <CardHeader>
-            <CardTitle className="text-lg">Select Tenant</CardTitle>
+          <CardHeader className="p-3 sm:p-6">
+            <CardTitle className="text-sm sm:text-lg">Select Tenant</CardTitle>
           </CardHeader>
-          <CardContent className="overflow-visible">
+          <CardContent className="overflow-visible p-3 pt-0 sm:p-6 sm:pt-0">
             <div className="relative z-50">
               <div 
-                className="flex items-center justify-between p-3 border rounded-md cursor-pointer bg-white hover:bg-gray-50"
+                className="flex items-center justify-between p-2.5 sm:p-3 border rounded-md cursor-pointer bg-white hover:bg-gray-50 text-xs sm:text-sm"
                 onClick={() => setIsDropdownOpen(!isDropdownOpen)}
               >
                 <span className={selectedTenantObj ? 'text-black font-medium' : 'text-gray-500'}>
@@ -311,36 +311,36 @@ export default function TenantLedgerPage() {
                     ? `${selectedTenantObj.fullName} ${selectedTenantObj.unitNumber ? `(${selectedTenantObj.unitNumber})` : ''}` 
                     : 'Search and select a tenant...'}
                 </span>
-                <Search className="h-4 w-4 text-gray-400" />
+                <Search className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-gray-400" />
               </div>
               
               {isDropdownOpen && (
-                <div className="absolute top-full left-0 right-0 mt-1 z-50 bg-white border rounded-md shadow-xl overflow-hidden">
+                <div className="absolute top-full left-0 right-0 mt-1 z-50 bg-white border rounded-md shadow-xl overflow-hidden text-xs sm:text-sm">
                   <div className="p-2 border-b bg-gray-50">
                     <Input 
                       placeholder="Type name or unit no..." 
                       value={tenantSearch}
                       onChange={e => setTenantSearch(e.target.value)}
-                      className="w-full bg-white"
+                      className="w-full bg-white h-8 text-xs sm:h-9 sm:text-sm"
                       autoFocus
                     />
                   </div>
                   <div className="max-h-60 overflow-y-auto">
                     {filteredTenants.length === 0 ? (
-                      <div className="p-4 text-sm text-gray-500 text-center">No tenants found matching "{tenantSearch}"</div>
+                      <div className="p-3 text-xs sm:text-sm text-gray-500 text-center">No tenants found matching "{tenantSearch}"</div>
                     ) : (
                       <div className="p-1">
                         {filteredTenants.map(t => (
                           <div 
                             key={t.uid}
-                            className={`p-2 px-3 text-sm rounded-sm cursor-pointer hover:bg-indigo-50 hover:text-indigo-900 ${selectedTenant === t.uid ? 'bg-indigo-100 font-semibold' : ''}`}
+                            className={`p-2 px-3 text-xs sm:text-sm rounded-sm cursor-pointer hover:bg-indigo-50 hover:text-indigo-900 ${selectedTenant === t.uid ? 'bg-indigo-100 font-semibold' : ''}`}
                             onClick={() => {
                               setSelectedTenant(t.uid);
                               setIsDropdownOpen(false);
                               setTenantSearch(''); // Reset search after selection
                             }}
                           >
-                            {t.fullName} <span className="text-gray-500 text-xs ml-1">{t.unitNumber ? `(${t.unitNumber})` : ''}</span>
+                            {t.fullName} <span className="text-gray-500 text-[10px] sm:text-xs ml-1">{t.unitNumber ? `(${t.unitNumber})` : ''}</span>
                           </div>
                         ))}
                       </div>
@@ -358,23 +358,23 @@ export default function TenantLedgerPage() {
 
         {selectedTenant && (
           <>
-            <div className="grid gap-4 md:grid-cols-3">
+            <div className="grid gap-3 sm:gap-4 grid-cols-1 sm:grid-cols-3">
               <Card>
-                <CardContent className="p-6">
-                  <p className="text-sm text-muted-foreground">Total Billed</p>
-                  <p className="text-2xl font-bold">₨ {totalBilled.toLocaleString()}</p>
+                <CardContent className="p-3 sm:p-6">
+                  <p className="text-xs sm:text-sm text-muted-foreground">Total Billed</p>
+                  <p className="text-lg sm:text-2xl font-bold">₨ {totalBilled.toLocaleString()}</p>
                 </CardContent>
               </Card>
               <Card>
-                <CardContent className="p-6">
-                  <p className="text-sm text-muted-foreground">Total Paid</p>
-                  <p className="text-2xl font-bold text-emerald-600">₨ {totalPaid.toLocaleString()}</p>
+                <CardContent className="p-3 sm:p-6">
+                  <p className="text-xs sm:text-sm text-muted-foreground">Total Paid</p>
+                  <p className="text-lg sm:text-2xl font-bold text-emerald-600">₨ {totalPaid.toLocaleString()}</p>
                 </CardContent>
               </Card>
               <Card className={balanceDue > 0 ? 'border-red-200 bg-red-50' : 'border-green-200 bg-green-50'}>
-                <CardContent className="p-6">
-                  <p className="text-sm text-muted-foreground font-medium">Balance Due</p>
-                  <p className={`text-2xl font-bold ${balanceDue > 0 ? 'text-red-600' : 'text-green-600'}`}>
+                <CardContent className="p-3 sm:p-6">
+                  <p className="text-xs sm:text-sm text-muted-foreground font-medium">Balance Due</p>
+                  <p className={`text-lg sm:text-2xl font-bold ${balanceDue > 0 ? 'text-red-600' : 'text-green-600'}`}>
                     ₨ {balanceDue.toLocaleString()}
                   </p>
                 </CardContent>
@@ -382,55 +382,55 @@ export default function TenantLedgerPage() {
             </div>
 
             <Card>
-              <CardHeader>
-                <CardTitle>Statement of Account</CardTitle>
+              <CardHeader className="p-3 sm:p-6">
+                <CardTitle className="text-base sm:text-xl">Statement of Account</CardTitle>
               </CardHeader>
-              <CardContent>
+              <CardContent className="p-3 pt-0 sm:p-6 sm:pt-0">
                 {loading ? (
                   <div className="flex justify-center py-8"><Loader2 className="h-8 w-8 animate-spin text-muted-foreground" /></div>
                 ) : entries.length === 0 ? (
-                  <div className="text-center py-8 text-muted-foreground">No transactions found for this tenant.</div>
+                  <div className="text-center py-8 text-xs sm:text-sm text-muted-foreground">No transactions found for this tenant.</div>
                 ) : (
                   <div className="overflow-x-auto">
-                    <table className="w-full text-left text-sm">
+                    <table className="w-full text-left text-xs sm:text-sm">
                       <thead>
                         <tr className="border-b bg-muted/50">
-                          <th className="py-3 px-4 font-medium">Date</th>
-                          <th className="py-3 px-4 font-medium">Description</th>
-                          <th className="py-3 px-4 font-medium text-right">Debit (Charges)</th>
-                          <th className="py-3 px-4 font-medium text-right">Credit (Payments)</th>
-                          <th className="py-3 px-4 font-medium text-right">Balance</th>
-                          <th className="py-3 px-4 font-medium text-center">Status</th>
-                          <th className="py-3 px-4 font-medium text-center">Actions</th>
+                          <th className="py-2 px-3 sm:py-3 sm:px-4 text-[10px] sm:text-xs font-medium">Date</th>
+                          <th className="py-2 px-3 sm:py-3 sm:px-4 text-[10px] sm:text-xs font-medium">Description</th>
+                          <th className="py-2 px-3 sm:py-3 sm:px-4 text-[10px] sm:text-xs font-medium text-right">Debit (Charges)</th>
+                          <th className="py-2 px-3 sm:py-3 sm:px-4 text-[10px] sm:text-xs font-medium text-right">Credit (Payments)</th>
+                          <th className="py-2 px-3 sm:py-3 sm:px-4 text-[10px] sm:text-xs font-medium text-right">Balance</th>
+                          <th className="py-2 px-3 sm:py-3 sm:px-4 text-[10px] sm:text-xs font-medium text-center">Status</th>
+                          <th className="py-2 px-3 sm:py-3 sm:px-4 text-[10px] sm:text-xs font-medium text-center">Actions</th>
                         </tr>
                       </thead>
                       <tbody>
                         {entries.map((entry, index) => (
                           <tr key={`${entry.id}-${index}`} className="border-b hover:bg-muted/30 transition-colors">
-                            <td className="py-3 px-4 whitespace-nowrap">{entry.date}</td>
-                            <td className="py-3 px-4">
+                            <td className="py-2 px-3 sm:py-3 sm:px-4 whitespace-nowrap text-xs sm:text-sm">{entry.date}</td>
+                            <td className="py-2 px-3 sm:py-3 sm:px-4 text-xs sm:text-sm">
                               <span className="font-medium">{entry.type === 'invoice' ? 'INV' : 'PAY'}</span> - {entry.description}
                             </td>
-                            <td className="py-3 px-4 text-right text-red-600">
+                            <td className="py-2 px-3 sm:py-3 sm:px-4 text-right text-red-600 text-xs sm:text-sm">
                               {entry.debit > 0 ? `₨ ${entry.debit.toLocaleString()}` : '-'}
                             </td>
-                            <td className="py-3 px-4 text-right text-emerald-600">
+                            <td className="py-2 px-3 sm:py-3 sm:px-4 text-right text-emerald-600 text-xs sm:text-sm">
                               {entry.credit > 0 ? `₨ ${entry.credit.toLocaleString()}` : '-'}
                             </td>
-                            <td className="py-3 px-4 text-right font-semibold">
+                            <td className="py-2 px-3 sm:py-3 sm:px-4 text-right font-semibold text-xs sm:text-sm">
                               ₨ {entry.balance.toLocaleString()}
                             </td>
-                            <td className="py-3 px-4 text-center">
-                              <Badge variant={entry.type === 'payment' ? 'success' : entry.status === 'paid' ? 'success' : entry.status === 'overdue' ? 'destructive' : 'warning'}>
+                            <td className="py-2 px-3 sm:py-3 sm:px-4 text-center">
+                              <Badge className="text-[9px] sm:text-xs px-1.5 py-0.5" variant={entry.type === 'payment' ? 'success' : entry.status === 'paid' ? 'success' : entry.status === 'overdue' ? 'destructive' : 'warning'}>
                                 {entry.status.toUpperCase()}
                               </Badge>
                             </td>
-                            <td className="py-3 px-4 text-center">
+                            <td className="py-2 px-3 sm:py-3 sm:px-4 text-center">
                               {entry.type === 'invoice' && ['pending', 'partial', 'overdue'].includes(entry.status) && (
                                 <Button
                                   variant="outline"
                                   size="sm"
-                                  className="text-emerald-600 border-emerald-200 hover:bg-emerald-50"
+                                  className="h-7 text-[10px] px-2 sm:h-8 sm:text-xs sm:px-3 text-emerald-600 border-emerald-200 hover:bg-emerald-50"
                                   onClick={() => {
                                     const inv = rawInvoices.find(i => i.id === entry.id)
                                     if (inv) handleOpenReceivePayment(inv)
