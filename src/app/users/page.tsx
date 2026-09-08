@@ -273,45 +273,45 @@ export default function UsersPage() {
         </div>
 
         <Card>
-          <CardHeader className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-            <CardTitle>All Users</CardTitle>
+          <CardHeader className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 py-3">
+            <CardTitle className="text-base font-bold">All Users</CardTitle>
             <Input
               placeholder="Search by name or unit..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="max-w-sm"
+              className="max-w-sm h-8 text-xs"
             />
           </CardHeader>
-          <CardContent>
-            <div className="overflow-x-auto overflow-y-hidden"><table className="w-full min-w-[800px]">
+          <CardContent className="pt-0">
+            <div className="overflow-x-auto overflow-y-hidden"><table className="w-full min-w-[800px] text-xs">
               <thead>
                 <tr className="border-b">
-                  <th className="pb-3 text-left">User</th>
-                  <th className="pb-3 text-left">Phone</th>
-                  <th className="pb-3 text-left">Role</th>
-                  <th className="pb-3 text-left">Building</th>
-                  <th className="pb-3 text-left">Unit</th>
-                  <th className="pb-3 text-left">Status</th>
-                  {isAuthorized('manage_users') && <th className="pb-3 text-left">Actions</th>}
+                  <th className="pb-2 text-left font-semibold text-gray-600">User</th>
+                  <th className="pb-2 text-left font-semibold text-gray-600">Phone</th>
+                  <th className="pb-2 text-left font-semibold text-gray-600">Role</th>
+                  <th className="pb-2 text-left font-semibold text-gray-600">Building</th>
+                  <th className="pb-2 text-left font-semibold text-gray-600">Unit</th>
+                  <th className="pb-2 text-left font-semibold text-gray-600">Status</th>
+                  {isAuthorized('manage_users') && <th className="pb-2 text-left font-semibold text-gray-600">Actions</th>}
                 </tr>
               </thead>
               <tbody>
                 {filteredUsers.map((user) => (
                   <tr key={user.uid} className="border-b hover:bg-muted/50 transition-colors">
-                    <td className="py-3">
-                      <div className="flex items-center gap-3">
-                        <Avatar className="h-9 w-9">
-                          <AvatarFallback className="bg-primary text-primary-foreground text-xs">{getInitials(user.fullName)}</AvatarFallback>
+                    <td className="py-2">
+                      <div className="flex items-center gap-2.5">
+                        <Avatar className="h-7 w-7">
+                          <AvatarFallback className="bg-primary text-primary-foreground text-[10px]">{getInitials(user.fullName)}</AvatarFallback>
                         </Avatar>
                         <div>
-                          <p className="font-medium">{user.fullName}</p>
-                          <p className="text-xs text-muted-foreground">{user.email}</p>
+                          <p className="font-semibold text-xs text-gray-900">{user.fullName}</p>
+                          <p className="text-[10px] text-muted-foreground">{user.email}</p>
                         </div>
                       </div>
                     </td>
-                    <td className="py-3">{user.phone}</td>
-                    <td className="py-3"><Badge className={roleColors[user.role] || 'bg-gray-100'}>{roleLabels[user.role] || user.role}</Badge></td>
-                    <td className="py-3">
+                    <td className="py-2">{user.phone}</td>
+                    <td className="py-2"><Badge className={`text-[10px] px-2 py-0.5 ${roleColors[user.role] || 'bg-gray-100'}`}>{roleLabels[user.role] || user.role}</Badge></td>
+                    <td className="py-2">
                       {(() => {
                         let tower = null;
                         for (const [t, units] of Object.entries(TOWER_UNITS)) {
@@ -324,20 +324,20 @@ export default function UsersPage() {
                         return displayBuilding.length > 15 ? '-' : displayBuilding; // Ignore random firebase IDs
                       })()}
                     </td>
-                    <td className="py-3">{user.unitNumber || '-'}</td>
-                    <td className="py-3"><Badge variant={user.status === 'approved' ? 'success' : user.status === 'rejected' ? 'destructive' : 'secondary'}>{user.status === 'pending_approval' ? 'Pending' : user.status}</Badge></td>
+                    <td className="py-2 font-medium">{user.unitNumber || '-'}</td>
+                    <td className="py-2"><Badge variant={user.status === 'approved' ? 'success' : user.status === 'rejected' ? 'destructive' : 'secondary'} className="text-[10px] px-2 py-0.5">{user.status === 'pending_approval' ? 'Pending' : user.status}</Badge></td>
                     {isAuthorized('manage_users') && (
-                      <td className="py-3">
-                        <div className="flex gap-2">
-                          <Button variant="ghost" size="sm" onClick={() => setEditingUser(user)}>
-                            <Edit2 className="h-4 w-4 text-blue-500" />
+                      <td className="py-2">
+                        <div className="flex gap-1.5">
+                          <Button variant="ghost" size="sm" className="h-7 w-7 p-0" onClick={() => setEditingUser(user)}>
+                            <Edit2 className="h-3.5 w-3.5 text-blue-500" />
                           </Button>
                           {deleting === user.uid ? (
-                            <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
+                            <Loader2 className="h-3.5 w-3.5 animate-spin text-muted-foreground" />
                           ) : (
                             isAuthorized('delete_records') && (
-                              <Button variant="ghost" size="sm" onClick={() => handleDelete(user.uid, user.role)}>
-                                <Trash2 className="h-4 w-4 text-red-500" />
+                              <Button variant="ghost" size="sm" className="h-7 w-7 p-0" onClick={() => handleDelete(user.uid, user.role)}>
+                                <Trash2 className="h-3.5 w-3.5 text-red-500" />
                               </Button>
                             )
                           )}

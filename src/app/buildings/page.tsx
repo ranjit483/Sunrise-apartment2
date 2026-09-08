@@ -207,53 +207,53 @@ export default function BuildingsPage() {
         </div>
 
         <Card>
-          <CardHeader><CardTitle>All Buildings</CardTitle></CardHeader>
-          <CardContent>
+          <CardHeader className="py-3"><CardTitle className="text-base font-bold">All Buildings</CardTitle></CardHeader>
+          <CardContent className="pt-0">
             {loading ? (
               <div className="flex justify-center py-8"><Loader2 className="h-8 w-8 animate-spin text-muted-foreground" /></div>
             ) : buildings.length === 0 ? (
               <div className="text-center py-8 text-muted-foreground">No buildings found. Click "Add Building" to create one.</div>
             ) : (
-              <div className="overflow-x-auto overflow-y-hidden"><table className="w-full min-w-[800px]">
+              <div className="overflow-x-auto overflow-y-hidden"><table className="w-full min-w-[800px] text-xs">
                 <thead>
                   <tr className="border-b">
-                    <th className="pb-3 text-left">Building</th>
-                    <th className="pb-3 text-left">Address</th>
-                    <th className="pb-3 text-left">Floors</th>
-                    <th className="pb-3 text-left">Units</th>
-                    <th className="pb-3 text-left">Status</th>
-                    {isAuthorized('manage_apartments') && <th className="pb-3 text-left">Actions</th>}
+                    <th className="pb-2 text-left font-semibold text-gray-600">Building</th>
+                    <th className="pb-2 text-left font-semibold text-gray-600">Address</th>
+                    <th className="pb-2 text-left font-semibold text-gray-600">Floors</th>
+                    <th className="pb-2 text-left font-semibold text-gray-600">Units</th>
+                    <th className="pb-2 text-left font-semibold text-gray-600">Status</th>
+                    {isAuthorized('manage_apartments') && <th className="pb-2 text-left font-semibold text-gray-600">Actions</th>}
                   </tr>
                 </thead>
                 <tbody>
                   {buildings.map((b) => (
-                    <tr key={b.id} className="border-b">
-                      <td className="py-3 font-medium">{b.name}</td>
-                      <td className="py-3 text-muted-foreground">{b.address}</td>
-                      <td className="py-3">{b.totalFloors}</td>
-                      <td className="py-3">{b.totalUnits}</td>
-                      <td className="py-3">
-                        <Badge variant={b.status === 'active' ? 'default' : 'secondary'} className={b.status === 'active' ? 'bg-green-100 text-green-800' : ''}>
+                    <tr key={b.id} className="border-b hover:bg-muted/50 transition-colors">
+                      <td className="py-2 font-medium">{b.name}</td>
+                      <td className="py-2 text-muted-foreground">{b.address}</td>
+                      <td className="py-2">{b.totalFloors}</td>
+                      <td className="py-2">{b.totalUnits}</td>
+                      <td className="py-2">
+                        <Badge variant={b.status === 'active' ? 'default' : 'secondary'} className={`text-[10px] px-2 py-0.5 ${b.status === 'active' ? 'bg-green-100 text-green-800' : ''}`}>
                           {b.status}
                         </Badge>
                       </td>
                       {isAuthorized('manage_apartments') && (
-                        <td className="py-3">
+                        <td className="py-2">
                           {deleting === b.id ? (
-                            <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
+                            <Loader2 className="h-3.5 w-3.5 animate-spin text-muted-foreground" />
                           ) : (
-                            <div className="flex gap-2">
+                            <div className="flex gap-1.5">
                               {role === 'SUPER_ADMIN' && (
-                                <Button variant="ghost" size="sm" onClick={() => {
+                                <Button variant="ghost" size="sm" className="h-7 w-7 p-0" onClick={() => {
                                   setEditingBuilding(b)
                                   setIsEditModalOpen(true)
                                 }}>
-                                  <Edit2 className="h-4 w-4 text-blue-500" />
+                                  <Edit2 className="h-3.5 w-3.5 text-blue-500" />
                                 </Button>
                               )}
                               {isAuthorized('delete_records') && (
-                                <Button variant="ghost" size="sm" onClick={() => handleDeleteBuilding(b.id)}>
-                                  <Trash2 className="h-4 w-4 text-red-500" />
+                                <Button variant="ghost" size="sm" className="h-7 w-7 p-0" onClick={() => handleDeleteBuilding(b.id)}>
+                                  <Trash2 className="h-3.5 w-3.5 text-red-500" />
                                 </Button>
                               )}
                             </div>
