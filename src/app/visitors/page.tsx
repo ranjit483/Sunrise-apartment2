@@ -228,23 +228,23 @@ export default function VisitorsPage() {
   )
 
   const getVehicleIcon = (type?: string) => {
-    if (type === '4-wheeler') return <Car className="h-4 w-4 mr-1 text-blue-500" />
-    if (type === '2-wheeler') return <Bike className="h-4 w-4 mr-1 text-orange-500" />
-    return <User className="h-4 w-4 mr-1 text-gray-500" />
+    if (type === '4-wheeler') return <Car className="h-3 w-3 sm:h-4 sm:w-4 mr-1 text-blue-500" />
+    if (type === '2-wheeler') return <Bike className="h-3 w-3 sm:h-4 sm:w-4 mr-1 text-orange-500" />
+    return <User className="h-3 w-3 sm:h-4 sm:w-4 mr-1 text-gray-500" />
   }
 
   return (
     <DashboardLayout title="Visitor Management">
-      <div className="space-y-6">
+      <div className="space-y-4 sm:space-y-6">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
-            <h2 className="text-lg sm:text-xl font-bold">Logbook Management</h2>
-            <p className="text-xs text-muted-foreground">Track visitor entries, exits, and vehicles</p>
+            <h2 className="text-sm sm:text-xl font-bold">Logbook Management</h2>
+            <p className="text-[10px] sm:text-xs text-muted-foreground">Track visitor entries, exits, and vehicles</p>
           </div>
           
           <Dialog open={isRegisterModalOpen} onOpenChange={setIsRegisterModalOpen}>
             <DialogTrigger asChild>
-              <Button className="bg-green-600 hover:bg-green-700">
+              <Button className="bg-green-600 hover:bg-green-700 h-8 text-xs sm:h-10 sm:text-sm">
                 {isResident ? "Pre-Register Visitor" : "Register Visitor"}
               </Button>
             </DialogTrigger>
@@ -397,52 +397,52 @@ export default function VisitorsPage() {
           </Dialog>
         </div>
 
-        <div className="grid gap-3 md:grid-cols-4">
-          <Card><CardContent className="p-3"><p className="text-xs text-muted-foreground">Today's Total</p><p className="text-base font-bold">{filteredVisitors.length}</p></CardContent></Card>
-          <Card><CardContent className="p-3"><p className="text-xs text-muted-foreground">Currently Inside</p><p className="text-base font-bold text-green-600">{currentlyInside}</p></CardContent></Card>
-          <Card><CardContent className="p-3"><p className="text-xs text-muted-foreground">This Week</p><p className="text-base font-bold">{filteredVisitors.length}</p></CardContent></Card>
-          <Card><CardContent className="p-3"><p className="text-xs text-muted-foreground">Pending Approval</p><p className="text-base font-bold text-yellow-600">{pendingApproval}</p></CardContent></Card>
+        <div className="grid gap-2 sm:gap-3 grid-cols-2 md:grid-cols-4">
+          <Card><CardContent className="p-2 sm:p-3"><p className="text-[10px] sm:text-xs text-muted-foreground">Today's Total</p><p className="text-sm sm:text-base font-bold">{filteredVisitors.length}</p></CardContent></Card>
+          <Card><CardContent className="p-2 sm:p-3"><p className="text-[10px] sm:text-xs text-muted-foreground">Currently Inside</p><p className="text-sm sm:text-base font-bold text-green-600">{currentlyInside}</p></CardContent></Card>
+          <Card><CardContent className="p-2 sm:p-3"><p className="text-[10px] sm:text-xs text-muted-foreground">This Week</p><p className="text-sm sm:text-base font-bold">{filteredVisitors.length}</p></CardContent></Card>
+          <Card><CardContent className="p-2 sm:p-3"><p className="text-[10px] sm:text-xs text-muted-foreground">Pending Approval</p><p className="text-sm sm:text-base font-bold text-yellow-600">{pendingApproval}</p></CardContent></Card>
         </div>
 
         <Card>
-          <CardHeader>
-            <CardTitle>Live Logbook Data</CardTitle>
+          <CardHeader className="p-3 sm:p-6 pb-1.5 sm:pb-3">
+            <CardTitle className="text-sm sm:text-base font-bold">Live Logbook Data</CardTitle>
           </CardHeader>
-          <CardContent>
+          <CardContent className="p-3 sm:p-6 pt-0">
             {loading ? (
               <div className="flex justify-center py-8"><Loader2 className="h-8 w-8 animate-spin text-muted-foreground" /></div>
             ) : filteredVisitors.length === 0 ? (
-              <div className="text-center py-8 text-muted-foreground">No visitors logged yet. Click "Register Visitor" to start.</div>
+              <div className="text-center py-8 text-muted-foreground text-xs sm:text-sm">No visitors logged yet. Click "Register Visitor" to start.</div>
             ) : (
               <div className="overflow-x-auto overflow-y-hidden">
-                <table className="w-full min-w-[1000px]">
+                <table className="w-full min-w-[700px]">
                   <thead>
-                    <tr className="border-b">
-                      <th className="pb-3 text-left">Visitor Info</th>
-                      <th className="pb-3 text-left">Destination</th>
-                      <th className="pb-3 text-left">Vehicle Info</th>
-                      <th className="pb-3 text-left">Parking Slot</th>
-                      <th className="pb-3 text-left">Timing</th>
-                      <th className="pb-3 text-left">Status</th>
-                      <th className="pb-3 text-right">Actions</th>
+                    <tr className="border-b text-[11px] sm:text-xs font-semibold text-muted-foreground">
+                      <th className="py-2 px-2.5 text-left font-medium">Visitor Info</th>
+                      <th className="py-2 px-2.5 text-left font-medium">Destination</th>
+                      <th className="py-2 px-2.5 text-left font-medium">Vehicle Info</th>
+                      <th className="py-2 px-2.5 text-left font-medium">Parking Slot</th>
+                      <th className="py-2 px-2.5 text-left font-medium">Timing</th>
+                      <th className="py-2 px-2.5 text-left font-medium">Status</th>
+                      <th className="py-2 px-2.5 text-right font-medium">Actions</th>
                     </tr>
                   </thead>
                   <tbody>
                     {filteredVisitors.map((v) => (
                       <tr key={v.id} className="border-b hover:bg-gray-50">
-                        <td className="py-3">
-                          <p className="font-medium">{v.name}</p>
-                          <p className="text-xs text-muted-foreground">{v.phone} • {v.purpose}</p>
+                        <td className="py-2 px-2.5">
+                          <p className="font-medium text-xs sm:text-sm">{v.name}</p>
+                          <p className="text-[10px] sm:text-xs text-muted-foreground">{v.phone} • {v.purpose}</p>
                         </td>
-                        <td className="py-3 font-medium text-blue-700">{v.unitId}</td>
-                        <td className="py-3">
-                          <div className="flex flex-col gap-1">
-                            <Badge variant="outline" className="w-fit flex items-center">
+                        <td className="py-2 px-2.5 font-medium text-blue-700 text-xs sm:text-sm">{v.unitId}</td>
+                        <td className="py-2 px-2.5">
+                          <div className="flex flex-col gap-0.5">
+                            <Badge variant="outline" className="w-fit flex items-center text-[10px] sm:text-xs px-1.5 py-0.5">
                               {getVehicleIcon(v.vehicleType)}
                               {v.vehicleType ? v.vehicleType.charAt(0).toUpperCase() + v.vehicleType.slice(1) : 'Unknown'}
                             </Badge>
                             {v.vehicleType && v.vehicleType !== 'pedestrian' && (
-                              <div className="text-xs text-muted-foreground mt-0.5 font-medium">
+                              <div className="text-[10px] sm:text-xs text-muted-foreground font-medium">
                                 {v.province ? `${v.province} ` : ''}{v.licensePlate}
                                 {v.vehicleBrand ? ` • ${v.vehicleBrand}` : ''}
                                 {v.vehicleTypeDetail ? ` (${v.vehicleTypeDetail})` : ''}
@@ -450,47 +450,47 @@ export default function VisitorsPage() {
                             )}
                           </div>
                         </td>
-                        <td className="py-3">
+                        <td className="py-2 px-2.5">
                           {v.vehicleType !== 'pedestrian' && v.parkingSlot ? (
-                            <span className="font-semibold text-gray-700">{v.parkingSlot}</span>
+                            <span className="font-semibold text-gray-700 text-xs sm:text-sm">{v.parkingSlot}</span>
                           ) : (
-                            <span className="text-gray-400 font-normal">—</span>
+                            <span className="text-gray-400 font-normal text-xs sm:text-sm">—</span>
                           )}
                         </td>
-                        <td className="py-3">
+                        <td className="py-2 px-2.5">
                           {v.entryTime ? (
-                            <p className="text-xs"><span className="font-semibold">In:</span> {new Date(v.entryTime).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</p>
+                            <p className="text-[10px] sm:text-xs"><span className="font-semibold">In:</span> {new Date(v.entryTime).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</p>
                           ) : (
-                            <p className="text-xs text-yellow-600 font-medium">Expected Today</p>
+                            <p className="text-[10px] sm:text-xs text-yellow-600 font-medium">Expected Today</p>
                           )}
                           {v.exitTime && (
-                            <p className="text-xs text-gray-500"><span className="font-semibold">Out:</span> {new Date(v.exitTime).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</p>
+                            <p className="text-[10px] sm:text-xs text-gray-500"><span className="font-semibold">Out:</span> {new Date(v.exitTime).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</p>
                           )}
                         </td>
-                        <td className="py-3">
-                          <Badge variant={v.status === 'entered' ? 'success' : v.status === 'waiting' ? 'warning' : 'secondary'}>
+                        <td className="py-2 px-2.5">
+                          <Badge variant={v.status === 'entered' ? 'success' : v.status === 'waiting' ? 'warning' : 'secondary'} className="text-[10px] sm:text-xs px-1.5 py-0.5">
                             {v.status.toUpperCase()}
                           </Badge>
                         </td>
-                        <td className="py-3 text-right">
+                        <td className="py-2 px-2.5 text-right">
                           {v.status === 'waiting' && !isResident && (
-                            <Button size="sm" variant="outline" className="text-green-600 hover:text-green-700 hover:bg-green-50 border-green-200 mr-2" onClick={() => initiateCheckIn(v)}>
+                            <Button size="sm" variant="outline" className="h-7 text-xs px-2 sm:h-8 sm:px-3 text-green-600 hover:text-green-700 hover:bg-green-50 border-green-200 mr-2" onClick={() => initiateCheckIn(v)}>
                               Check In
                             </Button>
                           )}
                           {v.status === 'entered' ? (
                             !isResident ? (
-                              <Button size="sm" variant="outline" className="text-red-600 hover:text-red-700 hover:bg-red-50 border-red-200" onClick={() => handleCheckOut(v.id)}>
-                                <LogOut className="h-4 w-4 mr-1" />
+                              <Button size="sm" variant="outline" className="h-7 text-xs px-2 sm:h-8 sm:px-3 text-red-600 hover:text-red-700 hover:bg-red-50 border-red-200" onClick={() => handleCheckOut(v.id)}>
+                                <LogOut className="h-3.5 w-3.5 mr-1" />
                                 Check Out
                               </Button>
                             ) : (
-                              <span className="text-xs text-gray-500 italic">Inside</span>
+                              <span className="text-[10px] sm:text-xs text-gray-500 italic">Inside</span>
                             )
                           ) : v.status === 'exited' ? (
-                            <span className="text-xs text-gray-400">Completed</span>
+                            <span className="text-[10px] sm:text-xs text-gray-400">Completed</span>
                           ) : (
-                            isResident && <span className="text-xs text-gray-500 italic">Expected</span>
+                            isResident && <span className="text-[10px] sm:text-xs text-gray-500 italic">Expected</span>
                           )}
                         </td>
                       </tr>
