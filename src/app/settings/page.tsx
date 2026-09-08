@@ -162,166 +162,166 @@ export default function SettingsPage() {
 
   return (
     <DashboardLayout title="Settings">
-      <div className="space-y-6">
+      <div className="space-y-3 sm:space-y-6">
         <div>
-          <h2 className="text-lg sm:text-xl font-bold">Settings</h2>
-          <p className="text-xs text-muted-foreground">Manage your preferences and security</p>
+          <h2 className="text-sm sm:text-xl font-bold">Settings</h2>
+          <p className="text-[10px] sm:text-xs text-muted-foreground">Manage your preferences and security</p>
         </div>
 
         {isGlobalAdmin && (
           <>
-            <div className="border-b pb-2 mt-8">
-              <h3 className="text-xl font-semibold">System Configuration</h3>
-              <p className="text-sm text-muted-foreground">Global settings applied to all users and the apartment building.</p>
+            <div className="border-b pb-1.5 sm:pb-2 mt-4 sm:mt-8">
+              <h3 className="text-sm sm:text-xl font-semibold">System Configuration</h3>
+              <p className="text-[10px] sm:text-sm text-muted-foreground">Global settings applied to all users and the apartment building.</p>
             </div>
             
-            <div className="grid gap-6 md:grid-cols-2">
+            <div className="grid gap-3 sm:gap-6 md:grid-cols-2">
               <Card>
-                <CardHeader>
-                  <CardTitle>Apartment Information</CardTitle>
-                  <CardDescription>Basic information about the apartment</CardDescription>
+                <CardHeader className="p-3 sm:p-6 pb-1.5 sm:pb-3">
+                  <CardTitle className="text-xs sm:text-2xl font-semibold">Apartment Information</CardTitle>
+                  <CardDescription className="text-[10px] sm:text-sm">Basic information about the apartment</CardDescription>
                 </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="space-y-2">
-                    <Label>Apartment Name</Label>
-                    <Input value={globalSettings.apartmentName} onChange={(e) => handleChangeGlobal('apartmentName', e.target.value)} />
+                <CardContent className="p-3 sm:p-6 pt-0 space-y-2.5 sm:space-y-4">
+                  <div className="space-y-1 sm:space-y-2">
+                    <Label className="text-xs sm:text-sm">Apartment Name</Label>
+                    <Input className="h-8 text-xs sm:h-10 sm:text-sm" value={globalSettings.apartmentName} onChange={(e) => handleChangeGlobal('apartmentName', e.target.value)} />
                   </div>
-                  <div className="space-y-2">
-                    <Label>Address</Label>
-                    <Input value={globalSettings.address} onChange={(e) => handleChangeGlobal('address', e.target.value)} />
+                  <div className="space-y-1 sm:space-y-2">
+                    <Label className="text-xs sm:text-sm">Address</Label>
+                    <Input className="h-8 text-xs sm:h-10 sm:text-sm" value={globalSettings.address} onChange={(e) => handleChangeGlobal('address', e.target.value)} />
                   </div>
-                  <div className="space-y-2">
-                    <Label>Contact Phone</Label>
-                    <Input value={globalSettings.contactPhone} onChange={(e) => handleChangeGlobal('contactPhone', e.target.value)} />
+                  <div className="space-y-1 sm:space-y-2">
+                    <Label className="text-xs sm:text-sm">Contact Phone</Label>
+                    <Input className="h-8 text-xs sm:h-10 sm:text-sm" value={globalSettings.contactPhone} onChange={(e) => handleChangeGlobal('contactPhone', e.target.value)} />
                   </div>
-                  <Button onClick={handleSaveGlobal} disabled={savingGlobal}>{savingGlobal ? <Loader2 className="h-4 w-4 animate-spin mr-2"/> : null}Save Changes</Button>
+                  <Button className="h-8 text-xs sm:h-10 sm:text-sm" onClick={handleSaveGlobal} disabled={savingGlobal}>{savingGlobal ? <Loader2 className="h-3 w-3 sm:h-4 sm:w-4 animate-spin mr-2"/> : null}Save Changes</Button>
                 </CardContent>
               </Card>
 
               <Card>
-                <CardHeader>
-                  <CardTitle>Invoice Settings</CardTitle>
-                  <CardDescription>Configure global invoice generation</CardDescription>
+                <CardHeader className="p-3 sm:p-6 pb-1.5 sm:pb-3">
+                  <CardTitle className="text-xs sm:text-2xl font-semibold">Invoice Settings</CardTitle>
+                  <CardDescription className="text-[10px] sm:text-sm">Configure global invoice generation</CardDescription>
                 </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="space-y-2">
-                    <Label>Invoice Due Date</Label>
-                    <Input value={globalSettings.invoiceDueDate} onChange={(e) => handleChangeGlobal('invoiceDueDate', parseInt(e.target.value))} type="number" />
+                <CardContent className="p-3 sm:p-6 pt-0 space-y-2.5 sm:space-y-4">
+                  <div className="space-y-1 sm:space-y-2">
+                    <Label className="text-xs sm:text-sm">Invoice Due Date</Label>
+                    <Input className="h-8 text-xs sm:h-10 sm:text-sm" value={globalSettings.invoiceDueDate} onChange={(e) => handleChangeGlobal('invoiceDueDate', parseInt(e.target.value))} type="number" />
                   </div>
-                  <div className="space-y-2">
-                    <Label>Late Fee (%)</Label>
-                    <Input value={globalSettings.lateFeePercent} onChange={(e) => handleChangeGlobal('lateFeePercent', parseInt(e.target.value))} type="number" />
+                  <div className="space-y-1 sm:space-y-2">
+                    <Label className="text-xs sm:text-sm">Late Fee (%)</Label>
+                    <Input className="h-8 text-xs sm:h-10 sm:text-sm" value={globalSettings.lateFeePercent} onChange={(e) => handleChangeGlobal('lateFeePercent', parseInt(e.target.value))} type="number" />
                   </div>
                   <div className="flex items-center justify-between">
-                    <Label>Auto-generate Invoices</Label>
-                    <Switch checked={globalSettings.autoGenerateInvoices} onCheckedChange={(c) => handleChangeGlobal('autoGenerateInvoices', c)} />
+                    <Label className="text-xs sm:text-sm">Auto-generate Invoices</Label>
+                    <Switch className="scale-75 sm:scale-100 origin-right" checked={globalSettings.autoGenerateInvoices} onCheckedChange={(c) => handleChangeGlobal('autoGenerateInvoices', c)} />
                   </div>
-                  <div className="space-y-2 pt-2 border-t mt-2">
-                    <Label>Electricity Price Per Unit (Rs.)</Label>
-                    <Input value={globalSettings.electricityPricePerUnit || ''} onChange={(e) => handleChangeGlobal('electricityPricePerUnit', parseFloat(e.target.value) || 0)} type="number" />
-                    <p className="text-xs text-muted-foreground">This rate is used to calculate the monthly City electricity bills based on meter readings.</p>
+                  <div className="space-y-1 sm:space-y-2 pt-1.5 sm:pt-2 border-t mt-1.5 sm:mt-2">
+                    <Label className="text-xs sm:text-sm">Electricity Price Per Unit (Rs.)</Label>
+                    <Input className="h-8 text-xs sm:h-10 sm:text-sm" value={globalSettings.electricityPricePerUnit || ''} onChange={(e) => handleChangeGlobal('electricityPricePerUnit', parseFloat(e.target.value) || 0)} type="number" />
+                    <p className="text-[10px] sm:text-xs text-muted-foreground">This rate is used to calculate the monthly City electricity bills based on meter readings.</p>
                   </div>
-                  <div className="space-y-2 pt-2 border-t mt-2">
-                    <Label>Generator (DG) Price Per Unit (Rs.)</Label>
-                    <Input value={globalSettings.generatorPricePerUnit || ''} onChange={(e) => handleChangeGlobal('generatorPricePerUnit', parseFloat(e.target.value) || 0)} type="number" />
-                    <p className="text-xs text-muted-foreground">This rate is used to calculate the monthly Generator electricity bills based on meter readings.</p>
+                  <div className="space-y-1 sm:space-y-2 pt-1.5 sm:pt-2 border-t mt-1.5 sm:mt-2">
+                    <Label className="text-xs sm:text-sm">Generator (DG) Price Per Unit (Rs.)</Label>
+                    <Input className="h-8 text-xs sm:h-10 sm:text-sm" value={globalSettings.generatorPricePerUnit || ''} onChange={(e) => handleChangeGlobal('generatorPricePerUnit', parseFloat(e.target.value) || 0)} type="number" />
+                    <p className="text-[10px] sm:text-xs text-muted-foreground">This rate is used to calculate the monthly Generator electricity bills based on meter readings.</p>
                   </div>
-                  <div className="space-y-2 pt-2 border-t mt-2">
-                    <Label>Water Supply Flat Fee (Rs.)</Label>
-                    <Input value={globalSettings.waterSupplyFlatFee || ''} onChange={(e) => handleChangeGlobal('waterSupplyFlatFee', parseFloat(e.target.value) || 0)} type="number" />
-                    <p className="text-xs text-muted-foreground">This is the fixed monthly flat fee for Water Supply & Society Maintenance.</p>
+                  <div className="space-y-1 sm:space-y-2 pt-1.5 sm:pt-2 border-t mt-1.5 sm:mt-2">
+                    <Label className="text-xs sm:text-sm">Water Supply Flat Fee (Rs.)</Label>
+                    <Input className="h-8 text-xs sm:h-10 sm:text-sm" value={globalSettings.waterSupplyFlatFee || ''} onChange={(e) => handleChangeGlobal('waterSupplyFlatFee', parseFloat(e.target.value) || 0)} type="number" />
+                    <p className="text-[10px] sm:text-xs text-muted-foreground">This is the fixed monthly flat fee for Water Supply & Society Maintenance.</p>
                   </div>
-                  <div className="space-y-2 pt-2 border-t mt-2">
-                    <Label>Insurance Rate Per Sq Ft (Rs.)</Label>
-                    <Input value={globalSettings.insuranceRatePerSqFt || ''} onChange={(e) => handleChangeGlobal('insuranceRatePerSqFt', parseFloat(e.target.value) || 0)} type="number" />
-                    <p className="text-xs text-muted-foreground">This rate is used to calculate the Apartment Structure Insurance Contribution based on Unit area (Sq Ft).</p>
+                  <div className="space-y-1 sm:space-y-2 pt-1.5 sm:pt-2 border-t mt-1.5 sm:mt-2">
+                    <Label className="text-xs sm:text-sm">Insurance Rate Per Sq Ft (Rs.)</Label>
+                    <Input className="h-8 text-xs sm:h-10 sm:text-sm" value={globalSettings.insuranceRatePerSqFt || ''} onChange={(e) => handleChangeGlobal('insuranceRatePerSqFt', parseFloat(e.target.value) || 0)} type="number" />
+                    <p className="text-[10px] sm:text-xs text-muted-foreground">This rate is used to calculate the Apartment Structure Insurance Contribution based on Unit area (Sq Ft).</p>
                   </div>
-                  <div className="space-y-2 pt-2 border-t mt-2">
-                    <Label>Diesel Cost Sharing Flat Fee (Rs.)</Label>
-                    <Input value={globalSettings.dieselCostFlatFee || ''} onChange={(e) => handleChangeGlobal('dieselCostFlatFee', parseFloat(e.target.value) || 0)} type="number" />
-                    <p className="text-xs text-muted-foreground">This is the fixed monthly flat fee for Diesel Cost Sharing Standby pool.</p>
+                  <div className="space-y-1 sm:space-y-2 pt-1.5 sm:pt-2 border-t mt-1.5 sm:mt-2">
+                    <Label className="text-xs sm:text-sm">Diesel Cost Sharing Flat Fee (Rs.)</Label>
+                    <Input className="h-8 text-xs sm:h-10 sm:text-sm" value={globalSettings.dieselCostFlatFee || ''} onChange={(e) => handleChangeGlobal('dieselCostFlatFee', parseFloat(e.target.value) || 0)} type="number" />
+                    <p className="text-[10px] sm:text-xs text-muted-foreground">This is the fixed monthly flat fee for Diesel Cost Sharing Standby pool.</p>
                   </div>
-                  <div className="space-y-2 pt-2 border-t mt-2">
-                    <Label>Structure/Maintenance Rate Per Sq Ft (Rs.)</Label>
-                    <Input value={globalSettings.structureMaintenanceRatePerSqFt || ''} onChange={(e) => handleChangeGlobal('structureMaintenanceRatePerSqFt', parseFloat(e.target.value) || 0)} type="number" />
-                    <p className="text-xs text-muted-foreground">This rate is used to calculate the Monthly Service Charge per Sq Ft.</p>
+                  <div className="space-y-1 sm:space-y-2 pt-1.5 sm:pt-2 border-t mt-1.5 sm:mt-2">
+                    <Label className="text-xs sm:text-sm">Structure/Maintenance Rate Per Sq Ft (Rs.)</Label>
+                    <Input className="h-8 text-xs sm:h-10 sm:text-sm" value={globalSettings.structureMaintenanceRatePerSqFt || ''} onChange={(e) => handleChangeGlobal('structureMaintenanceRatePerSqFt', parseFloat(e.target.value) || 0)} type="number" />
+                    <p className="text-[10px] sm:text-xs text-muted-foreground">This rate is used to calculate the Monthly Service Charge per Sq Ft.</p>
                   </div>
-                  <div className="space-y-2 pt-2 border-t mt-2">
-                    <Label>Other Charges Flat Fee (Rs.)</Label>
-                    <Input value={globalSettings.otherChargesFlatFee || ''} onChange={(e) => handleChangeGlobal('otherChargesFlatFee', parseFloat(e.target.value) || 0)} type="number" />
-                    <p className="text-xs text-muted-foreground">This is the fixed monthly flat fee for Other Charges.</p>
+                  <div className="space-y-1 sm:space-y-2 pt-1.5 sm:pt-2 border-t mt-1.5 sm:mt-2">
+                    <Label className="text-xs sm:text-sm">Other Charges Flat Fee (Rs.)</Label>
+                    <Input className="h-8 text-xs sm:h-10 sm:text-sm" value={globalSettings.otherChargesFlatFee || ''} onChange={(e) => handleChangeGlobal('otherChargesFlatFee', parseFloat(e.target.value) || 0)} type="number" />
+                    <p className="text-[10px] sm:text-xs text-muted-foreground">This is the fixed monthly flat fee for Other Charges.</p>
                   </div>
-                  <div className="flex items-center justify-between pt-2 border-t mt-2">
-                    <Label>Send Email Reminders</Label>
-                    <Switch checked={globalSettings.sendEmailReminders} onCheckedChange={(c) => handleChangeGlobal('sendEmailReminders', c)} />
+                  <div className="flex items-center justify-between pt-1.5 sm:pt-2 border-t mt-1.5 sm:mt-2">
+                    <Label className="text-xs sm:text-sm">Send Email Reminders</Label>
+                    <Switch className="scale-75 sm:scale-100 origin-right" checked={globalSettings.sendEmailReminders} onCheckedChange={(c) => handleChangeGlobal('sendEmailReminders', c)} />
                   </div>
-                  <Button onClick={handleSaveGlobal} disabled={savingGlobal}>{savingGlobal ? <Loader2 className="h-4 w-4 animate-spin mr-2"/> : null}Save Changes</Button>
+                  <Button className="h-8 text-xs sm:h-10 sm:text-sm" onClick={handleSaveGlobal} disabled={savingGlobal}>{savingGlobal ? <Loader2 className="h-3 w-3 sm:h-4 sm:w-4 animate-spin mr-2"/> : null}Save Changes</Button>
                 </CardContent>
               </Card>
             </div>
           </>
         )}
 
-        <div className="border-b pb-2 mt-8">
-          <h3 className="text-xl font-semibold">Personal Preferences</h3>
-          <p className="text-sm text-muted-foreground">Manage your personal notifications and account security.</p>
+        <div className="border-b pb-1.5 sm:pb-2 mt-4 sm:mt-8">
+          <h3 className="text-sm sm:text-xl font-semibold">Personal Preferences</h3>
+          <p className="text-[10px] sm:text-sm text-muted-foreground">Manage your personal notifications and account security.</p>
         </div>
 
-        <div className="grid gap-6 md:grid-cols-2">
+        <div className="grid gap-3 sm:gap-6 md:grid-cols-2">
           <Card>
-            <CardHeader>
-              <CardTitle>Notification Settings</CardTitle>
-              <CardDescription>Configure how you receive alerts</CardDescription>
+            <CardHeader className="p-3 sm:p-6 pb-1.5 sm:pb-3">
+              <CardTitle className="text-xs sm:text-2xl font-semibold">Notification Settings</CardTitle>
+              <CardDescription className="text-[10px] sm:text-sm">Configure how you receive alerts</CardDescription>
             </CardHeader>
-            <CardContent className="space-y-4">
+            <CardContent className="p-3 sm:p-6 pt-0 space-y-2.5 sm:space-y-4">
               <div className="flex items-center justify-between">
-                <Label>Email Notifications</Label>
-                <Switch checked={userSettings.emailNotifications} onCheckedChange={(c) => handleChangeUser('emailNotifications', c)} />
+                <Label className="text-xs sm:text-sm">Email Notifications</Label>
+                <Switch className="scale-75 sm:scale-100 origin-right" checked={userSettings.emailNotifications} onCheckedChange={(c) => handleChangeUser('emailNotifications', c)} />
               </div>
               <div className="flex items-center justify-between">
-                <Label>SMS Notifications</Label>
-                <Switch checked={userSettings.smsNotifications} onCheckedChange={(c) => handleChangeUser('smsNotifications', c)} />
+                <Label className="text-xs sm:text-sm">SMS Notifications</Label>
+                <Switch className="scale-75 sm:scale-100 origin-right" checked={userSettings.smsNotifications} onCheckedChange={(c) => handleChangeUser('smsNotifications', c)} />
               </div>
               <div className="flex items-center justify-between">
-                <Label>Push Notifications</Label>
-                <Switch checked={userSettings.pushNotifications} onCheckedChange={(c) => handleChangeUser('pushNotifications', c)} />
+                <Label className="text-xs sm:text-sm">Push Notifications</Label>
+                <Switch className="scale-75 sm:scale-100 origin-right" checked={userSettings.pushNotifications} onCheckedChange={(c) => handleChangeUser('pushNotifications', c)} />
               </div>
-              <Button onClick={handleSaveUser} disabled={savingUser}>{savingUser ? <Loader2 className="h-4 w-4 animate-spin mr-2"/> : null}Save Preferences</Button>
+              <Button className="h-8 text-xs sm:h-10 sm:text-sm" onClick={handleSaveUser} disabled={savingUser}>{savingUser ? <Loader2 className="h-3 w-3 sm:h-4 sm:w-4 animate-spin mr-2"/> : null}Save Preferences</Button>
             </CardContent>
           </Card>
 
           <Card>
-            <CardHeader>
-              <CardTitle>Security Settings</CardTitle>
-              <CardDescription>Manage your account security and password</CardDescription>
+            <CardHeader className="p-3 sm:p-6 pb-1.5 sm:pb-3">
+              <CardTitle className="text-xs sm:text-2xl font-semibold">Security Settings</CardTitle>
+              <CardDescription className="text-[10px] sm:text-sm">Manage your account security and password</CardDescription>
             </CardHeader>
-            <CardContent className="space-y-6">
-              <div className="space-y-4">
+            <CardContent className="p-3 sm:p-6 pt-0 space-y-3 sm:space-y-6">
+              <div className="space-y-2.5 sm:space-y-4">
                 <div className="flex items-center justify-between">
-                  <Label>Two-Factor Authentication</Label>
-                  <Switch checked={userSettings.twoFactorAuth} onCheckedChange={(c) => handleChangeUser('twoFactorAuth', c)} />
+                  <Label className="text-xs sm:text-sm">Two-Factor Authentication</Label>
+                  <Switch className="scale-75 sm:scale-100 origin-right" checked={userSettings.twoFactorAuth} onCheckedChange={(c) => handleChangeUser('twoFactorAuth', c)} />
                 </div>
                 <div className="flex items-center justify-between">
-                  <Label>Session Timeout (minutes)</Label>
-                  <Input value={userSettings.sessionTimeout} onChange={(e) => handleChangeUser('sessionTimeout', parseInt(e.target.value))} type="number" className="w-20" />
+                  <Label className="text-xs sm:text-sm">Session Timeout (minutes)</Label>
+                  <Input value={userSettings.sessionTimeout} onChange={(e) => handleChangeUser('sessionTimeout', parseInt(e.target.value))} type="number" className="w-16 h-8 text-xs sm:w-20 sm:h-10 sm:text-sm" />
                 </div>
-                <Button onClick={handleSaveUser} disabled={savingUser} variant="outline" className="w-full">{savingUser ? <Loader2 className="h-4 w-4 animate-spin mr-2"/> : null}Save Security Preferences</Button>
+                <Button onClick={handleSaveUser} disabled={savingUser} variant="outline" className="w-full h-8 text-xs sm:h-10 sm:text-sm">{savingUser ? <Loader2 className="h-3 w-3 sm:h-4 sm:w-4 animate-spin mr-2"/> : null}Save Security Preferences</Button>
               </div>
               
-              <div className="border-t pt-4 space-y-4">
-                <Label className="text-lg font-medium">Change Password</Label>
-                {passwordError && <p className="text-sm text-red-500">{passwordError}</p>}
-                {passwordSuccess && <p className="text-sm text-green-500">{passwordSuccess}</p>}
-                <div className="space-y-2">
-                  <Label>New Password</Label>
-                  <Input type="password" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} />
+              <div className="border-t pt-3 sm:pt-4 space-y-2.5 sm:space-y-4">
+                <Label className="text-xs sm:text-lg font-medium">Change Password</Label>
+                {passwordError && <p className="text-[10px] sm:text-sm text-red-500">{passwordError}</p>}
+                {passwordSuccess && <p className="text-[10px] sm:text-sm text-green-500">{passwordSuccess}</p>}
+                <div className="space-y-1 sm:space-y-2">
+                  <Label className="text-xs sm:text-sm">New Password</Label>
+                  <Input type="password" className="h-8 text-xs sm:h-10 sm:text-sm" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} />
                 </div>
-                <div className="space-y-2">
-                  <Label>Confirm New Password</Label>
-                  <Input type="password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} />
+                <div className="space-y-1 sm:space-y-2">
+                  <Label className="text-xs sm:text-sm">Confirm New Password</Label>
+                  <Input type="password" className="h-8 text-xs sm:h-10 sm:text-sm" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} />
                 </div>
-                <Button onClick={handleChangePassword} disabled={savingPassword} className="w-full">
-                  {savingPassword ? <Loader2 className="h-4 w-4 animate-spin mr-2"/> : null}
+                <Button onClick={handleChangePassword} disabled={savingPassword} className="w-full h-8 text-xs sm:h-10 sm:text-sm">
+                  {savingPassword ? <Loader2 className="h-3 w-3 sm:h-4 sm:w-4 animate-spin mr-2"/> : null}
                   Update Password
                 </Button>
               </div>
