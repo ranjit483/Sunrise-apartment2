@@ -15,7 +15,8 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { Badge } from '@/components/ui/badge'
 import { getInitials } from '@/lib/utils'
-import { Bell, Moon, Sun, LogOut, User, Settings, Menu } from 'lucide-react'
+import { Moon, Sun, LogOut, User, Settings, Menu } from 'lucide-react'
+import { NotificationBell } from '@/components/notifications/NotificationBell'
 
 interface NavbarProps {
   title?: string
@@ -40,7 +41,7 @@ export function Navbar({ title, setMobileOpen }: NavbarProps) {
         {title && <h1 className="text-sm sm:text-xl font-semibold truncate max-w-[220px] sm:max-w-none">{title}</h1>}
       </div>
 
-      <div className="flex items-center gap-4">
+      <div className="flex items-center gap-2 sm:gap-4">
         <Button
           variant="ghost"
           size="icon"
@@ -53,12 +54,8 @@ export function Navbar({ title, setMobileOpen }: NavbarProps) {
           )}
         </Button>
 
-        <Button variant="ghost" size="icon" className="relative">
-          <Bell className="h-5 w-5" />
-          <Badge className="absolute -top-1 -right-1 h-5 w-5 p-0 flex items-center justify-center text-xs">
-            3
-          </Badge>
-        </Button>
+        <NotificationBell />
+
 
         <DropdownMenu>
           <DropdownMenuTrigger asChild>

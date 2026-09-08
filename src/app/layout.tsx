@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from 'next'
 import { Inter } from 'next/font/google'
 import './globals.css'
 import { AuthProvider } from '@/context/AuthContext'
+import { NotificationProvider } from '@/context/NotificationContext'
 import { ThemeProvider } from '@/components/ThemeProvider'
 import { PWARegister } from '@/components/PWARegister'
 
@@ -55,7 +56,9 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <AuthProvider>{children}</AuthProvider>
+          <AuthProvider>
+            <NotificationProvider>{children}</NotificationProvider>
+          </AuthProvider>
         </ThemeProvider>
       </body>
     </html>

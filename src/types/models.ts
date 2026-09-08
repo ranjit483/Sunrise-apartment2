@@ -202,3 +202,35 @@ export interface UserSettings {
   twoFactorAuth: boolean
   sessionTimeout: number
 }
+
+export type NotificationType = 
+  | 'announcement'
+  | 'billing'
+  | 'maintenance'
+  | 'visitor'
+  | 'security'
+  | 'complaint'
+  | 'system'
+
+export type NotificationPriority = 'low' | 'normal' | 'high' | 'urgent'
+
+export type NotificationTargetType = 'all' | 'role' | 'individual' | 'unit'
+
+export interface AppNotification {
+  id: string
+  title: string
+  body: string
+  type: NotificationType
+  priority: NotificationPriority
+  targetType: NotificationTargetType
+  targetRoles?: string[]
+  targetUserId?: string
+  targetUnit?: string
+  link?: string
+  readBy: string[]
+  senderId: string
+  senderName: string
+  createdAt: string
+  data?: Record<string, any>
+}
+

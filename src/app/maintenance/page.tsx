@@ -17,6 +17,7 @@ import {
   Wrench, CheckCircle, Clock, AlertTriangle, Plus, User, MapPin, 
   Sparkles, Package, ListFilter, Calendar, DollarSign, X, ChevronRight, Activity, FileText, Loader2
 } from 'lucide-react'
+import { sendNotification } from '@/lib/notifications'
 
 const priorityColors: Record<string, string> = { 
   critical: 'bg-rose-100 text-rose-800 border-rose-200', 
@@ -231,6 +232,22 @@ export default function MaintenancePage() {
 
       await addDoc(collection(db, 'maintenance'), newTicket)
 
+      // Notify staff and management of new maintenance ticket
+      try {
+        await sendNotification({
+          title: `🔧 New Maintenance: ${title}`,
+          body: `${profile.fullName} submitted a ${priority} priority ticket: ${description.slice(0, 80)}...`,
+          type: 'maintenance',
+          priority: priority === 'critical' ? 'urgent' : priority === 'high' ? 'high' : 'normal',
+          targetType: 'role',
+          targetRoles: ['PLUMBER', 'ELECTRICIAN', 'CLEANER', 'GENERAL_STAFF', 'MANAGER', 'SUPER_ADMIN'],
+          link: '/maintenance',
+          senderName: profile.fullName,
+        })
+      } catch (err) {
+        console.error('Failed to dispatch maintenance notification:', err)
+      }
+
       // Reset
       setTitle('')
       setDescription('')
@@ -256,6 +273,23 @@ export default function MaintenancePage() {
         assignedTo: tech.fullName,
         updatedAt: new Date().toISOString()
       })
+
+      // Notify the reporting resident that technician has been assigned
+      try {
+        await sendNotification({
+          title: `🔧 Technician Assigned: ${currentTicket.title}`,
+          body: `${tech.fullName} has been assigned to your ticket (${currentTicket.ticketNo || ''}) and is in progress.`,
+          type: 'maintenance',
+          priority: 'normal',
+          targetType: 'individual',
+          targetUserId: currentTicket.reportedBy,
+          link: '/maintenance',
+          senderName: profile?.fullName || 'Maintenance Dept',
+        })
+      } catch (err) {
+        console.error('Failed to dispatch technician assigned notification:', err)
+      }
+
       setIsAssignOpen(false)
     } catch (error) {
       console.error('Error assigning technician:', error)

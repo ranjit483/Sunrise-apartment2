@@ -17,6 +17,7 @@ import {
   AlertTriangle, CheckCircle, Clock, Plus, User, Info, 
   Sparkles, FileText, ListFilter, Calendar, X, ChevronRight, MessageSquare, ShieldAlert, Loader2
 } from 'lucide-react'
+import { sendNotification } from '@/lib/notifications'
 
 const categoryIcons: Record<string, any> = {
   Noise: ShieldAlert,
@@ -147,6 +148,22 @@ export default function ComplaintsPage() {
 
       await addDoc(collection(db, 'complaints'), newTicket)
 
+      // Notify Management of new grievance / complaint
+      try {
+        await sendNotification({
+          title: `📝 New Complaint: ${title}`,
+          body: `${profile.fullName} logged a grievance under ${category || 'General'}: ${description.slice(0, 80)}...`,
+          type: 'complaint',
+          priority: 'high',
+          targetType: 'role',
+          targetRoles: ['SUPER_ADMIN', 'MANAGER', 'OFFICE_ASSISTANT'],
+          link: '/complaints',
+          senderName: profile.fullName,
+        })
+      } catch (err) {
+        console.error('Complaint notification error:', err)
+      }
+
       // Reset
       setTitle('')
       setDescription('')
@@ -171,6 +188,23 @@ export default function ComplaintsPage() {
         adminRemarks,
         updatedAt: new Date().toISOString()
       })
+
+      // Notify resident about complaint resolution / status change
+      try {
+        await sendNotification({
+          title: `📝 Complaint Update: ${activeComplaint.title}`,
+          body: `Status updated to ${newStatus.toUpperCase()}.${adminRemarks ? ` Remarks: ${adminRemarks}` : ''}`,
+          type: 'complaint',
+          priority: newStatus === 'resolved' ? 'normal' : 'high',
+          targetType: 'individual',
+          targetUserId: activeComplaint.tenantId,
+          link: '/complaints',
+          senderName: profile?.fullName || 'Society Management',
+        })
+      } catch (err) {
+        console.error('Failed to dispatch complaint status notification:', err)
+      }
+
       setIsActionOpen(false)
       setAdminRemarks('')
     } catch (error) {

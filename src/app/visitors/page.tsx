@@ -14,6 +14,7 @@ import { collection, onSnapshot, query, orderBy, addDoc, updateDoc, doc } from '
 import { useAuth } from '@/context/AuthContext'
 import { Visitor } from '@/types/models'
 import { Loader2, Car, User, LogOut, Bike } from 'lucide-react'
+import { sendNotification } from '@/lib/notifications'
 
 const TOWER_UNITS: Record<string, string[]> = {
   'Tower A': [
@@ -141,6 +142,24 @@ export default function VisitorsPage() {
 
       await addDoc(collection(db, 'visitors'), newVisitor)
       
+      // Dispatch live notification to resident unit
+      if (hostUnit) {
+        try {
+          await sendNotification({
+            title: `👤 Visitor Arrival: ${name}`,
+            body: `${name} has arrived at the Main Gate for Unit ${hostUnit} (${purpose || 'Visit'}).`,
+            type: 'visitor',
+            priority: 'high',
+            targetType: 'unit',
+            targetUnit: hostUnit,
+            link: '/visitors',
+            senderName: profile?.fullName || 'Gate Security Guard',
+          })
+        } catch (notifErr) {
+          console.error('Visitor notification error:', notifErr)
+        }
+      }
+
       // Reset form
       setName('')
       if (!isResident) {

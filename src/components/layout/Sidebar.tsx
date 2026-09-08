@@ -40,6 +40,7 @@ interface NavItem {
 
 const navItems: NavItem[] = [
   { title: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
+  { title: 'Notifications', href: '/notifications', icon: Bell },
   { title: 'User Approvals', href: '/admin-approve', icon: UserPlus, roles: ['SUPER_ADMIN', 'MANAGER'] },
   { title: 'Buildings', href: '/buildings', icon: Building2, minClearance: 3 },
   { title: 'Units', href: '/units', icon: Home, minClearance: 4, excludeRoles: ['RESIDENT', 'TENANT', 'OWNER'] },
