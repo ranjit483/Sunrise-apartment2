@@ -699,57 +699,57 @@ export default function InvoicesPage() {
         </div>
 
         <Card>
-          <CardHeader className="flex flex-row items-center justify-between">
-            <CardTitle>All Invoices</CardTitle>
-            <div className="flex items-center gap-3">
+          <CardHeader className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 py-3">
+            <CardTitle className="text-sm sm:text-base font-bold whitespace-nowrap">All Invoices</CardTitle>
+            <div className="flex flex-wrap sm:flex-nowrap items-center gap-2 w-full sm:w-auto">
               <Select value={statusFilter} onValueChange={setStatusFilter}>
-                <SelectTrigger className="w-[160px] bg-white">
+                <SelectTrigger className="w-full sm:w-[130px] h-8 text-xs bg-white">
                   <SelectValue placeholder="Status" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">All Statuses</SelectItem>
-                  <SelectItem value="draft">Draft</SelectItem>
-                  <SelectItem value="pending">Pending</SelectItem>
-                  <SelectItem value="paid">Paid</SelectItem>
-                  <SelectItem value="partial">Partial</SelectItem>
-                  <SelectItem value="overdue">Overdue</SelectItem>
-                  <SelectItem value="carried_forward">Carried Forward</SelectItem>
+                  <SelectItem value="all" className="text-xs">All Statuses</SelectItem>
+                  <SelectItem value="draft" className="text-xs">Draft</SelectItem>
+                  <SelectItem value="pending" className="text-xs">Pending</SelectItem>
+                  <SelectItem value="paid" className="text-xs">Paid</SelectItem>
+                  <SelectItem value="partial" className="text-xs">Partial</SelectItem>
+                  <SelectItem value="overdue" className="text-xs">Overdue</SelectItem>
+                  <SelectItem value="carried_forward" className="text-xs">Carried Forward</SelectItem>
                 </SelectContent>
               </Select>
-              <div className="relative w-64">
-                <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+              <div className="relative w-full sm:w-52">
+                <Search className="absolute left-2.5 top-2.5 h-3.5 w-3.5 text-muted-foreground" />
                 <Input
                   placeholder="Search invoices..."
-                  className="pl-8 bg-white"
+                  className="pl-8 h-8 text-xs bg-white"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                 />
               </div>
             </div>
           </CardHeader>
-          <CardContent>
+          <CardContent className="pt-0">
             {loading ? (
               <div className="flex justify-center py-8"><Loader2 className="h-8 w-8 animate-spin text-muted-foreground" /></div>
             ) : invoices.length === 0 ? (
               <div className="text-center py-8 text-muted-foreground">No invoices found. Generate invoices to get started.</div>
             ) : (
               <div className="overflow-auto max-h-[calc(100vh-280px)] border rounded-md">
-                <table className="w-full min-w-[1200px] text-sm relative">
+                <table className="w-full min-w-[1200px] text-xs relative">
                   <thead className="sticky top-0 bg-gray-50 shadow-sm z-10">
                     <tr className="border-b">
-                      <th className="py-3 px-3 text-left whitespace-nowrap">Invoice ID</th>
-                      <th className="py-3 px-3 text-left whitespace-nowrap">Unit</th>
-                      <th className="py-3 px-3 text-left whitespace-nowrap">Resident/Tenant</th>
-                      <th className="py-3 px-3 text-left whitespace-nowrap">Month</th>
-                      <th className="py-3 px-3 text-left whitespace-nowrap">Due Date</th>
-                      <th className="py-3 px-3 text-left whitespace-nowrap">Service Charge</th>
-                      <th className="py-3 px-3 text-left whitespace-nowrap">Electricity</th>
-                      <th className="py-3 px-3 text-left whitespace-nowrap">Water</th>
-                      <th className="py-3 px-3 text-left whitespace-nowrap">Insurance</th>
-                      <th className="py-3 px-3 text-left whitespace-nowrap">Other</th>
-                      <th className="py-3 px-3 text-left whitespace-nowrap">Total</th>
-                      <th className="py-3 px-3 text-left whitespace-nowrap">Status</th>
-                      <th className="py-3 px-3 text-left whitespace-nowrap">Actions</th>
+                      <th className="py-2 px-2.5 text-left whitespace-nowrap font-semibold text-gray-600">Invoice ID</th>
+                      <th className="py-2 px-2.5 text-left whitespace-nowrap font-semibold text-gray-600">Unit</th>
+                      <th className="py-2 px-2.5 text-left whitespace-nowrap font-semibold text-gray-600">Resident/Tenant</th>
+                      <th className="py-2 px-2.5 text-left whitespace-nowrap font-semibold text-gray-600">Month</th>
+                      <th className="py-2 px-2.5 text-left whitespace-nowrap font-semibold text-gray-600">Due Date</th>
+                      <th className="py-2 px-2.5 text-left whitespace-nowrap font-semibold text-gray-600">Service Charge</th>
+                      <th className="py-2 px-2.5 text-left whitespace-nowrap font-semibold text-gray-600">Electricity</th>
+                      <th className="py-2 px-2.5 text-left whitespace-nowrap font-semibold text-gray-600">Water</th>
+                      <th className="py-2 px-2.5 text-left whitespace-nowrap font-semibold text-gray-600">Insurance</th>
+                      <th className="py-2 px-2.5 text-left whitespace-nowrap font-semibold text-gray-600">Other</th>
+                      <th className="py-2 px-2.5 text-left whitespace-nowrap font-semibold text-gray-600">Total</th>
+                      <th className="py-2 px-2.5 text-left whitespace-nowrap font-semibold text-gray-600">Status</th>
+                      <th className="py-2 px-2.5 text-left whitespace-nowrap font-semibold text-gray-600">Actions</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -757,13 +757,13 @@ export default function InvoicesPage() {
                       const total = inv.amount + (inv.electricityAmount || 0) + (inv.generatorAmount || 0) + (inv.utilityAmount || 0) + (inv.waterAmount || 0) + (inv.insuranceAmount || 0) + (inv.dieselAmount || 0) + (inv.structureMaintenanceAmount || 0) + (inv.otherAmount || 0) + (inv.previousPendingOutstandingDue || 0) + (inv.latePenaltyAmount || 0) + (inv.electricityVatAmount || 0)
                       return (
                         <tr key={inv.id} className="border-b hover:bg-gray-50/50">
-                          <td className="py-3 px-3 font-medium whitespace-nowrap">{inv.id.substring(0, 8)}...</td>
-                          <td className="py-3 px-3 font-semibold text-gray-700 whitespace-nowrap">{inv.unitNumber || (inv.unitId !== 'N/A' ? inv.unitId.substring(0,8) + '...' : 'N/A')}</td>
-                          <td className="py-3 px-3 whitespace-nowrap">{formatTenantName(inv.tenantName, inv.tenantId)}</td>
-                          <td className="py-3 px-3 whitespace-nowrap">{inv.month}</td>
-                          <td className="py-3 px-3 whitespace-nowrap">{inv.dueDate}</td>
-                          <td className="py-3 px-3 whitespace-nowrap">₨ {inv.amount.toLocaleString()}</td>
-                          <td className="py-3 px-3 whitespace-nowrap">
+                          <td className="py-2 px-2.5 font-medium whitespace-nowrap">{inv.id.substring(0, 8)}...</td>
+                          <td className="py-2 px-2.5 font-semibold text-gray-700 whitespace-nowrap">{inv.unitNumber || (inv.unitId !== 'N/A' ? inv.unitId.substring(0,8) + '...' : 'N/A')}</td>
+                          <td className="py-2 px-2.5 whitespace-nowrap">{formatTenantName(inv.tenantName, inv.tenantId)}</td>
+                          <td className="py-2 px-2.5 whitespace-nowrap">{inv.month}</td>
+                          <td className="py-2 px-2.5 whitespace-nowrap">{inv.dueDate}</td>
+                          <td className="py-2 px-2.5 whitespace-nowrap">₨ {inv.amount.toLocaleString()}</td>
+                          <td className="py-2 px-2.5 whitespace-nowrap">
                             <div className="font-medium">₨ {((inv.electricityAmount || 0) + (inv.generatorAmount || 0)).toLocaleString()}</div>
                             {(inv.electricityReading || inv.electricityPreviousReading || inv.electricityConsumed) ? (
                               <div className="text-[10px] text-gray-500 mt-0.5">
@@ -771,10 +771,10 @@ export default function InvoicesPage() {
                               </div>
                             ) : null}
                           </td>
-                          <td className="py-3 px-3 whitespace-nowrap">₨ {(inv.waterAmount || 0).toLocaleString()}</td>
-                          <td className="py-3 px-3 whitespace-nowrap">₨ {(inv.insuranceAmount || 0).toLocaleString()}</td>
-                          <td className="py-3 px-3 whitespace-nowrap">₨ {(inv.otherAmount || 0).toLocaleString()}</td>
-                          <td className="py-3 px-3 font-semibold text-indigo-700 whitespace-nowrap">
+                          <td className="py-2 px-2.5 whitespace-nowrap">₨ {(inv.waterAmount || 0).toLocaleString()}</td>
+                          <td className="py-2 px-2.5 whitespace-nowrap">₨ {(inv.insuranceAmount || 0).toLocaleString()}</td>
+                          <td className="py-2 px-2.5 whitespace-nowrap">₨ {(inv.otherAmount || 0).toLocaleString()}</td>
+                          <td className="py-2 px-2.5 font-semibold text-indigo-700 whitespace-nowrap">
                             ₨ {total.toLocaleString()}
                             {inv.paidAmount ? (
                               <div className="text-[10px] text-gray-500 font-normal">
@@ -782,32 +782,32 @@ export default function InvoicesPage() {
                               </div>
                             ) : null}
                           </td>
-                          <td className="py-3 px-3 whitespace-nowrap">
-                            <Badge variant="outline" className={`${statusColors[inv.status] || ''} font-semibold uppercase text-xs px-2 py-0.5 rounded-full`}>
+                          <td className="py-2 px-2.5 whitespace-nowrap">
+                            <Badge variant="outline" className={`${statusColors[inv.status] || ''} font-semibold uppercase text-[10px] px-2 py-0.5 rounded-full`}>
                               {inv.status}
                             </Badge>
                           </td>
-                          <td className="py-3 px-3 whitespace-nowrap">
-                            <div className="flex gap-1.5 items-center">
+                          <td className="py-2 px-2.5 whitespace-nowrap">
+                            <div className="flex gap-1 items-center">
                               <Button 
                                 variant="ghost" 
                                 size="sm" 
-                                className="h-8 w-8 p-0" 
+                                className="h-7 w-7 p-0" 
                                 onClick={() => openViewBillModal(inv)} 
                                 title="View/Print Bill"
                               >
-                                <Eye className="h-4 w-4 text-indigo-600 hover:text-indigo-800" />
+                                <Eye className="h-3.5 w-3.5 text-indigo-600 hover:text-indigo-800" />
                               </Button>
 
                               {inv.status === 'draft' && canManageInvoices && (
                                 <Button 
                                   variant="ghost" 
                                   size="sm" 
-                                  className="h-8 w-8 p-0" 
+                                  className="h-7 w-7 p-0" 
                                   onClick={() => openEditModal(inv)} 
                                   title="Edit Draft"
                                 >
-                                  <Edit2 className="h-4 w-4 text-blue-500 hover:text-blue-700" />
+                                  <Edit2 className="h-3.5 w-3.5 text-blue-500 hover:text-blue-700" />
                                 </Button>
                               )}
 
@@ -815,11 +815,11 @@ export default function InvoicesPage() {
                                 <Button 
                                   variant="ghost" 
                                   size="sm" 
-                                  className="h-8 w-8 p-0" 
+                                  className="h-7 w-7 p-0" 
                                   onClick={() => handleDeleteDraft(inv.id)} 
                                   title="Delete Draft"
                                 >
-                                  <Trash2 className="h-4 w-4 text-red-500 hover:text-red-700" />
+                                  <Trash2 className="h-3.5 w-3.5 text-red-500 hover:text-red-700" />
                                 </Button>
                               )}
 
