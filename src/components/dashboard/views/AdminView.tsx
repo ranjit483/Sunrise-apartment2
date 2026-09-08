@@ -96,35 +96,35 @@ export function AdminView({ profile }: { profile: any }) {
   ]
 
   return (
-    <div className="space-y-6">
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+    <div className="space-y-4 sm:space-y-6">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-3 sm:gap-4">
         <div>
-          <h2 className="text-xl md:text-2xl font-bold tracking-tight">
+          <h2 className="text-sm sm:text-2xl font-bold tracking-tight">
             Welcome back, {profile?.fullName?.split(' ')[0] || 'Admin'}!
-            <Badge variant="secondary" className="ml-2 align-middle bg-green-100 text-green-800 hover:bg-green-100">
+            <Badge variant="secondary" className="ml-2 align-middle bg-green-100 text-green-800 hover:bg-green-100 text-[10px] sm:text-xs px-1.5 py-0.5">
               {profile?.role}
             </Badge>
           </h2>
-          <p className="text-muted-foreground mt-1 text-sm md:text-base">
+          <p className="text-muted-foreground mt-0.5 text-xs sm:text-base">
             Here's the current overview of Sunrise Apartment.
           </p>
         </div>
-        <div className="flex flex-wrap gap-2 w-full md:w-auto mt-2 md:mt-0">
+        <div className="flex flex-wrap gap-2 w-full md:w-auto mt-1 sm:mt-2 md:mt-0">
           {profile?.role === 'SUPER_ADMIN' && <SeedButton />}
-          <Button variant="outline" className="flex-1 md:flex-none h-9 text-sm">Export Reports</Button>
-          <Button className="flex-1 md:flex-none bg-emerald-400 hover:bg-emerald-500 text-black h-9 text-sm">Generate Invoice</Button>
+          <Button variant="outline" className="flex-1 md:flex-none h-8 text-xs sm:h-9 sm:text-sm">Export Reports</Button>
+          <Button className="flex-1 md:flex-none bg-emerald-400 hover:bg-emerald-500 text-black h-8 text-xs sm:h-9 sm:text-sm font-medium">Generate Invoice</Button>
         </div>
       </div>
 
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-8">
+      <div className="grid gap-2 sm:gap-4 grid-cols-2 md:grid-cols-4 lg:grid-cols-4 xl:grid-cols-8">
         {kpis.map((kpi, index) => (
-          <Card key={index} className="col-span-2">
-            <CardContent className="p-4">
+          <Card key={index} className="col-span-1 md:col-span-2">
+            <CardContent className="p-2.5 sm:p-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-xs text-muted-foreground font-medium">{kpi.title}</p>
-                  <p className="text-lg md:text-xl font-bold mt-0.5">{kpi.value}</p>
-                  <div className="flex items-center gap-1 mt-1">
+                  <p className="text-[10px] sm:text-xs text-muted-foreground font-medium">{kpi.title}</p>
+                  <p className="text-sm sm:text-xl font-bold mt-0.5">{kpi.value}</p>
+                  <div className="flex items-center gap-1 mt-0.5">
                     {kpi.change && (
                       <>
                         {kpi.trend === 'up' ? (
@@ -132,15 +132,15 @@ export function AdminView({ profile }: { profile: any }) {
                         ) : (
                           <TrendingDown className="h-3 w-3 text-red-500" />
                         )}
-                        <span className={`text-[10px] ${kpi.trend === 'up' ? 'text-green-500' : 'text-red-500'}`}>
+                        <span className={`text-[9px] sm:text-[10px] ${kpi.trend === 'up' ? 'text-green-500' : 'text-red-500'}`}>
                           {kpi.change}
                         </span>
                       </>
                     )}
                   </div>
                 </div>
-                <div className={`p-2 rounded-lg ${kpi.color}`}>
-                  <kpi.icon className="h-5 w-5 text-white" />
+                <div className={`p-1.5 sm:p-2 rounded-lg ${kpi.color}`}>
+                  <kpi.icon className="h-4 w-4 sm:h-5 sm:w-5 text-white" />
                 </div>
               </div>
             </CardContent>
@@ -150,9 +150,9 @@ export function AdminView({ profile }: { profile: any }) {
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
         <Card className="col-span-4">
-          <CardHeader><CardTitle>Revenue & Expenses</CardTitle></CardHeader>
-          <CardContent>
-            <ResponsiveContainer width="100%" height={350}>
+          <CardHeader className="p-3 sm:p-6 pb-1.5 sm:pb-3"><CardTitle className="text-sm sm:text-lg font-bold">Revenue & Expenses</CardTitle></CardHeader>
+          <CardContent className="p-3 sm:p-6 pt-0">
+            <ResponsiveContainer width="100%" height={300}>
               <AreaChart data={revenueData}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
                 <XAxis dataKey="month" stroke="#64748b" />
@@ -167,21 +167,21 @@ export function AdminView({ profile }: { profile: any }) {
         </Card>
 
         <Card className="col-span-3">
-          <CardHeader><CardTitle>Occupancy Status</CardTitle></CardHeader>
-          <CardContent>
-            <ResponsiveContainer width="100%" height={350}>
+          <CardHeader className="p-3 sm:p-6 pb-1.5 sm:pb-3"><CardTitle className="text-sm sm:text-lg font-bold">Occupancy Status</CardTitle></CardHeader>
+          <CardContent className="p-3 sm:p-6 pt-0">
+            <ResponsiveContainer width="100%" height={300}>
               <PieChart>
-                <Pie data={occupancyData} cx="50%" cy="50%" innerRadius={60} outerRadius={100} paddingAngle={5} dataKey="value" label={({ name, value }) => `${name}: ${value}`}>
+                <Pie data={occupancyData} cx="50%" cy="50%" innerRadius={50} outerRadius={90} paddingAngle={5} dataKey="value" label={({ name, value }) => `${name}: ${value}`}>
                   {occupancyData.map((entry, index) => (<Cell key={`cell-${index}`} fill={entry.color} />))}
                 </Pie>
                 <Tooltip />
               </PieChart>
             </ResponsiveContainer>
-            <div className="flex flex-wrap gap-4 justify-center mt-4">
+            <div className="flex flex-wrap gap-3 sm:gap-4 justify-center mt-2 sm:mt-4 text-xs sm:text-sm">
               {occupancyData.map((item) => (
-                <div key={item.name} className="flex items-center gap-2">
-                  <div className="w-3 h-3 rounded-full" style={{ backgroundColor: item.color }} />
-                  <span className="text-sm">{item.name}</span>
+                <div key={item.name} className="flex items-center gap-1.5 sm:gap-2">
+                  <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full" style={{ backgroundColor: item.color }} />
+                  <span>{item.name}</span>
                 </div>
               ))}
             </div>

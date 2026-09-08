@@ -67,7 +67,7 @@ export function SeedButton() {
       variant="outline" 
       onClick={handleSeedData} 
       disabled={seeding}
-      className="border-indigo-200 text-indigo-700 hover:bg-indigo-50"
+      className="border-indigo-200 text-indigo-700 hover:bg-indigo-50 flex-1 md:flex-none h-8 text-xs sm:h-9 sm:text-sm"
     >
       {seeding && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
       Seed Database
