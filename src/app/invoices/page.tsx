@@ -12,6 +12,7 @@ import { Loader2, Plus, Send, Edit2, CheckCircle2, Eye, Printer, FileText, Check
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { useAuth } from '@/context/AuthContext'
 import { numberToWords } from '@/lib/utils'
 
@@ -99,6 +100,7 @@ export default function InvoicesPage() {
   const [invoices, setInvoices] = useState<Invoice[]>([])
   const [loading, setLoading] = useState(true)
   const [searchQuery, setSearchQuery] = useState('')
+  const [statusFilter, setStatusFilter] = useState('all')
   const [usersMap, setUsersMap] = useState<Record<string, string>>({})
 
   useEffect(() => {
@@ -606,6 +608,7 @@ export default function InvoicesPage() {
   }, 0)
 
   const filteredInvoices = invoices.filter(inv => {
+    if (statusFilter !== 'all' && inv.status !== statusFilter) return false
     if (!searchQuery) return true
     const q = searchQuery.toLowerCase()
     const tName = formatTenantName(inv.tenantName, inv.tenantId).toLowerCase()
@@ -698,14 +701,30 @@ export default function InvoicesPage() {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between">
             <CardTitle>All Invoices</CardTitle>
-            <div className="relative w-64">
-              <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-              <Input
-                placeholder="Search invoices..."
-                className="pl-8 bg-white"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-              />
+            <div className="flex items-center gap-3">
+              <Select value={statusFilter} onValueChange={setStatusFilter}>
+                <SelectTrigger className="w-[160px] bg-white">
+                  <SelectValue placeholder="Status" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Statuses</SelectItem>
+                  <SelectItem value="draft">Draft</SelectItem>
+                  <SelectItem value="pending">Pending</SelectItem>
+                  <SelectItem value="paid">Paid</SelectItem>
+                  <SelectItem value="partial">Partial</SelectItem>
+                  <SelectItem value="overdue">Overdue</SelectItem>
+                  <SelectItem value="carried_forward">Carried Forward</SelectItem>
+                </SelectContent>
+              </Select>
+              <div className="relative w-64">
+                <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+                <Input
+                  placeholder="Search invoices..."
+                  className="pl-8 bg-white"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                />
+              </div>
             </div>
           </CardHeader>
           <CardContent>
