@@ -164,8 +164,8 @@ export default function SettingsPage() {
     <DashboardLayout title="Settings">
       <div className="space-y-6">
         <div>
-          <h2 className="text-3xl font-bold">Settings</h2>
-          <p className="text-muted-foreground">Manage your preferences and security</p>
+          <h2 className="text-lg sm:text-xl font-bold">Settings</h2>
+          <p className="text-xs text-muted-foreground">Manage your preferences and security</p>
         </div>
 
         {isGlobalAdmin && (

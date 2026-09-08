@@ -391,16 +391,16 @@ export default function PaymentsPage() {
     <DashboardLayout title="Payments">
       <div className="space-y-6 no-print">
         <div>
-          <h2 className="text-3xl font-bold">{isResident ? 'My Payments' : 'Payments'}</h2>
-          <p className="text-muted-foreground">{isResident ? 'Manage your invoices and payment history' : 'Track payment collections and receipts'}</p>
+          <h2 className="text-lg sm:text-xl font-bold">{isResident ? 'My Payments' : 'Payments'}</h2>
+          <p className="text-xs text-muted-foreground">{isResident ? 'Manage your invoices and payment history' : 'Track payment collections and receipts'}</p>
         </div>
 
-        <div className="grid gap-4 md:grid-cols-4">
-          <Card><CardContent className="p-6"><p className="text-sm text-muted-foreground">{isResident ? 'Total Paid' : 'Total Collected'}</p><p className="text-2xl font-bold">₨ {totalCollected.toLocaleString()}</p></CardContent></Card>
-          {isResident && <Card><CardContent className="p-6"><p className="text-sm text-muted-foreground">Due Balance</p><p className="text-2xl font-bold text-red-500">₨ {pendingTotal.toLocaleString()}</p></CardContent></Card>}
-          {!isResident && <Card><CardContent className="p-6"><p className="text-sm text-muted-foreground">This Month</p><p className="text-2xl font-bold">₨ {thisMonthCollected.toLocaleString()}</p></CardContent></Card>}
-          {!isResident && <Card><CardContent className="p-6"><p className="text-sm text-muted-foreground">Pending</p><p className="text-2xl font-bold">₨ {pendingTotal.toLocaleString()}</p></CardContent></Card>}
-          <Card><CardContent className="p-6"><p className="text-sm text-muted-foreground">Transactions</p><p className="text-2xl font-bold">{transactionsCount}</p></CardContent></Card>
+        <div className="grid gap-3 md:grid-cols-4">
+          <Card><CardContent className="p-3"><p className="text-xs text-muted-foreground">{isResident ? 'Total Paid' : 'Total Collected'}</p><p className="text-base font-bold">₨ {totalCollected.toLocaleString()}</p></CardContent></Card>
+          {isResident && <Card><CardContent className="p-3"><p className="text-xs text-muted-foreground">Due Balance</p><p className="text-base font-bold text-red-500">₨ {pendingTotal.toLocaleString()}</p></CardContent></Card>}
+          {!isResident && <Card><CardContent className="p-3"><p className="text-xs text-muted-foreground">This Month</p><p className="text-base font-bold">₨ {thisMonthCollected.toLocaleString()}</p></CardContent></Card>}
+          {!isResident && <Card><CardContent className="p-3"><p className="text-xs text-muted-foreground">Pending</p><p className="text-base font-bold">₨ {pendingTotal.toLocaleString()}</p></CardContent></Card>}
+          <Card><CardContent className="p-3"><p className="text-xs text-muted-foreground">Transactions</p><p className="text-base font-bold">{transactionsCount}</p></CardContent></Card>
         </div>
 
         {isResident && pendingInvoices.length > 0 && (

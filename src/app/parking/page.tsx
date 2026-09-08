@@ -470,8 +470,8 @@ export default function ParkingPage() {
       <DashboardLayout title="My Parking Space">
         <div className="space-y-6 max-w-3xl mx-auto pb-8">
           <div>
-            <h2 className="text-3xl font-extrabold tracking-tight text-slate-900">My Parking Spot</h2>
-            <p className="text-muted-foreground">View your assigned vehicle bay and lease credentials</p>
+            <h2 className="text-lg sm:text-xl font-extrabold tracking-tight text-slate-900">My Parking Spot</h2>
+            <p className="text-xs text-muted-foreground">View your assigned vehicle bay and lease credentials</p>
           </div>
 
           {myAssignedSlots.length === 0 ? (
@@ -598,8 +598,8 @@ export default function ParkingPage() {
         {/* Header Hero Title */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
-            <h2 className="text-3xl font-extrabold tracking-tight text-slate-900">Parking Space Control Center</h2>
-            <p className="text-muted-foreground">Manage Resident, Tenant, Visitor, and Office Staff vehicle bays dynamically</p>
+            <h2 className="text-lg sm:text-xl font-extrabold tracking-tight text-slate-900">Parking Space Control Center</h2>
+            <p className="text-xs text-muted-foreground">Manage Resident, Tenant, Visitor, and Office Staff vehicle bays dynamically</p>
           </div>
           
           <div className="flex flex-wrap items-center gap-3">
@@ -692,43 +692,43 @@ export default function ParkingPage() {
         </div>
 
         {/* Dashboard Stats */}
-        <div className="grid gap-4 md:grid-cols-4">
-          <Card className="rounded-2xl border-slate-100 shadow-sm"><CardContent className="p-6">
+        <div className="grid gap-3 md:grid-cols-4">
+          <Card className="rounded-2xl border-slate-100 shadow-sm"><CardContent className="p-3">
             <div className="flex items-center justify-between">
-              <p className="text-sm font-semibold text-slate-500">Total Bays Grid</p>
-              <Layers className="h-5 w-5 text-indigo-500" />
+              <p className="text-xs font-semibold text-slate-500">Total Bays Grid</p>
+              <Layers className="h-4 w-4 text-indigo-500" />
             </div>
-            <p className="text-3xl font-extrabold text-slate-900 mt-2">{parkingSlots.length}</p>
-            <div className="flex gap-2 mt-2 text-[10px] text-slate-400 font-medium">
+            <p className="text-base font-extrabold text-slate-900 mt-1">{parkingSlots.length}</p>
+            <div className="flex gap-1.5 mt-1 text-[10px] text-slate-400 font-medium">
               <span>{residentCount} Res</span>•<span>{tenantCount} Ten</span>•<span>{visitorCount} Vis</span>•<span>{staffCount} Staff</span>
             </div>
           </CardContent></Card>
 
-          <Card className="rounded-2xl border-slate-100 shadow-sm"><CardContent className="p-6">
+          <Card className="rounded-2xl border-slate-100 shadow-sm"><CardContent className="p-3">
             <div className="flex items-center justify-between">
-              <p className="text-sm font-semibold text-slate-500">Occupied Spots</p>
-              <Car className="h-5 w-5 text-amber-500 animate-pulse" />
+              <p className="text-xs font-semibold text-slate-500">Occupied Spots</p>
+              <Car className="h-4 w-4 text-amber-500 animate-pulse" />
             </div>
-            <p className="text-3xl font-extrabold text-slate-950 mt-2">{occupiedCount}</p>
-            <p className="text-xs text-amber-600 font-semibold mt-1">Active Parking assignments</p>
+            <p className="text-base font-extrabold text-slate-950 mt-1">{occupiedCount}</p>
+            <p className="text-[10px] text-amber-600 font-semibold mt-0.5">Active Parking assignments</p>
           </CardContent></Card>
 
-          <Card className="rounded-2xl border-slate-100 shadow-sm"><CardContent className="p-6">
+          <Card className="rounded-2xl border-slate-100 shadow-sm"><CardContent className="p-3">
             <div className="flex items-center justify-between">
-              <p className="text-sm font-semibold text-slate-500">Available Slots</p>
-              <CheckCircle2 className="h-5 w-5 text-emerald-500" />
+              <p className="text-xs font-semibold text-slate-500">Available Slots</p>
+              <CheckCircle2 className="h-4 w-4 text-emerald-500" />
             </div>
-            <p className="text-3xl font-extrabold text-emerald-600 mt-2">{availableCount}</p>
-            <p className="text-xs text-emerald-600 font-semibold mt-1">Ready for occupancy</p>
+            <p className="text-base font-extrabold text-emerald-600 mt-1">{availableCount}</p>
+            <p className="text-[10px] text-emerald-600 font-semibold mt-0.5">Ready for occupancy</p>
           </CardContent></Card>
 
-          <Card className="rounded-2xl border-slate-100 shadow-sm"><CardContent className="p-6">
+          <Card className="rounded-2xl border-slate-100 shadow-sm"><CardContent className="p-3">
             <div className="flex items-center justify-between">
-              <p className="text-sm font-semibold text-slate-500">Monthly Billing Revenue</p>
-              <span className="font-bold text-xs text-slate-400">SAWS</span>
+              <p className="text-xs font-semibold text-slate-500">Monthly Billing Revenue</p>
+              <span className="font-bold text-[10px] text-slate-400">SAWS</span>
             </div>
-            <p className="text-3xl font-extrabold text-indigo-600 mt-2">₨ {monthlyRevenue.toLocaleString()}</p>
-            <p className="text-xs text-slate-400 mt-1">Calculated from leased spots</p>
+            <p className="text-base font-extrabold text-indigo-600 mt-1">₨ {monthlyRevenue.toLocaleString()}</p>
+            <p className="text-[10px] text-slate-400 font-medium mt-0.5">Automated LedgerSync</p>
           </CardContent></Card>
         </div>
 

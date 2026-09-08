@@ -238,8 +238,8 @@ export default function VisitorsPage() {
       <div className="space-y-6">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
-            <h2 className="text-3xl font-bold">Logbook Management</h2>
-            <p className="text-muted-foreground">Track visitor entries, exits, and vehicles</p>
+            <h2 className="text-lg sm:text-xl font-bold">Logbook Management</h2>
+            <p className="text-xs text-muted-foreground">Track visitor entries, exits, and vehicles</p>
           </div>
           
           <Dialog open={isRegisterModalOpen} onOpenChange={setIsRegisterModalOpen}>
@@ -397,11 +397,11 @@ export default function VisitorsPage() {
           </Dialog>
         </div>
 
-        <div className="grid gap-4 md:grid-cols-4">
-          <Card><CardContent className="p-6"><p className="text-sm text-muted-foreground">Today's Total</p><p className="text-2xl font-bold">{filteredVisitors.length}</p></CardContent></Card>
-          <Card><CardContent className="p-6"><p className="text-sm text-muted-foreground">Currently Inside</p><p className="text-2xl font-bold text-green-600">{currentlyInside}</p></CardContent></Card>
-          <Card><CardContent className="p-6"><p className="text-sm text-muted-foreground">This Week</p><p className="text-2xl font-bold">{filteredVisitors.length}</p></CardContent></Card>
-          <Card><CardContent className="p-6"><p className="text-sm text-muted-foreground">Pending Approval</p><p className="text-2xl font-bold text-yellow-600">{pendingApproval}</p></CardContent></Card>
+        <div className="grid gap-3 md:grid-cols-4">
+          <Card><CardContent className="p-3"><p className="text-xs text-muted-foreground">Today's Total</p><p className="text-base font-bold">{filteredVisitors.length}</p></CardContent></Card>
+          <Card><CardContent className="p-3"><p className="text-xs text-muted-foreground">Currently Inside</p><p className="text-base font-bold text-green-600">{currentlyInside}</p></CardContent></Card>
+          <Card><CardContent className="p-3"><p className="text-xs text-muted-foreground">This Week</p><p className="text-base font-bold">{filteredVisitors.length}</p></CardContent></Card>
+          <Card><CardContent className="p-3"><p className="text-xs text-muted-foreground">Pending Approval</p><p className="text-base font-bold text-yellow-600">{pendingApproval}</p></CardContent></Card>
         </div>
 
         <Card>

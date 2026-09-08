@@ -213,11 +213,11 @@ export default function ComplaintsPage() {
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
-            <h2 className="text-3xl font-extrabold tracking-tight text-gray-900 flex items-center gap-2">
-              <ShieldAlert className="h-8 w-8 text-rose-500" />
+            <h2 className="text-lg sm:text-xl font-extrabold tracking-tight text-gray-900 flex items-center gap-2">
+              <ShieldAlert className="h-5 w-5 text-rose-500" />
               Complaints & Grievances
             </h2>
-            <p className="text-muted-foreground mt-1">
+            <p className="text-xs text-muted-foreground mt-1">
               {isAdminOrManager 
                 ? 'Society Dispute Resolutions & Grievance Control Room' 
                 : isGuard 
@@ -285,44 +285,44 @@ export default function ComplaintsPage() {
         </div>
 
         {/* Stats Grid */}
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
           <Card className="border-l-4 border-l-rose-500 hover:shadow-md transition">
-            <CardContent className="p-6 flex justify-between items-center">
+            <CardContent className="p-3 flex justify-between items-center">
               <div>
-                <p className="text-sm text-gray-500 uppercase tracking-wider font-semibold">Open Grievances</p>
-                <p className="text-3xl font-extrabold text-gray-900 mt-1">{openCount}</p>
+                <p className="text-xs text-gray-500 uppercase tracking-wider font-semibold">Open Grievances</p>
+                <p className="text-base font-extrabold text-gray-900 mt-0.5">{openCount}</p>
               </div>
-              <div className="p-3 bg-rose-50 rounded-full text-rose-600"><AlertTriangle className="h-6 w-6" /></div>
+              <div className="p-2 bg-rose-50 rounded-full text-rose-600"><AlertTriangle className="h-4 w-4" /></div>
             </CardContent>
           </Card>
 
           <Card className="border-l-4 border-l-amber-500 hover:shadow-md transition">
-            <CardContent className="p-6 flex justify-between items-center">
+            <CardContent className="p-3 flex justify-between items-center">
               <div>
-                <p className="text-sm text-gray-500 uppercase tracking-wider font-semibold">In Investigation</p>
-                <p className="text-3xl font-extrabold text-gray-900 mt-1">{inProgressCount}</p>
+                <p className="text-xs text-gray-500 uppercase tracking-wider font-semibold">In Investigation</p>
+                <p className="text-base font-extrabold text-gray-900 mt-0.5">{inProgressCount}</p>
               </div>
-              <div className="p-3 bg-amber-50 rounded-full text-amber-600"><Clock className="h-6 w-6" /></div>
+              <div className="p-2 bg-amber-50 rounded-full text-amber-600"><Clock className="h-4 w-4" /></div>
             </CardContent>
           </Card>
 
           <Card className="border-l-4 border-l-emerald-500 hover:shadow-md transition">
-            <CardContent className="p-6 flex justify-between items-center">
+            <CardContent className="p-3 flex justify-between items-center">
               <div>
-                <p className="text-sm text-gray-500 uppercase tracking-wider font-semibold">Resolved Cases</p>
-                <p className="text-3xl font-extrabold text-gray-900 mt-1">{resolvedCount}</p>
+                <p className="text-xs text-gray-500 uppercase tracking-wider font-semibold">Resolved Cases</p>
+                <p className="text-base font-extrabold text-gray-900 mt-0.5">{resolvedCount}</p>
               </div>
-              <div className="p-3 bg-emerald-50 rounded-full text-emerald-600"><CheckCircle className="h-6 w-6" /></div>
+              <div className="p-2 bg-emerald-50 rounded-full text-emerald-600"><CheckCircle className="h-4 w-4" /></div>
             </CardContent>
           </Card>
 
           <Card className="border-l-4 border-l-gray-400 hover:shadow-md transition">
-            <CardContent className="p-6 flex justify-between items-center">
+            <CardContent className="p-3 flex justify-between items-center">
               <div>
-                <p className="text-sm text-gray-500 uppercase tracking-wider font-semibold">Total Audited</p>
-                <p className="text-3xl font-extrabold text-gray-900 mt-1">{complaints.length}</p>
+                <p className="text-xs text-gray-500 uppercase tracking-wider font-semibold">Total Audited</p>
+                <p className="text-base font-extrabold text-gray-900 mt-0.5">{complaints.length}</p>
               </div>
-              <div className="p-3 bg-gray-50 rounded-full text-gray-600"><FileText className="h-6 w-6" /></div>
+              <div className="p-2 bg-gray-50 rounded-full text-gray-600"><FileText className="h-4 w-4" /></div>
             </CardContent>
           </Card>
         </div>

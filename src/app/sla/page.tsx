@@ -254,10 +254,10 @@ export default function SLAPage() {
                   Effective: {slaData.effectiveDate}
                 </Badge>
               </div>
-              <h2 className="text-3xl md:text-4xl font-extrabold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-white via-indigo-100 to-indigo-200">
+              <h2 className="text-lg sm:text-xl font-extrabold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-white via-indigo-100 to-indigo-200">
                 Service Level Agreement (SLA)
               </h2>
-              <p className="text-slate-300 text-sm max-w-2xl leading-relaxed">
+              <p className="text-slate-300 text-xs max-w-2xl leading-relaxed">
                 Baseline operational framework for municipal, technical, security, and administrative services provided by the <span className="font-semibold text-white">Sunrise Apartment Welfare Society (SAWS)</span>.
               </p>
             </div>

@@ -623,8 +623,8 @@ export default function InvoicesPage() {
       <div className="space-y-6 no-print">
         <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
           <div>
-            <h2 className="text-3xl font-bold">Invoices</h2>
-            <p className="text-muted-foreground">Manage monthly invoices and billing</p>
+            <h2 className="text-lg sm:text-xl font-bold">Invoices</h2>
+            <p className="text-xs text-muted-foreground">Manage monthly invoices and billing</p>
           </div>
           
           {canManageInvoices && (
@@ -691,11 +691,11 @@ export default function InvoicesPage() {
           )}
         </div>
 
-        <div className="grid gap-4 md:grid-cols-4">
-          <Card><CardContent className="p-6"><p className="text-sm text-muted-foreground">Drafts / Pending</p><p className="text-2xl font-bold">{draftCount} / {pendingCount}</p></CardContent></Card>
-          <Card><CardContent className="p-6"><p className="text-sm text-muted-foreground">Collected</p><p className="text-2xl font-bold">₨ {collectedAmount.toLocaleString()}</p></CardContent></Card>
-          <Card><CardContent className="p-6"><p className="text-sm text-muted-foreground">Overdue</p><p className="text-2xl font-bold text-red-500">{overdueCount}</p></CardContent></Card>
-          <Card><CardContent className="p-6"><p className="text-sm text-muted-foreground">Outstanding Total</p><p className="text-2xl font-bold">₨ {outstandingAmount.toLocaleString()}</p></CardContent></Card>
+        <div className="grid gap-3 md:grid-cols-4">
+          <Card><CardContent className="p-3"><p className="text-xs text-muted-foreground">Drafts / Pending</p><p className="text-base font-bold">{draftCount} / {pendingCount}</p></CardContent></Card>
+          <Card><CardContent className="p-3"><p className="text-xs text-muted-foreground">Collected</p><p className="text-base font-bold">₨ {collectedAmount.toLocaleString()}</p></CardContent></Card>
+          <Card><CardContent className="p-3"><p className="text-xs text-muted-foreground">Overdue</p><p className="text-base font-bold text-red-500">{overdueCount}</p></CardContent></Card>
+          <Card><CardContent className="p-3"><p className="text-xs text-muted-foreground">Outstanding Total</p><p className="text-base font-bold">₨ {outstandingAmount.toLocaleString()}</p></CardContent></Card>
         </div>
 
         <Card>
