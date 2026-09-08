@@ -72,6 +72,7 @@ function LandingContent() {
               <a href="#features" className="text-gray-600 hover:text-gray-900 transition-colors">Features</a>
               <a href="#about" className="text-gray-600 hover:text-gray-900 transition-colors">About</a>
               <a href="#testimonials" className="text-gray-600 hover:text-gray-900 transition-colors">Testimonials</a>
+              <a href="/install" className="text-gray-600 hover:text-gray-900 transition-colors">App Install</a>
             </nav>
 
             <div className="hidden md:flex items-center gap-3">
@@ -90,6 +91,7 @@ function LandingContent() {
             <a href="#features" className="block text-gray-600" onClick={() => setMobileMenuOpen(false)}>Features</a>
             <a href="#about" className="block text-gray-600" onClick={() => setMobileMenuOpen(false)}>About</a>
             <a href="#testimonials" className="block text-gray-600" onClick={() => setMobileMenuOpen(false)}>Testimonials</a>
+            <a href="/install" className="block text-gray-600" onClick={() => setMobileMenuOpen(false)}>App Install</a>
             <div className="pt-4 border-t flex flex-col gap-3">
               <Button variant="outline" className="w-full justify-center" onClick={() => { setMobileMenuOpen(false); setAuthModalOpen(true); }}>Sign In</Button>
               <Button className="w-full justify-center" onClick={() => { setMobileMenuOpen(false); setAuthModalOpen(true); }}>Get Started</Button>
