@@ -106,20 +106,20 @@ export default function ChartOfAccountsPage() {
       <div className="space-y-6">
         <div className="flex items-center justify-between">
           <div>
-            <h2 className="text-3xl font-bold">Chart of Accounts</h2>
-            <p className="text-muted-foreground">Manage financial account categories</p>
+            <h2 className="text-base sm:text-lg font-bold">Chart of Accounts</h2>
+            <p className="text-xs text-muted-foreground">Manage financial account categories</p>
           </div>
           {canManage && (
-            <Button onClick={() => handleOpenModal()} className="gap-2">
-              <Plus className="h-4 w-4" />
+            <Button onClick={() => handleOpenModal()} size="sm" className="gap-1.5 text-xs">
+              <Plus className="h-3.5 w-3.5" />
               Add Account
             </Button>
           )}
         </div>
 
         <Card>
-          <CardHeader><CardTitle>All Accounts</CardTitle></CardHeader>
-          <CardContent>
+          <CardHeader className="py-3"><CardTitle className="text-base font-bold">All Accounts</CardTitle></CardHeader>
+          <CardContent className="pt-0">
             {loading ? (
               <div className="flex justify-center py-8"><Loader2 className="h-8 w-8 animate-spin text-muted-foreground" /></div>
             ) : accounts.length === 0 ? (
@@ -128,45 +128,45 @@ export default function ChartOfAccountsPage() {
               </div>
             ) : (
               <div className="overflow-x-auto">
-                <table className="w-full text-left border-collapse">
+                <table className="w-full text-left border-collapse text-xs">
                   <thead>
                     <tr className="border-b bg-muted/50">
-                      <th className="py-3 px-4 font-medium">Code</th>
-                      <th className="py-3 px-4 font-medium">Name</th>
-                      <th className="py-3 px-4 font-medium">Type</th>
-                      <th className="py-3 px-4 font-medium">Status</th>
-                      {canManage && <th className="py-3 px-4 font-medium text-right">Actions</th>}
+                      <th className="py-2 px-3 font-semibold text-gray-600">Code</th>
+                      <th className="py-2 px-3 font-semibold text-gray-600">Name</th>
+                      <th className="py-2 px-3 font-semibold text-gray-600">Type</th>
+                      <th className="py-2 px-3 font-semibold text-gray-600">Status</th>
+                      {canManage && <th className="py-2 px-3 font-semibold text-gray-600 text-right">Actions</th>}
                     </tr>
                   </thead>
                   <tbody>
                     {accounts.map((acc) => (
                       <tr key={acc.id} className="border-b hover:bg-muted/50 transition-colors">
-                        <td className="py-3 px-4 font-semibold">{acc.code}</td>
-                        <td className="py-3 px-4">{acc.name}</td>
-                        <td className="py-3 px-4">
-                          <Badge variant={acc.type === 'Revenue' ? 'success' : acc.type === 'Expense' ? 'destructive' : 'default'}>
+                        <td className="py-2 px-3 font-semibold">{acc.code}</td>
+                        <td className="py-2 px-3">{acc.name}</td>
+                        <td className="py-2 px-3">
+                          <Badge variant={acc.type === 'Revenue' ? 'success' : acc.type === 'Expense' ? 'destructive' : 'default'} className="text-[10px] px-2 py-0.5">
                             {acc.type}
                           </Badge>
                         </td>
-                        <td className="py-3 px-4">
+                        <td className="py-2 px-3">
                           {acc.isSystemLocked ? (
-                            <div className="flex items-center text-xs text-muted-foreground bg-gray-100 px-2 py-1 rounded-md w-max">
+                            <div className="flex items-center text-[10px] text-muted-foreground bg-gray-100 px-1.5 py-0.5 rounded-md w-max">
                               <Lock className="h-3 w-3 mr-1" /> Locked
                             </div>
                           ) : (
-                            <Badge variant="outline" className="text-xs">Custom</Badge>
+                            <Badge variant="outline" className="text-[10px] px-2 py-0.5">Custom</Badge>
                           )}
                         </td>
                         {canManage && (
-                          <td className="py-3 px-4 text-right">
-                            <div className="flex items-center justify-end gap-2">
+                          <td className="py-2 px-3 text-right">
+                            <div className="flex items-center justify-end gap-1.5">
                               {!acc.isSystemLocked && (
                                 <>
-                                  <Button variant="ghost" size="icon" onClick={() => handleOpenModal(acc)}>
-                                    <Edit2 className="h-4 w-4 text-blue-500" />
+                                  <Button variant="ghost" size="sm" className="h-7 w-7 p-0" onClick={() => handleOpenModal(acc)}>
+                                    <Edit2 className="h-3.5 w-3.5 text-blue-500" />
                                   </Button>
-                                  <Button variant="ghost" size="icon" onClick={() => handleDelete(acc)}>
-                                    <Trash2 className="h-4 w-4 text-red-500" />
+                                  <Button variant="ghost" size="sm" className="h-7 w-7 p-0" onClick={() => handleDelete(acc)}>
+                                    <Trash2 className="h-3.5 w-3.5 text-red-500" />
                                   </Button>
                                 </>
                               )}
