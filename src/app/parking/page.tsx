@@ -593,13 +593,13 @@ export default function ParkingPage() {
 
   return (
     <DashboardLayout title="Parking Management">
-      <div className="space-y-6 max-w-7xl mx-auto pb-8">
+      <div className="space-y-4 sm:space-y-6 max-w-7xl mx-auto pb-8">
         
         {/* Header Hero Title */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
-            <h2 className="text-lg sm:text-xl font-extrabold tracking-tight text-slate-900">Parking Space Control Center</h2>
-            <p className="text-xs text-muted-foreground">Manage Resident, Tenant, Visitor, and Office Staff vehicle bays dynamically</p>
+            <h2 className="text-sm sm:text-xl font-extrabold tracking-tight text-slate-900">Parking Space Control Center</h2>
+            <p className="text-[10px] sm:text-xs text-muted-foreground">Manage Resident, Tenant, Visitor, and Office Staff vehicle bays dynamically</p>
           </div>
           
           <div className="flex flex-wrap items-center gap-3">
@@ -608,7 +608,7 @@ export default function ParkingPage() {
                 onClick={handleAutoSeed} 
                 disabled={seeding}
                 variant="outline" 
-                className="border-indigo-200 hover:bg-indigo-50 text-indigo-700 font-semibold"
+                className="border-indigo-200 hover:bg-indigo-50 text-indigo-700 font-semibold h-8 text-xs sm:h-10 sm:text-sm"
               >
                 {seeding ? (
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -622,8 +622,8 @@ export default function ParkingPage() {
             {profile?.role === 'SUPER_ADMIN' && (
               <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
                 <DialogTrigger asChild>
-                  <Button className="bg-indigo-600 hover:bg-indigo-700 font-semibold flex items-center gap-2">
-                    <Plus className="h-4.5 w-4.5" />
+                  <Button className="bg-indigo-600 hover:bg-indigo-700 font-semibold flex items-center gap-2 h-8 text-xs sm:h-10 sm:text-sm">
+                    <Plus className="h-4 w-4" />
                     Create Parking Slot
                   </Button>
                 </DialogTrigger>
@@ -692,48 +692,48 @@ export default function ParkingPage() {
         </div>
 
         {/* Dashboard Stats */}
-        <div className="grid gap-3 md:grid-cols-4">
-          <Card className="rounded-2xl border-slate-100 shadow-sm"><CardContent className="p-3">
+        <div className="grid gap-2 sm:gap-3 grid-cols-2 md:grid-cols-4">
+          <Card className="rounded-2xl border-slate-100 shadow-sm"><CardContent className="p-2.5 sm:p-3">
             <div className="flex items-center justify-between">
-              <p className="text-xs font-semibold text-slate-500">Total Bays Grid</p>
-              <Layers className="h-4 w-4 text-indigo-500" />
+              <p className="text-[10px] sm:text-xs font-semibold text-slate-500">Total Bays Grid</p>
+              <Layers className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-indigo-500" />
             </div>
-            <p className="text-base font-extrabold text-slate-900 mt-1">{parkingSlots.length}</p>
-            <div className="flex gap-1.5 mt-1 text-[10px] text-slate-400 font-medium">
+            <p className="text-xs sm:text-base font-extrabold text-slate-900 mt-0.5">{parkingSlots.length}</p>
+            <div className="flex gap-1 mt-0.5 text-[9px] sm:text-[10px] text-slate-400 font-medium">
               <span>{residentCount} Res</span>•<span>{tenantCount} Ten</span>•<span>{visitorCount} Vis</span>•<span>{staffCount} Staff</span>
             </div>
           </CardContent></Card>
 
-          <Card className="rounded-2xl border-slate-100 shadow-sm"><CardContent className="p-3">
+          <Card className="rounded-2xl border-slate-100 shadow-sm"><CardContent className="p-2.5 sm:p-3">
             <div className="flex items-center justify-between">
-              <p className="text-xs font-semibold text-slate-500">Occupied Spots</p>
-              <Car className="h-4 w-4 text-amber-500 animate-pulse" />
+              <p className="text-[10px] sm:text-xs font-semibold text-slate-500">Occupied Spots</p>
+              <Car className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-amber-500 animate-pulse" />
             </div>
-            <p className="text-base font-extrabold text-slate-950 mt-1">{occupiedCount}</p>
-            <p className="text-[10px] text-amber-600 font-semibold mt-0.5">Active Parking assignments</p>
+            <p className="text-xs sm:text-base font-extrabold text-slate-950 mt-0.5">{occupiedCount}</p>
+            <p className="text-[9px] sm:text-[10px] text-amber-600 font-semibold mt-0.5">Active Parking assignments</p>
           </CardContent></Card>
 
-          <Card className="rounded-2xl border-slate-100 shadow-sm"><CardContent className="p-3">
+          <Card className="rounded-2xl border-slate-100 shadow-sm"><CardContent className="p-2.5 sm:p-3">
             <div className="flex items-center justify-between">
-              <p className="text-xs font-semibold text-slate-500">Available Slots</p>
-              <CheckCircle2 className="h-4 w-4 text-emerald-500" />
+              <p className="text-[10px] sm:text-xs font-semibold text-slate-500">Available Slots</p>
+              <CheckCircle2 className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-emerald-500" />
             </div>
-            <p className="text-base font-extrabold text-emerald-600 mt-1">{availableCount}</p>
-            <p className="text-[10px] text-emerald-600 font-semibold mt-0.5">Ready for occupancy</p>
+            <p className="text-xs sm:text-base font-extrabold text-emerald-600 mt-0.5">{availableCount}</p>
+            <p className="text-[9px] sm:text-[10px] text-emerald-600 font-semibold mt-0.5">Ready for occupancy</p>
           </CardContent></Card>
 
-          <Card className="rounded-2xl border-slate-100 shadow-sm"><CardContent className="p-3">
+          <Card className="rounded-2xl border-slate-100 shadow-sm"><CardContent className="p-2.5 sm:p-3">
             <div className="flex items-center justify-between">
-              <p className="text-xs font-semibold text-slate-500">Monthly Billing Revenue</p>
-              <span className="font-bold text-[10px] text-slate-400">SAWS</span>
+              <p className="text-[10px] sm:text-xs font-semibold text-slate-500">Monthly Billing Revenue</p>
+              <span className="font-bold text-[9px] sm:text-[10px] text-slate-400">SAWS</span>
             </div>
-            <p className="text-base font-extrabold text-indigo-600 mt-1">₨ {monthlyRevenue.toLocaleString()}</p>
-            <p className="text-[10px] text-slate-400 font-medium mt-0.5">Automated LedgerSync</p>
+            <p className="text-xs sm:text-base font-extrabold text-indigo-600 mt-0.5">₨ {monthlyRevenue.toLocaleString()}</p>
+            <p className="text-[9px] sm:text-[10px] text-slate-400 font-medium mt-0.5">Automated LedgerSync</p>
           </CardContent></Card>
         </div>
 
         {/* Filter Navigation Panel */}
-        <div className="flex flex-col md:flex-row items-center gap-4 justify-between bg-white p-4 rounded-2xl shadow-sm border border-slate-100">
+        <div className="flex flex-col md:flex-row items-center gap-3 justify-between bg-white p-3 sm:p-4 rounded-2xl shadow-sm border border-slate-100">
           {/* Category Tabs */}
           <div className="flex flex-wrap gap-1.5 w-full md:w-auto">
             {(['all', 'resident', 'tenant', 'visitor', 'staff'] as const).map((cat) => (
@@ -742,7 +742,7 @@ export default function ParkingPage() {
                 variant={categoryFilter === cat ? 'default' : 'ghost'}
                 size="sm"
                 onClick={() => setCategoryFilter(cat)}
-                className={`rounded-xl capitalize font-semibold ${
+                className={`rounded-xl capitalize font-semibold h-7 text-xs px-2.5 sm:h-9 sm:px-3 ${
                   categoryFilter === cat 
                     ? 'bg-indigo-600 hover:bg-indigo-700 text-white shadow-sm' 
                     : 'text-slate-600 hover:bg-slate-50'
@@ -753,10 +753,10 @@ export default function ParkingPage() {
             ))}
           </div>
 
-          <div className="flex flex-col sm:flex-row gap-3 w-full md:w-auto shrink-0">
+          <div className="flex flex-col sm:flex-row gap-2.5 w-full md:w-auto shrink-0">
             {/* Status Dropdown */}
             <Select value={statusFilter} onValueChange={(val: any) => setStatusFilter(val)}>
-              <SelectTrigger className="w-full sm:w-40 rounded-xl border-slate-200">
+              <SelectTrigger className="w-full sm:w-40 h-8 text-xs sm:h-10 sm:text-sm rounded-xl border-slate-200">
                 <SelectValue placeholder="All Status" />
               </SelectTrigger>
               <SelectContent>
@@ -769,13 +769,13 @@ export default function ParkingPage() {
 
             {/* Search Input */}
             <div className="relative w-full sm:w-64">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 sm:h-4 sm:w-4 text-slate-400" />
               <Input
                 type="text"
                 placeholder="Search slot, unit, vehicle..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-9 pr-4 rounded-xl border-slate-200 focus-visible:ring-indigo-500"
+                className="pl-8 pr-3 h-8 text-xs sm:h-10 sm:text-sm rounded-xl border-slate-200 focus-visible:ring-indigo-500"
               />
             </div>
           </div>
@@ -787,64 +787,64 @@ export default function ParkingPage() {
             {loading ? (
               <div className="flex justify-center py-16"><Loader2 className="h-8 w-8 animate-spin text-indigo-600" /></div>
             ) : filteredSlots.length === 0 ? (
-              <div className="text-center py-16 text-slate-400">
-                <AlertCircle className="h-10 w-10 mx-auto mb-2 text-slate-300" />
+              <div className="text-center py-16 text-slate-400 text-xs sm:text-sm">
+                <AlertCircle className="h-8 w-8 sm:h-10 sm:w-10 mx-auto mb-2 text-slate-300" />
                 <p className="font-semibold text-slate-500">No parking slots matched filters</p>
-                <p className="text-xs text-slate-400 mt-1">Try resetting search string or active categorization filters</p>
+                <p className="text-[10px] sm:text-xs text-slate-400 mt-1">Try resetting search string or active categorization filters</p>
               </div>
             ) : (
               <div className="overflow-x-auto">
-                <table className="w-full text-left text-sm border-collapse min-w-[900px]">
+                <table className="w-full text-left text-xs sm:text-sm border-collapse min-w-[700px]">
                   <thead>
-                    <tr className="bg-slate-50/70 border-b border-slate-100 text-slate-600 font-semibold">
-                      <th className="p-4">Slot ID</th>
-                      <th className="p-4">Category</th>
-                      <th className="p-4">Unit Assignment</th>
-                      <th className="p-4">Assignee Info</th>
-                      <th className="p-4">Vehicle Details</th>
-                      <th className="p-4">Monthly Fee</th>
-                      <th className="p-4">Status</th>
-                      {profile?.role === 'SUPER_ADMIN' || profile?.role === 'MANAGER' ? <th className="p-4 text-right">Actions</th> : null}
+                    <tr className="bg-slate-50/70 border-b border-slate-100 text-slate-600 font-semibold text-[11px] sm:text-xs">
+                      <th className="py-2 px-2.5">Slot ID</th>
+                      <th className="py-2 px-2.5">Category</th>
+                      <th className="py-2 px-2.5">Unit Assignment</th>
+                      <th className="py-2 px-2.5">Assignee Info</th>
+                      <th className="py-2 px-2.5">Vehicle Details</th>
+                      <th className="py-2 px-2.5">Monthly Fee</th>
+                      <th className="py-2 px-2.5">Status</th>
+                      {profile?.role === 'SUPER_ADMIN' || profile?.role === 'MANAGER' ? <th className="py-2 px-2.5 text-right">Actions</th> : null}
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-slate-100 text-slate-600">
                     {filteredSlots.map((slot) => (
                       <tr key={slot.id} className="hover:bg-slate-50/50 transition-colors">
-                        <td className="p-4 font-bold text-slate-900">{slot.slotNumber}</td>
-                        <td className="p-4">
-                          <Badge variant="outline" className={`capitalize font-semibold text-[10px] rounded-full border px-2 py-0.5 ${getCategoryBadgeColor(slot.category)}`}>
+                        <td className="py-2 px-2.5 font-bold text-slate-900 text-xs sm:text-sm">{slot.slotNumber}</td>
+                        <td className="py-2 px-2.5">
+                          <Badge variant="outline" className={`capitalize font-semibold text-[10px] sm:text-xs rounded-full border px-1.5 py-0.5 ${getCategoryBadgeColor(slot.category)}`}>
                             {slot.category}
                           </Badge>
                         </td>
-                        <td className="p-4 font-semibold text-indigo-700">{slot.unitId || '—'}</td>
-                        <td className="p-4">
+                        <td className="py-2 px-2.5 font-semibold text-indigo-700 text-xs sm:text-sm">{slot.unitId || '—'}</td>
+                        <td className="py-2 px-2.5">
                           {slot.assignedTo ? (
-                            <div className="flex items-center gap-1.5 font-medium text-slate-800">
-                              <User className="h-3.5 w-3.5 text-slate-400" />
+                            <div className="flex items-center gap-1.5 font-medium text-slate-800 text-xs sm:text-sm">
+                              <User className="h-3 w-3 sm:h-3.5 sm:w-3.5 text-slate-400" />
                               <span>{slot.assignedTo}</span>
                             </div>
                           ) : (
-                            <span className="text-slate-400 font-normal">—</span>
+                            <span className="text-slate-400 font-normal text-xs sm:text-sm">—</span>
                           )}
                         </td>
-                        <td className="p-4 text-xs font-semibold text-slate-800">
+                        <td className="py-2 px-2.5 text-xs font-semibold text-slate-800">
                           {slot.vehicleNumber ? (
                             <div className="space-y-0.5">
-                              <p className="font-semibold text-slate-900">{slot.vehicleNumber}</p>
-                              {slot.vehicleModel && <p className="text-[10px] text-slate-400 font-normal">{slot.vehicleModel}</p>}
+                              <p className="font-semibold text-slate-900 text-xs sm:text-sm">{slot.vehicleNumber}</p>
+                              {slot.vehicleModel && <p className="text-[10px] sm:text-xs text-slate-400 font-normal">{slot.vehicleModel}</p>}
                             </div>
                           ) : (
-                            <span className="text-slate-400 font-normal">—</span>
+                            <span className="text-slate-400 font-normal text-xs sm:text-sm">—</span>
                           )}
                         </td>
-                        <td className="p-4 font-medium text-slate-900">
+                        <td className="py-2 px-2.5 font-medium text-slate-900 text-xs sm:text-sm">
                           {slot.category === 'visitor' ? (
-                            <span className="text-xs text-slate-400 italic">No Charge</span>
+                            <span className="text-[10px] sm:text-xs text-slate-400 italic">No Charge</span>
                           ) : (
                             <span>₨ {slot.monthlyFee}</span>
                           )}
                         </td>
-                        <td className="p-4">
+                        <td className="py-2 px-2.5">
                           <Badge 
                             variant={
                               slot.status === 'occupied' 
@@ -853,7 +853,7 @@ export default function ParkingPage() {
                                   ? 'destructive' 
                                   : 'warning'
                             }
-                            className="capitalize rounded-full font-bold px-2.5"
+                            className="capitalize rounded-full font-bold px-2 py-0.5 text-[10px] sm:text-xs"
                           >
                             {slot.status}
                           </Badge>
@@ -861,15 +861,15 @@ export default function ParkingPage() {
                         
                         {/* Manager & Admin actions */}
                         {(profile?.role === 'SUPER_ADMIN' || profile?.role === 'MANAGER') && (
-                          <td className="p-4 text-right">
+                          <td className="py-2 px-2.5 text-right">
                             <div className="flex justify-end items-center gap-1">
                               <Button 
                                 size="sm" 
                                 variant="ghost" 
-                                className="text-indigo-600 hover:text-indigo-700 hover:bg-indigo-50 font-semibold text-xs py-1 px-2.5 rounded-lg flex items-center gap-1"
+                                className="text-indigo-600 hover:text-indigo-700 hover:bg-indigo-50 font-semibold text-xs py-1 px-2 rounded-lg flex items-center gap-1 h-7"
                                 onClick={() => handleOpenAssign(slot)}
                               >
-                                <ArrowRightLeft className="h-3.5 w-3.5" />
+                                <ArrowRightLeft className="h-3 w-3 sm:h-3.5 sm:w-3.5" />
                                 {slot.status === 'occupied' ? 'Modify' : 'Assign'}
                               </Button>
                               
@@ -877,7 +877,7 @@ export default function ParkingPage() {
                                 <Button 
                                   size="sm" 
                                   variant="ghost" 
-                                  className="text-amber-600 hover:text-amber-700 hover:bg-amber-50 font-semibold text-xs py-1 px-2.5 rounded-lg"
+                                  className="text-amber-600 hover:text-amber-700 hover:bg-amber-50 font-semibold text-xs py-1 px-2 rounded-lg h-7"
                                   onClick={() => handleReleaseSlot(slot.id)}
                                 >
                                   Release
@@ -888,10 +888,10 @@ export default function ParkingPage() {
                                 <Button 
                                   size="sm" 
                                   variant="ghost" 
-                                  className="text-red-500 hover:text-red-600 hover:bg-red-50 p-1 rounded-lg"
+                                  className="text-red-500 hover:text-red-600 hover:bg-red-50 p-1 rounded-lg h-7 w-7"
                                   onClick={() => handleDeleteSlot(slot.id)}
                                 >
-                                  <Trash2 className="h-4 w-4" />
+                                  <Trash2 className="h-3.5 w-3.5" />
                                 </Button>
                               )}
                             </div>

@@ -389,39 +389,39 @@ export default function PaymentsPage() {
 
   return (
     <DashboardLayout title="Payments">
-      <div className="space-y-6 no-print">
+      <div className="space-y-4 sm:space-y-6 no-print">
         <div>
-          <h2 className="text-lg sm:text-xl font-bold">{isResident ? 'My Payments' : 'Payments'}</h2>
-          <p className="text-xs text-muted-foreground">{isResident ? 'Manage your invoices and payment history' : 'Track payment collections and receipts'}</p>
+          <h2 className="text-sm sm:text-xl font-bold">{isResident ? 'My Payments' : 'Payments'}</h2>
+          <p className="text-[10px] sm:text-xs text-muted-foreground">{isResident ? 'Manage your invoices and payment history' : 'Track payment collections and receipts'}</p>
         </div>
 
-        <div className="grid gap-3 md:grid-cols-4">
-          <Card><CardContent className="p-3"><p className="text-xs text-muted-foreground">{isResident ? 'Total Paid' : 'Total Collected'}</p><p className="text-base font-bold">₨ {totalCollected.toLocaleString()}</p></CardContent></Card>
-          {isResident && <Card><CardContent className="p-3"><p className="text-xs text-muted-foreground">Due Balance</p><p className="text-base font-bold text-red-500">₨ {pendingTotal.toLocaleString()}</p></CardContent></Card>}
-          {!isResident && <Card><CardContent className="p-3"><p className="text-xs text-muted-foreground">This Month</p><p className="text-base font-bold">₨ {thisMonthCollected.toLocaleString()}</p></CardContent></Card>}
-          {!isResident && <Card><CardContent className="p-3"><p className="text-xs text-muted-foreground">Pending</p><p className="text-base font-bold">₨ {pendingTotal.toLocaleString()}</p></CardContent></Card>}
-          <Card><CardContent className="p-3"><p className="text-xs text-muted-foreground">Transactions</p><p className="text-base font-bold">{transactionsCount}</p></CardContent></Card>
+        <div className="grid gap-2 sm:gap-3 grid-cols-2 md:grid-cols-4">
+          <Card><CardContent className="p-2.5 sm:p-3"><p className="text-[10px] sm:text-xs text-muted-foreground">{isResident ? 'Total Paid' : 'Total Collected'}</p><p className="text-xs sm:text-base font-bold">₨ {totalCollected.toLocaleString()}</p></CardContent></Card>
+          {isResident && <Card><CardContent className="p-2.5 sm:p-3"><p className="text-[10px] sm:text-xs text-muted-foreground">Due Balance</p><p className="text-xs sm:text-base font-bold text-red-500">₨ {pendingTotal.toLocaleString()}</p></CardContent></Card>}
+          {!isResident && <Card><CardContent className="p-2.5 sm:p-3"><p className="text-[10px] sm:text-xs text-muted-foreground">This Month</p><p className="text-xs sm:text-base font-bold">₨ {thisMonthCollected.toLocaleString()}</p></CardContent></Card>}
+          {!isResident && <Card><CardContent className="p-2.5 sm:p-3"><p className="text-[10px] sm:text-xs text-muted-foreground">Pending</p><p className="text-xs sm:text-base font-bold">₨ {pendingTotal.toLocaleString()}</p></CardContent></Card>}
+          <Card><CardContent className="p-2.5 sm:p-3"><p className="text-[10px] sm:text-xs text-muted-foreground">Transactions</p><p className="text-xs sm:text-base font-bold">{transactionsCount}</p></CardContent></Card>
         </div>
 
         {isResident && pendingInvoices.length > 0 && (
-          <div className="grid gap-6 md:grid-cols-3 items-start">
+          <div className="grid gap-4 sm:gap-6 md:grid-cols-3 items-start">
             <Card className="border-red-200 md:col-span-2 shadow-sm">
-              <CardHeader><CardTitle className="text-red-600 flex items-center gap-2">Pending Invoices</CardTitle></CardHeader>
-              <CardContent>
-                <div className="space-y-4">
+              <CardHeader className="p-3 sm:p-6 pb-1.5 sm:pb-3"><CardTitle className="text-sm sm:text-base text-red-600 flex items-center gap-2">Pending Invoices</CardTitle></CardHeader>
+              <CardContent className="p-3 sm:p-6 pt-0">
+                <div className="space-y-3 sm:space-y-4">
                   {pendingInvoices.map((inv) => {
                     const total = inv.amount + (inv.electricityAmount || 0) + (inv.generatorAmount || 0) + (inv.utilityAmount || 0) + (inv.waterAmount || 0) + (inv.insuranceAmount || 0) + (inv.dieselAmount || 0) + (inv.structureMaintenanceAmount || 0) + (inv.otherAmount || 0) + (inv.previousPendingOutstandingDue || 0) + (inv.latePenaltyAmount || 0)
                     return (
-                      <div key={inv.id} className="flex flex-col sm:flex-row sm:items-center justify-between p-4 border rounded-lg bg-red-50/50 gap-4">
+                      <div key={inv.id} className="flex flex-col sm:flex-row sm:items-center justify-between p-3 border rounded-lg bg-red-50/50 gap-3 sm:gap-4">
                         <div>
-                          <p className="font-semibold">Invoice for {inv.month}</p>
-                          <p className="text-sm text-muted-foreground">Due Date: {inv.dueDate}</p>
+                          <p className="font-semibold text-xs sm:text-base">Invoice for {inv.month}</p>
+                          <p className="text-[10px] sm:text-sm text-muted-foreground">Due Date: {inv.dueDate}</p>
                         </div>
-                        <div className="flex items-center gap-4">
+                        <div className="flex items-center gap-3 sm:gap-4">
                           <div className="text-right">
-                            <p className="font-bold text-lg text-indigo-700">₨ {total.toLocaleString()}</p>
-                            {inv.paidAmount ? <p className="text-xs text-muted-foreground font-medium mb-1">Paid: ₨{inv.paidAmount.toLocaleString()}</p> : null}
-                            <Badge variant={inv.status === 'partial' ? 'warning' : inv.status === 'overdue' ? 'destructive' : 'warning'} className={`uppercase font-semibold text-xs px-2 py-0.5 rounded-full ${inv.status === 'partial' ? 'bg-blue-100 text-blue-800' : ''}`}>{inv.status}</Badge>
+                            <p className="font-bold text-sm sm:text-lg text-indigo-700">₨ {total.toLocaleString()}</p>
+                            {inv.paidAmount ? <p className="text-[10px] sm:text-xs text-muted-foreground font-medium mb-0.5 sm:mb-1">Paid: ₨{inv.paidAmount.toLocaleString()}</p> : null}
+                            <Badge variant={inv.status === 'partial' ? 'warning' : inv.status === 'overdue' ? 'destructive' : 'warning'} className={`uppercase font-semibold text-[10px] sm:text-xs px-1.5 py-0.5 rounded-full ${inv.status === 'partial' ? 'bg-blue-100 text-blue-800' : ''}`}>{inv.status}</Badge>
                           </div>
                           <Button 
                             onClick={() => {
@@ -431,9 +431,9 @@ export default function PaymentsPage() {
                               const rem = total - (inv.paidAmount || 0)
                               setPayAmount(rem.toString())
                             }} 
-                            className="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold flex items-center gap-2"
+                            className="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold flex items-center gap-2 h-8 text-xs px-3.5 sm:h-10 sm:text-sm"
                           >
-                            <Eye className="h-4 w-4" />
+                            <Eye className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
                             View & Pay Invoice
                           </Button>
                         </div>
@@ -446,22 +446,22 @@ export default function PaymentsPage() {
 
             {/* Quick Fonepay Scan Card on Payments page itself */}
             <Card className="border-emerald-200 shadow-sm">
-              <CardHeader className="pb-3 text-center">
-                <CardTitle className="text-emerald-700 text-sm font-extrabold tracking-wide uppercase flex items-center justify-center gap-1.5">
+              <CardHeader className="p-3 sm:p-6 pb-2 text-center">
+                <CardTitle className="text-emerald-700 text-xs sm:text-sm font-extrabold tracking-wide uppercase flex items-center justify-center gap-1.5">
                   <QrCode className="h-4 w-4 text-[#007F3E]" />
                   Quick Scan To Pay
                 </CardTitle>
-                <CardDescription className="text-xs text-muted-foreground">Sunrise Apartment Welfare Society</CardDescription>
+                <CardDescription className="text-[10px] sm:text-xs text-muted-foreground">Sunrise Apartment Welfare Society</CardDescription>
               </CardHeader>
-              <CardContent className="flex flex-col items-center">
-                <div className="border border-gray-200 p-2 rounded-xl bg-white shadow-sm mb-4 w-full max-w-[210px]">
+              <CardContent className="p-3 sm:p-6 pt-0 flex flex-col items-center">
+                <div className="border border-gray-200 p-2 rounded-xl bg-white shadow-sm mb-3 w-full max-w-[190px] sm:max-w-[210px]">
                   <img 
                     src="/fonepay-qr.jpg?v=5" 
                     alt="Fonepay QR Code Card" 
                     className="w-full h-auto rounded-lg"
                   />
                 </div>
-                <div className="text-center text-[10px] text-gray-500 font-semibold space-y-1">
+                <div className="text-center text-[9px] sm:text-[10px] text-gray-500 font-semibold space-y-0.5">
                   <p className="font-bold text-[#007F3E]">Kathmandu/Lalitpur MP</p>
                   <p>Terminal ID: 2222020001358874</p>
                 </div>
@@ -472,46 +472,46 @@ export default function PaymentsPage() {
 
         {!isResident && payments.filter(p => p.status === 'pending_verification').length > 0 && (
           <Card className="border-amber-200 shadow-sm mb-6">
-            <CardHeader className="bg-amber-50 border-b border-amber-100">
-              <CardTitle className="text-amber-800 flex items-center gap-2">
-                <AlertCircle className="h-5 w-5" />
+            <CardHeader className="bg-amber-50 border-b border-amber-100 p-3 sm:p-6">
+              <CardTitle className="text-amber-800 text-sm sm:text-base flex items-center gap-2">
+                <AlertCircle className="h-4 w-4 sm:h-5 sm:w-5" />
                 Pending Verifications
               </CardTitle>
-              <CardDescription className="text-amber-700">Resident payments waiting for your approval.</CardDescription>
+              <CardDescription className="text-amber-700 text-[10px] sm:text-xs">Resident payments waiting for your approval.</CardDescription>
             </CardHeader>
-            <CardContent className="pt-4">
+            <CardContent className="p-3 sm:p-6 pt-3">
               <div className="overflow-x-auto overflow-y-hidden">
-                <table className="w-full min-w-[800px] text-sm">
+                <table className="w-full min-w-[700px] text-xs sm:text-sm">
                   <thead>
-                    <tr className="border-b">
-                      <th className="pb-3 text-left">Transaction ID</th>
-                      <th className="pb-3 text-left">Tenant ID</th>
-                      <th className="pb-3 text-left">Amount</th>
-                      <th className="pb-3 text-left">Method</th>
-                      <th className="pb-3 text-left">Date (AD)</th>
-                      <th className="pb-3 text-left">Status</th>
-                      <th className="pb-3 text-left">Actions</th>
+                    <tr className="border-b text-[11px] sm:text-xs text-muted-foreground font-semibold">
+                      <th className="py-2 px-2.5 text-left">Transaction ID</th>
+                      <th className="py-2 px-2.5 text-left">Tenant ID</th>
+                      <th className="py-2 px-2.5 text-left">Amount</th>
+                      <th className="py-2 px-2.5 text-left">Method</th>
+                      <th className="py-2 px-2.5 text-left">Date (AD)</th>
+                      <th className="py-2 px-2.5 text-left">Status</th>
+                      <th className="py-2 px-2.5 text-left">Actions</th>
                     </tr>
                   </thead>
                   <tbody>
                     {payments.filter(p => p.status === 'pending_verification').map((p) => (
                       <tr key={p.id} className="border-b hover:bg-amber-50/30">
-                        <td className="py-3 font-mono text-xs">{p.transactionId || p.id.substring(0, 10).toUpperCase()}</td>
-                        <td className="py-3 font-mono text-xs">{p.tenantId.substring(0, 10)}...</td>
-                        <td className="py-3 font-bold text-emerald-600">₨ {p.amount.toLocaleString()}</td>
-                        <td className="py-3 font-semibold text-xs uppercase text-indigo-700">{p.method.replace('_', ' ')}</td>
-                        <td className="py-3">{getNepaliDate(p.createdAt).ad}</td>
-                        <td className="py-3">
-                          <Badge variant="warning" className="uppercase font-semibold text-xs px-2 py-0.5 rounded-full bg-amber-100 text-amber-800">
+                        <td className="py-2 px-2.5 font-mono text-[10px] sm:text-xs">{p.transactionId || p.id.substring(0, 10).toUpperCase()}</td>
+                        <td className="py-2 px-2.5 font-mono text-[10px] sm:text-xs">{p.tenantId.substring(0, 10)}...</td>
+                        <td className="py-2 px-2.5 font-bold text-emerald-600 text-xs sm:text-sm">₨ {p.amount.toLocaleString()}</td>
+                        <td className="py-2 px-2.5 font-semibold text-[10px] sm:text-xs uppercase text-indigo-700">{p.method.replace('_', ' ')}</td>
+                        <td className="py-2 px-2.5 text-xs sm:text-sm">{getNepaliDate(p.createdAt).ad}</td>
+                        <td className="py-2 px-2.5">
+                          <Badge variant="warning" className="uppercase font-semibold text-[10px] sm:text-xs px-1.5 py-0.5 rounded-full bg-amber-100 text-amber-800">
                             PENDING VERIFICATION
                           </Badge>
                         </td>
-                        <td className="py-3">
-                          <div className="flex gap-2">
-                            <Button size="sm" className="h-8 bg-emerald-600 hover:bg-emerald-700 text-white" onClick={() => handleApprovePayment(p)}>
+                        <td className="py-2 px-2.5">
+                          <div className="flex gap-1.5">
+                            <Button size="sm" className="h-7 text-xs px-2 bg-emerald-600 hover:bg-emerald-700 text-white" onClick={() => handleApprovePayment(p)}>
                               Approve
                             </Button>
-                            <Button size="sm" variant="destructive" className="h-8" onClick={() => handleRejectPayment(p.id)}>
+                            <Button size="sm" variant="destructive" className="h-7 text-xs px-2" onClick={() => handleRejectPayment(p.id)}>
                               Reject
                             </Button>
                           </div>
@@ -526,57 +526,57 @@ export default function PaymentsPage() {
         )}
 
         <Card>
-          <CardHeader className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-            <CardTitle>Payment History</CardTitle>
+          <CardHeader className="p-3 sm:p-6 pb-1.5 sm:pb-3 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <CardTitle className="text-sm sm:text-base font-bold">Payment History</CardTitle>
             <div className="relative w-full sm:w-64">
-              <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+              <Search className="absolute left-2.5 top-2.5 h-3.5 w-3.5 sm:h-4 sm:w-4 text-muted-foreground" />
               <Input
                 type="text"
                 placeholder="Search payments..."
-                className="pl-8 bg-white"
+                className="pl-8 bg-white h-8 text-xs sm:h-10 sm:text-sm"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
               />
             </div>
           </CardHeader>
-          <CardContent>
+          <CardContent className="p-3 sm:p-6 pt-0">
             {loading ? (
               <div className="flex justify-center py-8"><Loader2 className="h-8 w-8 animate-spin text-muted-foreground" /></div>
             ) : filteredPayments.length === 0 ? (
-              <div className="text-center py-8 text-muted-foreground">No payment history found.</div>
+              <div className="text-center py-8 text-muted-foreground text-xs sm:text-sm">No payment history found.</div>
             ) : (
               <div className="overflow-x-auto overflow-y-hidden">
-                <table className="w-full min-w-[800px] text-sm">
+                <table className="w-full min-w-[700px] text-xs sm:text-sm">
                   <thead>
-                    <tr className="border-b">
-                      <th className="pb-3 text-left">Receipt Number</th>
-                      <th className="pb-3 text-left">Transaction ID</th>
-                      {!isResident && <th className="pb-3 text-left">Tenant Details</th>}
-                      <th className="pb-3 text-left">Amount</th>
-                      <th className="pb-3 text-left">Method</th>
-                      <th className="pb-3 text-left">Date (AD)</th>
-                      <th className="pb-3 text-left">Status</th>
-                      <th className="pb-3 text-left">Actions</th>
+                    <tr className="border-b text-[11px] sm:text-xs font-semibold text-muted-foreground">
+                      <th className="py-2 px-2.5 text-left font-medium">Receipt Number</th>
+                      <th className="py-2 px-2.5 text-left font-medium">Transaction ID</th>
+                      {!isResident && <th className="py-2 px-2.5 text-left font-medium">Tenant Details</th>}
+                      <th className="py-2 px-2.5 text-left font-medium">Amount</th>
+                      <th className="py-2 px-2.5 text-left font-medium">Method</th>
+                      <th className="py-2 px-2.5 text-left font-medium">Date (AD)</th>
+                      <th className="py-2 px-2.5 text-left font-medium">Status</th>
+                      <th className="py-2 px-2.5 text-left font-medium">Actions</th>
                     </tr>
                   </thead>
                   <tbody>
                     {filteredPayments.map((p) => (
                       <tr key={p.id} className="border-b hover:bg-gray-50/50">
-                        <td className="py-3 font-semibold text-gray-700">{p.receiptNo || 'N/A'}</td>
-                        <td className="py-3 font-mono text-xs">{p.transactionId || p.id.substring(0, 10).toUpperCase()}</td>
+                        <td className="py-2 px-2.5 font-semibold text-gray-700 text-xs sm:text-sm">{p.receiptNo || 'N/A'}</td>
+                        <td className="py-2 px-2.5 font-mono text-[10px] sm:text-xs">{p.transactionId || p.id.substring(0, 10).toUpperCase()}</td>
                         {!isResident && (
-                          <td className="py-3">
-                            <div className="font-medium">{formatTenantName(null, p.tenantId)}</div>
-                            <div className="text-xs text-muted-foreground">Unit: {unitsMap[p.tenantId] || 'N/A'}</div>
+                          <td className="py-2 px-2.5">
+                            <div className="font-medium text-xs sm:text-sm">{formatTenantName(null, p.tenantId)}</div>
+                            <div className="text-[10px] sm:text-xs text-muted-foreground">Unit: {unitsMap[p.tenantId] || 'N/A'}</div>
                           </td>
                         )}
-                        <td className="py-3 font-bold text-emerald-600">₨ {p.amount.toLocaleString()}</td>
-                        <td className="py-3 font-semibold text-xs uppercase text-indigo-700">{p.method.replace('_', ' ')}</td>
-                        <td className="py-3">{getNepaliDate(p.paidAt || p.createdAt).ad}</td>
-                        <td className="py-3">
+                        <td className="py-2 px-2.5 font-bold text-emerald-600 text-xs sm:text-sm">₨ {p.amount.toLocaleString()}</td>
+                        <td className="py-2 px-2.5 font-semibold text-[10px] sm:text-xs uppercase text-indigo-700">{p.method.replace('_', ' ')}</td>
+                        <td className="py-2 px-2.5 text-xs sm:text-sm">{getNepaliDate(p.paidAt || p.createdAt).ad}</td>
+                        <td className="py-2 px-2.5">
                           <Badge 
                             variant={p.status === 'completed' ? 'success' : p.status === 'rejected' ? 'destructive' : 'warning'} 
-                            className={`uppercase font-semibold text-xs px-2 py-0.5 rounded-full ${
+                            className={`uppercase font-semibold text-[10px] sm:text-xs px-1.5 py-0.5 rounded-full ${
                               p.status === 'completed' ? 'bg-green-100 text-green-800' :
                               p.status === 'rejected' ? 'bg-red-100 text-red-800' :
                               'bg-amber-100 text-amber-800'
@@ -585,15 +585,15 @@ export default function PaymentsPage() {
                             {p.status.replace('_', ' ')}
                           </Badge>
                         </td>
-                        <td className="py-3">
+                        <td className="py-2 px-2.5">
                           <Button 
                             variant="ghost" 
                             size="sm" 
-                            className="h-8 w-8 p-0" 
+                            className="h-7 w-7 sm:h-8 sm:w-8 p-0" 
                             onClick={() => handleOpenReceipt(p)} 
                             title="View/Print Receipt"
                           >
-                            <FileText className="h-4 w-4 text-emerald-600 hover:text-emerald-800" />
+                            <FileText className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-emerald-600 hover:text-emerald-800" />
                           </Button>
                         </td>
                       </tr>

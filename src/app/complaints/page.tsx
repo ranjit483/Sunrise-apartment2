@@ -208,16 +208,16 @@ export default function ComplaintsPage() {
 
   return (
     <DashboardLayout title="Complaints Center">
-      <div className="space-y-6 max-w-7xl mx-auto">
+      <div className="space-y-4 sm:space-y-6 max-w-7xl mx-auto">
 
         {/* Header */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4">
           <div>
-            <h2 className="text-lg sm:text-xl font-extrabold tracking-tight text-gray-900 flex items-center gap-2">
-              <ShieldAlert className="h-5 w-5 text-rose-500" />
+            <h2 className="text-sm sm:text-xl font-extrabold tracking-tight text-gray-900 flex items-center gap-2">
+              <ShieldAlert className="h-4 w-4 sm:h-5 sm:w-5 text-rose-500" />
               Complaints & Grievances
             </h2>
-            <p className="text-xs text-muted-foreground mt-1">
+            <p className="text-[10px] sm:text-xs text-muted-foreground mt-0.5">
               {isAdminOrManager 
                 ? 'Society Dispute Resolutions & Grievance Control Room' 
                 : isGuard 
@@ -229,7 +229,7 @@ export default function ComplaintsPage() {
           {!isGuard && (
             <Dialog open={isNewComplaintOpen} onOpenChange={setIsNewComplaintOpen}>
               <DialogTrigger asChild>
-                <Button className="bg-rose-600 hover:bg-rose-700 text-white font-medium shadow flex items-center gap-2">
+                <Button className="bg-rose-600 hover:bg-rose-700 text-white font-medium shadow flex items-center gap-2 h-8 text-xs sm:h-10 sm:text-sm">
                   <Plus className="h-4 w-4" />
                   File Complaint
                 </Button>
@@ -285,64 +285,64 @@ export default function ComplaintsPage() {
         </div>
 
         {/* Stats Grid */}
-        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="grid gap-2 sm:gap-3 grid-cols-2 lg:grid-cols-4">
           <Card className="border-l-4 border-l-rose-500 hover:shadow-md transition">
-            <CardContent className="p-3 flex justify-between items-center">
+            <CardContent className="p-2.5 sm:p-3 flex justify-between items-center">
               <div>
-                <p className="text-xs text-gray-500 uppercase tracking-wider font-semibold">Open Grievances</p>
-                <p className="text-base font-extrabold text-gray-900 mt-0.5">{openCount}</p>
+                <p className="text-[10px] sm:text-xs text-gray-500 uppercase tracking-wider font-semibold">Open Grievances</p>
+                <p className="text-xs sm:text-base font-extrabold text-gray-900 mt-0.5">{openCount}</p>
               </div>
-              <div className="p-2 bg-rose-50 rounded-full text-rose-600"><AlertTriangle className="h-4 w-4" /></div>
+              <div className="p-1.5 sm:p-2 bg-rose-50 rounded-full text-rose-600"><AlertTriangle className="h-3.5 w-3.5 sm:h-4 sm:w-4" /></div>
             </CardContent>
           </Card>
 
           <Card className="border-l-4 border-l-amber-500 hover:shadow-md transition">
-            <CardContent className="p-3 flex justify-between items-center">
+            <CardContent className="p-2.5 sm:p-3 flex justify-between items-center">
               <div>
-                <p className="text-xs text-gray-500 uppercase tracking-wider font-semibold">In Investigation</p>
-                <p className="text-base font-extrabold text-gray-900 mt-0.5">{inProgressCount}</p>
+                <p className="text-[10px] sm:text-xs text-gray-500 uppercase tracking-wider font-semibold">In Investigation</p>
+                <p className="text-xs sm:text-base font-extrabold text-gray-900 mt-0.5">{inProgressCount}</p>
               </div>
-              <div className="p-2 bg-amber-50 rounded-full text-amber-600"><Clock className="h-4 w-4" /></div>
+              <div className="p-1.5 sm:p-2 bg-amber-50 rounded-full text-amber-600"><Clock className="h-3.5 w-3.5 sm:h-4 sm:w-4" /></div>
             </CardContent>
           </Card>
 
           <Card className="border-l-4 border-l-emerald-500 hover:shadow-md transition">
-            <CardContent className="p-3 flex justify-between items-center">
+            <CardContent className="p-2.5 sm:p-3 flex justify-between items-center">
               <div>
-                <p className="text-xs text-gray-500 uppercase tracking-wider font-semibold">Resolved Cases</p>
-                <p className="text-base font-extrabold text-gray-900 mt-0.5">{resolvedCount}</p>
+                <p className="text-[10px] sm:text-xs text-gray-500 uppercase tracking-wider font-semibold">Resolved Cases</p>
+                <p className="text-xs sm:text-base font-extrabold text-gray-900 mt-0.5">{resolvedCount}</p>
               </div>
-              <div className="p-2 bg-emerald-50 rounded-full text-emerald-600"><CheckCircle className="h-4 w-4" /></div>
+              <div className="p-1.5 sm:p-2 bg-emerald-50 rounded-full text-emerald-600"><CheckCircle className="h-3.5 w-3.5 sm:h-4 sm:w-4" /></div>
             </CardContent>
           </Card>
 
           <Card className="border-l-4 border-l-gray-400 hover:shadow-md transition">
-            <CardContent className="p-3 flex justify-between items-center">
+            <CardContent className="p-2.5 sm:p-3 flex justify-between items-center">
               <div>
-                <p className="text-xs text-gray-500 uppercase tracking-wider font-semibold">Total Audited</p>
-                <p className="text-base font-extrabold text-gray-900 mt-0.5">{complaints.length}</p>
+                <p className="text-[10px] sm:text-xs text-gray-500 uppercase tracking-wider font-semibold">Total Audited</p>
+                <p className="text-xs sm:text-base font-extrabold text-gray-900 mt-0.5">{complaints.length}</p>
               </div>
-              <div className="p-2 bg-gray-50 rounded-full text-gray-600"><FileText className="h-4 w-4" /></div>
+              <div className="p-1.5 sm:p-2 bg-gray-50 rounded-full text-gray-600"><FileText className="h-3.5 w-3.5 sm:h-4 sm:w-4" /></div>
             </CardContent>
           </Card>
         </div>
 
         {/* List & Details split screen layout */}
-        <div className="grid gap-6 lg:grid-cols-3">
+        <div className="grid gap-4 sm:gap-6 lg:grid-cols-3">
           
           {/* Left Panel */}
           <div className="lg:col-span-2 space-y-4">
             <Card>
-              <CardHeader className="pb-3 border-b flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <CardHeader className="p-3 sm:p-6 pb-2.5 sm:pb-3 border-b flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                 <div>
-                  <CardTitle className="text-lg font-bold text-gray-800 flex items-center gap-2">
-                    <ListFilter className="h-5 w-5 text-gray-500" />
+                  <CardTitle className="text-sm sm:text-lg font-bold text-gray-800 flex items-center gap-2">
+                    <ListFilter className="h-4 w-4 sm:h-5 sm:w-5 text-gray-500" />
                     Resident Grievances Log
                   </CardTitle>
                 </div>
                 <div className="flex flex-wrap gap-2 items-center">
                   <Select value={statusFilter} onValueChange={(v: any) => setStatusFilter(v)}>
-                    <SelectTrigger className="w-[130px] h-9"><SelectValue placeholder="All Status" /></SelectTrigger>
+                    <SelectTrigger className="w-[110px] sm:w-[130px] h-8 text-xs"><SelectValue placeholder="All Status" /></SelectTrigger>
                     <SelectContent>
                       <SelectItem value="all">All Status</SelectItem>
                       <SelectItem value="open">Open</SelectItem>
@@ -352,7 +352,7 @@ export default function ComplaintsPage() {
                   </Select>
                   <Input 
                     placeholder="Search complaints..." 
-                    className="w-[180px] h-9" 
+                    className="w-[140px] sm:w-[180px] h-8 text-xs" 
                     value={searchQuery}
                     onChange={e => setSearchQuery(e.target.value)}
                   />
@@ -362,8 +362,8 @@ export default function ComplaintsPage() {
                 {loading ? (
                   <div className="flex justify-center items-center py-12"><Loader2 className="h-8 w-8 animate-spin text-rose-500" /></div>
                 ) : filteredComplaints.length === 0 ? (
-                  <div className="text-center py-12 text-gray-500">
-                    <MessageSquare className="h-12 w-12 text-gray-300 mx-auto mb-2" />
+                  <div className="text-center py-12 text-gray-500 text-xs sm:text-sm">
+                    <MessageSquare className="h-10 w-10 sm:h-12 sm:w-12 text-gray-300 mx-auto mb-2" />
                     No matching complaints found.
                   </div>
                 ) : (
@@ -372,33 +372,33 @@ export default function ComplaintsPage() {
                       <div 
                         key={c.id} 
                         onClick={() => setSelectedComplaint(c)}
-                        className={`p-4 hover:bg-rose-50/15 cursor-pointer transition flex items-start justify-between gap-4 ${
+                        className={`p-3 sm:p-4 hover:bg-rose-50/15 cursor-pointer transition flex items-start justify-between gap-3 ${
                           selectedComplaint?.id === c.id ? 'bg-rose-50/30 border-l-4 border-l-rose-500' : ''
                         }`}
                       >
-                        <div className="space-y-1.5 flex-1 min-w-0">
-                          <div className="flex items-center gap-2">
-                            <span className="text-xs font-mono bg-gray-100 px-2 py-0.5 rounded text-gray-600 font-semibold">
+                        <div className="space-y-1 flex-1 min-w-0">
+                          <div className="flex items-center gap-1.5">
+                            <span className="text-[10px] sm:text-xs font-mono bg-gray-100 px-1.5 py-0.5 rounded text-gray-600 font-semibold">
                               {c.id.substring(0, 8)}
                             </span>
-                            <Badge variant="outline" className="flex items-center text-[10px] py-0">
+                            <Badge variant="outline" className="flex items-center text-[9px] sm:text-[10px] py-0 px-1.5">
                               {getCategoryIcon(c.category)}
                               {c.category || 'General'}
                             </Badge>
                           </div>
-                          <h4 className="font-bold text-gray-900 truncate">{c.title}</h4>
-                          <p className="text-sm text-gray-500 line-clamp-1">{c.description}</p>
-                          <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-gray-400 font-medium mt-1">
+                          <h4 className="font-bold text-xs sm:text-sm text-gray-900 truncate">{c.title}</h4>
+                          <p className="text-xs sm:text-sm text-gray-500 line-clamp-1">{c.description}</p>
+                          <div className="flex flex-wrap gap-x-3 gap-y-0.5 text-[10px] sm:text-xs text-gray-400 font-medium mt-1">
                             <span className="flex items-center gap-1"><User className="h-3 w-3" /> Reported: {c.tenantName || 'Resident'} {getUnitDisplay(c)}</span>
                             <span className="flex items-center gap-1"><Calendar className="h-3 w-3" /> {new Date(c.createdAt).toLocaleDateString()}</span>
                           </div>
                         </div>
 
                         <div className="flex flex-col gap-2 items-end self-stretch justify-between flex-shrink-0">
-                          <Badge variant="outline" className={`capitalize text-xs font-semibold ${statusColors[c.status]}`}>
+                          <Badge variant="outline" className={`capitalize text-[10px] sm:text-xs font-semibold px-1.5 py-0.5 ${statusColors[c.status]}`}>
                             {c.status.replace('_', ' ')}
                           </Badge>
-                          <ChevronRight className="h-5 w-5 text-gray-400" />
+                          <ChevronRight className="h-4 w-4 sm:h-5 sm:w-5 text-gray-400" />
                         </div>
                       </div>
                     ))}
