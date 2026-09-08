@@ -27,17 +27,17 @@ export function Navbar({ title, setMobileOpen }: NavbarProps) {
   const { theme, setTheme } = useTheme()
 
   return (
-    <header className="sticky top-0 z-30 flex h-16 items-center justify-between border-b bg-background px-4 md:px-6">
-      <div className="flex items-center gap-3">
+    <header className="sticky top-0 z-30 flex h-14 sm:h-16 items-center justify-between border-b bg-background px-3 sm:px-4 md:px-6">
+      <div className="flex items-center gap-2 sm:gap-3">
         <Button
           variant="ghost"
           size="icon"
-          className="lg:hidden"
+          className="lg:hidden h-8 w-8 sm:h-10 sm:w-10"
           onClick={() => setMobileOpen?.(true)}
         >
-          <Menu className="h-6 w-6" />
+          <Menu className="h-5 w-5 sm:h-6 sm:w-6" />
         </Button>
-        {title && <h1 className="text-xl font-semibold truncate max-w-[150px] sm:max-w-none">{title}</h1>}
+        {title && <h1 className="text-sm sm:text-xl font-semibold truncate max-w-[220px] sm:max-w-none">{title}</h1>}
       </div>
 
       <div className="flex items-center gap-4">
