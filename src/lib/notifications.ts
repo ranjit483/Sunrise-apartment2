@@ -102,6 +102,7 @@ export function showBrowserNotification(title: string, options?: { body?: string
 
   if (Notification.permission === 'granted') {
     try {
+      // This works on desktop browsers
       const notif = new Notification(title, {
         body: options?.body || '',
         icon: options?.icon || '/icon-192.png',
@@ -119,13 +120,20 @@ export function showBrowserNotification(title: string, options?: { body?: string
         notif.close()
       }
     } catch (e) {
-      // If service worker is active on mobile browsers (where new Notification() might throw)
-      if ('serviceWorker' in navigator && navigator.serviceWorker.controller) {
-        navigator.serviceWorker.controller.postMessage({
-          type: 'SHOW_NOTIFICATION',
-          title,
-          options,
-        })
+      // On Android/iOS Chrome, new Notification() throws an Illegal constructor error.
+      // You MUST use the Service Worker registration to show notifications.
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.ready.then((registration) => {
+          registration.showNotification(title, {
+            body: options?.body || '',
+            icon: options?.icon || '/icon-192.png',
+            badge: '/favicon.png',
+            tag: options?.tag || 'sunrise-live',
+            data: { url: options?.link || '/notifications' },
+          })
+        }).catch(err => {
+          console.error("Service worker registration failed to show notification:", err);
+        });
       }
     }
   }
