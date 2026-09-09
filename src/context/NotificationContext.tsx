@@ -74,7 +74,14 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
           currentBatchIds.add(notif.id)
 
           const isAdminOrManager = ['SUPER_ADMIN', 'MANAGER', 'OFFICE_ASSISTANT', 'ADMIN'].includes(userRole)
-          const isSender = notif.senderId === userUid
+          const userProfileUid = profile?.uid
+          const userEmail = profile?.email?.trim().toLowerCase()
+
+          const isSender = Boolean(
+            notif.senderId === userUid ||
+              (userProfileUid && notif.senderId === userProfileUid) ||
+              (userEmail && notif.senderId === userEmail)
+          )
 
           // Check targeting relevance for current user
           let isTargeted = false
@@ -89,10 +96,17 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
             }
           } else if (notif.targetType === 'unit') {
             if (userUnit && notif.targetUnit) {
-              isTargeted = notif.targetUnit.trim().toLowerCase() === userUnit
+              const cleanTarget = notif.targetUnit.trim().toLowerCase()
+              isTargeted = cleanTarget === userUnit || cleanTarget === `unit ${userUnit}`
             }
           } else if (notif.targetType === 'individual') {
-            isTargeted = notif.targetUserId === userUid
+            const targetId = notif.targetUserId?.trim().toLowerCase()
+            isTargeted = Boolean(
+              targetId &&
+                (targetId === userUid.toLowerCase() ||
+                  (userProfileUid && targetId === userProfileUid.toLowerCase()) ||
+                  (userEmail && targetId === userEmail))
+            )
           }
 
           // Admins, managers, senders, and targeted recipients can view notifications in the list/Center
@@ -101,9 +115,9 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
           if (isRelevant) {
             matchedNotifications.push(notif)
 
-            // Trigger live audio chime & native push when a brand-new notification arrives
+            // Trigger live audio chime & native push when a brand-new notification arrives for a targeted recipient (not sender)
             if (!isInitialLoadRef.current && !previousIdsRef.current.has(notif.id)) {
-              if (isTargeted || isSender) {
+              if (isTargeted && !isSender) {
                 hasNewNotificationForSound = true
                 if (!newestNotifForPush) {
                   newestNotifForPush = notif
