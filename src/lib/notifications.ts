@@ -104,7 +104,7 @@ export function showBrowserNotification(title: string, options?: { body?: string
     const notifOptions = {
       body: options?.body || '',
       icon: options?.icon || '/icon-192.png',
-      badge: '/badge.png',
+      badge: '/badge.png?v=3',
       tag: options?.tag || `sunrise-${Date.now()}`,
       data: { url: options?.link || '/notifications' },
       vibrate: [200, 100, 200],

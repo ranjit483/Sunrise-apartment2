@@ -58,7 +58,7 @@ self.addEventListener('push', (event) => {
   const options = {
     body: data.body || data.message || 'You have a new update.',
     icon: data.icon || '/icon-192.png',
-    badge: '/badge.png',
+    badge: '/badge.png?v=3',
     data: {
       url: data.link || data.url || '/notifications',
     },

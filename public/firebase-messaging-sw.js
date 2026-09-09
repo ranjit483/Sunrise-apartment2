@@ -19,7 +19,7 @@ self.addEventListener('push', (event) => {
   const options = {
     body: body,
     icon: '/icon-192.png',
-    badge: '/badge.png',
+    badge: '/badge.png?v=3',
     data: { url: link },
     vibrate: [200, 100, 200],
     tag: 'sunrise-notification',
