@@ -101,9 +101,9 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
           if (isRelevant) {
             matchedNotifications.push(notif)
 
-            // Trigger live audio chime & native push when a brand-new notification arrives for a targeted user (not sender)
+            // Trigger live audio chime & native push when a brand-new notification arrives
             if (!isInitialLoadRef.current && !previousIdsRef.current.has(notif.id)) {
-              if (isTargeted && !isSender) {
+              if (isTargeted || isSender) {
                 hasNewNotificationForSound = true
                 if (!newestNotifForPush) {
                   newestNotifForPush = notif

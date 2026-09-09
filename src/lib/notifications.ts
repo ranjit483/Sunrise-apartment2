@@ -101,39 +101,45 @@ export function showBrowserNotification(title: string, options?: { body?: string
   if (typeof window === 'undefined' || !('Notification' in window)) return
 
   if (Notification.permission === 'granted') {
-    try {
-      // This works on desktop browsers
-      const notif = new Notification(title, {
-        body: options?.body || '',
-        icon: options?.icon || '/icon-192.png',
-        badge: '/badge.png',
-        tag: options?.tag || 'sunrise-live',
-        data: { url: options?.link || '/notifications' },
-      })
+    const notifOptions = {
+      body: options?.body || '',
+      icon: options?.icon || '/icon-192.png',
+      badge: '/badge.png',
+      tag: options?.tag || `sunrise-${Date.now()}`,
+      data: { url: options?.link || '/notifications' },
+      vibrate: [200, 100, 200],
+      renotify: true,
+    }
 
-      notif.onclick = function (event) {
-        event.preventDefault()
-        window.focus()
-        if (options?.link) {
-          window.location.href = options.link
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.ready
+        .then((registration) => {
+          registration.showNotification(title, notifOptions)
+        })
+        .catch(() => {
+          try {
+            const notif = new Notification(title, notifOptions)
+            notif.onclick = (event) => {
+              event.preventDefault()
+              window.focus()
+              if (options?.link) window.location.href = options.link
+              notif.close()
+            }
+          } catch (err) {
+            console.error('Failed to trigger native notification:', err)
+          }
+        })
+    } else {
+      try {
+        const notif = new Notification(title, notifOptions)
+        notif.onclick = (event) => {
+          event.preventDefault()
+          window.focus()
+          if (options?.link) window.location.href = options.link
+          notif.close()
         }
-        notif.close()
-      }
-    } catch (e) {
-      // On Android/iOS Chrome, new Notification() throws an Illegal constructor error.
-      // You MUST use the Service Worker registration to show notifications.
-      if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.ready.then((registration) => {
-          registration.showNotification(title, {
-            body: options?.body || '',
-            icon: options?.icon || '/icon-192.png',
-            badge: '/badge.png',
-            tag: options?.tag || 'sunrise-live',
-            data: { url: options?.link || '/notifications' },
-          })
-        }).catch(err => {
-          console.error("Service worker registration failed to show notification:", err);
-        });
+      } catch (err) {
+        console.error('Failed to trigger native notification:', err)
       }
     }
   }
