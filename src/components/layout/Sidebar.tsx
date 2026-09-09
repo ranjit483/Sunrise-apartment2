@@ -128,8 +128,8 @@ export function Sidebar({ collapsed, setCollapsed, mobileOpen, setMobileOpen }: 
             </button>
           </div>
 
-          <nav className="flex-1 overflow-y-auto py-4">
-            <ul className="space-y-1 px-2">
+          <nav className="flex-1 overflow-y-auto py-2 md:py-4">
+            <ul className="space-y-0.5 md:space-y-1 px-2">
               {filteredNavItems.map((item) => {
                 const isActive = pathname === item.href || pathname.startsWith(`${item.href}/`)
                 return (
@@ -138,13 +138,13 @@ export function Sidebar({ collapsed, setCollapsed, mobileOpen, setMobileOpen }: 
                       href={item.href}
                       onClick={() => setMobileOpen?.(false)}
                       className={cn(
-                        'flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors',
+                        'flex items-center gap-2 md:gap-3 rounded-lg px-2 md:px-3 py-1.5 md:py-2.5 text-[10px] md:text-sm font-medium transition-colors',
                         isActive
                           ? 'bg-primary text-primary-foreground'
                           : 'text-muted-foreground hover:bg-muted hover:text-foreground'
                       )}
                     >
-                      <item.icon className={cn('h-5 w-5', collapsed && 'mx-auto')} />
+                      <item.icon className={cn('h-4 w-4 md:h-5 md:w-5', collapsed && 'mx-auto')} />
                       {!collapsed && <span>{item.title}</span>}
                     </Link>
                   </li>
