@@ -106,7 +106,7 @@ export function showBrowserNotification(title: string, options?: { body?: string
       const notif = new Notification(title, {
         body: options?.body || '',
         icon: options?.icon || '/icon-192.png',
-        badge: '/favicon.png',
+        badge: '/badge.png',
         tag: options?.tag || 'sunrise-live',
         data: { url: options?.link || '/notifications' },
       })
@@ -127,7 +127,7 @@ export function showBrowserNotification(title: string, options?: { body?: string
           registration.showNotification(title, {
             body: options?.body || '',
             icon: options?.icon || '/icon-192.png',
-            badge: '/favicon.png',
+            badge: '/badge.png',
             tag: options?.tag || 'sunrise-live',
             data: { url: options?.link || '/notifications' },
           })

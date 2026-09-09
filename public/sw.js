@@ -7,7 +7,8 @@ const ASSETS_TO_CACHE = [
   '/icon-192.png',
   '/icon-512.png',
   '/apple-touch-icon.png',
-  '/favicon.png'
+  '/favicon.png',
+  '/badge.png'
 ];
 
 self.addEventListener('install', (event) => {
@@ -57,7 +58,7 @@ self.addEventListener('push', (event) => {
   const options = {
     body: data.body || data.message || 'You have a new update.',
     icon: data.icon || '/icon-192.png',
-    badge: '/favicon.png',
+    badge: '/badge.png',
     data: {
       url: data.link || data.url || '/notifications',
     },
