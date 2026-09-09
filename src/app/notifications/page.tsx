@@ -65,6 +65,7 @@ export default function NotificationsPage() {
 
   // Inbox state
   const [activeTab, setActiveTab] = useState<string>('all')
+  const [targetTypeFilter, setTargetTypeFilter] = useState<string>('all_targets')
   const [searchQuery, setSearchQuery] = useState<string>('')
 
   // Dispatch Modal state
@@ -251,13 +252,19 @@ export default function NotificationsPage() {
       if (notif.type !== activeTab) return false
     }
 
+    // Target Audience filter
+    if (targetTypeFilter !== 'all_targets') {
+      if (notif.targetType !== targetTypeFilter) return false
+    }
+
     // Search query filter
     if (searchQuery.trim() !== '') {
       const q = searchQuery.toLowerCase()
       const matchTitle = notif.title.toLowerCase().includes(q)
       const matchBody = notif.body.toLowerCase().includes(q)
       const matchSender = notif.senderName?.toLowerCase().includes(q)
-      if (!matchTitle && !matchBody && !matchSender) return false
+      const matchUnit = notif.targetUnit?.toLowerCase().includes(q)
+      if (!matchTitle && !matchBody && !matchSender && !matchUnit) return false
     }
 
     return true
@@ -408,14 +415,29 @@ export default function NotificationsPage() {
                 </TabsList>
               </Tabs>
 
-              <div className="relative w-full md:w-64">
-                <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-                <Input
-                  placeholder="Search notifications..."
-                  className="pl-9 h-8 text-xs sm:h-9 sm:text-sm"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                />
+              <div className="flex flex-col sm:flex-row items-center gap-2 w-full md:w-auto">
+                <Select value={targetTypeFilter} onValueChange={setTargetTypeFilter}>
+                  <SelectTrigger className="h-8 text-xs sm:h-9 sm:text-xs w-full sm:w-44 bg-background">
+                    <SelectValue placeholder="All Target Audiences" />
+                  </SelectTrigger>
+                  <SelectContent className="text-xs">
+                    <SelectItem value="all_targets">🎯 All Audiences</SelectItem>
+                    <SelectItem value="all">📢 All Society</SelectItem>
+                    <SelectItem value="role">👥 Group Role</SelectItem>
+                    <SelectItem value="unit">🏢 Specific Unit</SelectItem>
+                    <SelectItem value="individual">👤 Individual</SelectItem>
+                  </SelectContent>
+                </Select>
+
+                <div className="relative w-full sm:w-56">
+                  <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+                  <Input
+                    placeholder="Search notifications..."
+                    className="pl-9 h-8 text-xs sm:h-9 sm:text-sm"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                  />
+                </div>
               </div>
             </div>
           </CardHeader>
@@ -495,7 +517,9 @@ export default function NotificationsPage() {
                                 ? `🏢 Unit ${notif.targetUnit}`
                                 : notif.targetType === 'role'
                                 ? `👥 Group: ${notif.targetRoles?.join(', ')}`
-                                : '👤 Direct to You'}
+                                : notif.targetType === 'individual'
+                                ? (notif.targetUserId === user?.uid ? '👤 Direct to You' : '👤 Individual User')
+                                : '📢 Announcement'}
                             </span>
                           </div>
 
