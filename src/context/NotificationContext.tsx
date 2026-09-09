@@ -73,33 +73,41 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
           const notif = { id: docSnap.id, ...docSnap.data() } as AppNotification
           currentBatchIds.add(notif.id)
 
+          const isAdminOrManager = ['SUPER_ADMIN', 'MANAGER', 'OFFICE_ASSISTANT', 'ADMIN'].includes(userRole)
+          const isSender = notif.senderId === userUid
+
           // Check targeting relevance for current user
-          let isRelevant = false
+          let isTargeted = false
 
           if (notif.targetType === 'all') {
-            isRelevant = true
+            isTargeted = true
           } else if (notif.targetType === 'role') {
             if (notif.targetRoles && notif.targetRoles.length > 0) {
-              isRelevant = notif.targetRoles.includes(userRole)
+              isTargeted = notif.targetRoles.includes(userRole)
             } else {
-              isRelevant = true
+              isTargeted = true
             }
           } else if (notif.targetType === 'unit') {
             if (userUnit && notif.targetUnit) {
-              isRelevant = notif.targetUnit.trim().toLowerCase() === userUnit
+              isTargeted = notif.targetUnit.trim().toLowerCase() === userUnit
             }
           } else if (notif.targetType === 'individual') {
-            isRelevant = notif.targetUserId === userUid
+            isTargeted = notif.targetUserId === userUid
           }
+
+          // Admins, managers, senders, and targeted recipients can view notifications in the list/Center
+          const isRelevant = isTargeted || isSender || isAdminOrManager
 
           if (isRelevant) {
             matchedNotifications.push(notif)
 
-            // If not initial load and this is a brand-new notification not seen before
+            // Trigger live audio chime & native push when a brand-new notification arrives for a targeted user (not sender)
             if (!isInitialLoadRef.current && !previousIdsRef.current.has(notif.id)) {
-              hasNewNotificationForSound = true
-              if (!newestNotifForPush) {
-                newestNotifForPush = notif
+              if (isTargeted && !isSender) {
+                hasNewNotificationForSound = true
+                if (!newestNotifForPush) {
+                  newestNotifForPush = notif
+                }
               }
             }
           }

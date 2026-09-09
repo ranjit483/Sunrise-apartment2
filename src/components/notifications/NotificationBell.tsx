@@ -4,6 +4,7 @@ import React from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useNotifications } from '@/context/NotificationContext'
+import { useAuth } from '@/context/AuthContext'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -32,6 +33,7 @@ import { playNotificationSound } from '@/lib/notifications'
 
 export function NotificationBell() {
   const router = useRouter()
+  const { user } = useAuth()
   const {
     notifications,
     unreadCount,
@@ -184,7 +186,7 @@ export function NotificationBell() {
             </div>
           ) : (
             recentNotifications.map((notif) => {
-              const isUnread = !notif.readBy?.includes(notif.id) // check read status
+              const isUnread = !notif.readBy?.includes(user?.uid || '') // check read status
               return (
                 <div
                   key={notif.id}
