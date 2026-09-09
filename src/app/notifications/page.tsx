@@ -160,6 +160,22 @@ export default function NotificationsPage() {
         setFormTargetType('all')
         setFormLink('/maintenance')
         break
+      case 'greetings':
+        setFormTitle('👋 Greetings from Sunrise Management')
+        setFormBody('Wishing all residents a wonderful day ahead! Please reach out to the management office for any assistance.')
+        setFormType('announcement')
+        setFormPriority('normal')
+        setFormTargetType('all')
+        setFormLink('/dashboard')
+        break
+      case 'publicNotice':
+        setFormTitle('📢 Public Notice')
+        setFormBody('Please be informed that a general community meeting will be held this coming Saturday at the clubhouse. All residents are requested to attend.')
+        setFormType('announcement')
+        setFormPriority('normal')
+        setFormTargetType('all')
+        setFormLink('/notifications')
+        break
     }
   }
 
@@ -591,6 +607,24 @@ export default function NotificationsPage() {
                   className="h-7 text-[10px] sm:text-xs px-2"
                 >
                   🔧 Lift Maintenance
+                </Button>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => applyTemplate('greetings')}
+                  className="h-7 text-[10px] sm:text-xs px-2"
+                >
+                  👋 Greetings
+                </Button>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => applyTemplate('publicNotice')}
+                  className="h-7 text-[10px] sm:text-xs px-2"
+                >
+                  📢 Public Notice
                 </Button>
               </div>
             </div>
