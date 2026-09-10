@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { collection, getDocs, query, orderBy, deleteDoc, doc, updateDoc } from 'firebase/firestore'
-import { db } from '@/config/firebase'
+import { db, auth } from '@/config/firebase'
 import { DashboardLayout } from '@/components/layout/DashboardLayout'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
@@ -144,6 +144,43 @@ export default function UsersPage() {
       alert('Failed to update user: ' + error.message)
     } finally {
       setSaving(false)
+    }
+  }
+
+  const handleResetPassword = async () => {
+    if (!editingUser) return;
+    if (currentUserRole !== 'SUPER_ADMIN') {
+      alert('Only Super Admins can reset passwords.');
+      return;
+    }
+
+    const newPassword = window.prompt(`Enter new password for ${editingUser.fullName}:`);
+    if (!newPassword) return;
+    if (newPassword.length < 6) {
+      alert('Password must be at least 6 characters.');
+      return;
+    }
+
+    try {
+      const res = await fetch('/api/users/reset-password', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          uid: editingUser.uid,
+          newPassword,
+          adminUid: auth.currentUser?.uid
+        })
+      });
+
+      const data = await res.json();
+      if (res.ok) {
+        alert('Password updated successfully!');
+      } else {
+        alert('Failed to reset password: ' + data.error);
+      }
+    } catch (error) {
+      console.error('Error resetting password:', error);
+      alert('An error occurred while resetting the password.');
     }
   }
 
@@ -454,12 +491,21 @@ export default function UsersPage() {
                   </SelectContent>
                 </Select>
               </div>
-              <div className="flex justify-end gap-3 pt-4">
-                <Button variant="outline" onClick={() => setEditingUser(null)} disabled={saving}>Cancel</Button>
-                <Button onClick={handleUpdateUser} disabled={saving}>
-                  {saving && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                  Save Changes
-                </Button>
+              <div className="flex justify-between items-center pt-4">
+                <div>
+                  {currentUserRole === 'SUPER_ADMIN' && (
+                    <Button variant="destructive" onClick={handleResetPassword} disabled={saving}>
+                      Reset Password
+                    </Button>
+                  )}
+                </div>
+                <div className="flex gap-3">
+                  <Button variant="outline" onClick={() => setEditingUser(null)} disabled={saving}>Cancel</Button>
+                  <Button onClick={handleUpdateUser} disabled={saving}>
+                    {saving && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                    Save Changes
+                  </Button>
+                </div>
               </div>
             </div>
           )}
