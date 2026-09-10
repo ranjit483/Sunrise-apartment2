@@ -154,33 +154,16 @@ export default function UsersPage() {
       return;
     }
 
-    const newPassword = window.prompt(`Enter new password for ${editingUser.fullName}:`);
-    if (!newPassword) return;
-    if (newPassword.length < 6) {
-      alert('Password must be at least 6 characters.');
-      return;
-    }
+    const confirmReset = window.confirm(`Send a password reset email to ${editingUser.fullName} (${editingUser.email})?`);
+    if (!confirmReset) return;
 
     try {
-      const res = await fetch('/api/users/reset-password', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          uid: editingUser.uid,
-          newPassword,
-          adminUid: auth.currentUser?.uid
-        })
-      });
-
-      const data = await res.json();
-      if (res.ok) {
-        alert('Password updated successfully!');
-      } else {
-        alert('Failed to reset password: ' + data.error);
-      }
-    } catch (error) {
-      console.error('Error resetting password:', error);
-      alert('An error occurred while resetting the password.');
+      const { sendPasswordResetEmail } = await import('firebase/auth');
+      await sendPasswordResetEmail(auth, editingUser.email);
+      alert(`Password reset email sent successfully to ${editingUser.email}!`);
+    } catch (error: any) {
+      console.error('Error sending reset email:', error);
+      alert('Failed to send reset email: ' + error.message);
     }
   }
 
