@@ -177,15 +177,15 @@ export default function ProfitLossPage() {
 
   return (
     <DashboardLayout title="Profit & Loss Statement">
-      <div className="space-y-6 max-w-5xl mx-auto">
-        <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 print:hidden">
+      <div className="space-y-3 sm:space-y-6 max-w-5xl mx-auto">
+        <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-3 sm:gap-4 print:hidden">
           <div>
-            <h2 className="text-3xl font-bold">Profit & Loss</h2>
-            <p className="text-muted-foreground">Financial statement of revenues and expenses</p>
+            <h2 className="text-lg sm:text-3xl font-bold tracking-tight">Profit & Loss</h2>
+            <p className="text-[10px] sm:text-sm text-muted-foreground mt-0.5 sm:mt-1">Financial statement of revenues and expenses</p>
           </div>
           <div className="flex gap-2">
             <Select value={dateFilter} onValueChange={setDateFilter}>
-              <SelectTrigger className="w-[180px]">
+              <SelectTrigger className="w-[130px] sm:w-[180px] h-8 sm:h-10 text-xs sm:text-sm">
                 <SelectValue placeholder="Select period" />
               </SelectTrigger>
               <SelectContent>
@@ -195,8 +195,8 @@ export default function ProfitLossPage() {
                 <SelectItem value="all_time">All Time</SelectItem>
               </SelectContent>
             </Select>
-            <Button variant="outline" className="gap-2" onClick={() => window.print()}>
-              <Printer className="h-4 w-4" /> Print
+            <Button variant="outline" size="sm" className="gap-1.5 h-8 sm:h-10 text-xs sm:text-sm" onClick={() => window.print()}>
+              <Printer className="h-3.5 w-3.5 sm:h-4 sm:w-4" /> Print
             </Button>
           </div>
         </div>
@@ -205,114 +205,114 @@ export default function ProfitLossPage() {
           <div className="flex justify-center py-20"><Loader2 className="h-8 w-8 animate-spin text-muted-foreground" /></div>
         ) : (
           <Card className="bg-white print:shadow-none print:border-none">
-            <CardHeader className="text-center border-b pb-6">
-              <CardTitle className="text-2xl uppercase tracking-wider">Statement of Profit & Loss</CardTitle>
-              <p className="text-muted-foreground mt-2">
+            <CardHeader className="text-center border-b pb-3 sm:pb-6 p-3 sm:p-6">
+              <CardTitle className="text-sm sm:text-2xl font-black uppercase tracking-wider">Statement of Profit & Loss</CardTitle>
+              <p className="text-[10px] sm:text-sm text-muted-foreground mt-1 sm:mt-2">
                 For the period: {dateFilter.replace('_', ' ').toUpperCase()}
               </p>
             </CardHeader>
-            <CardContent className="p-0 sm:p-6">
+            <CardContent className="p-2 sm:p-6">
               <div className="w-full">
                 {/* Revenue Section */}
-                <div className="mb-8">
-                  <h3 className="font-bold text-lg border-b pb-2 mb-4 text-emerald-800">REVENUE (INCOME)</h3>
-                  <div className="space-y-3 px-4">
+                <div className="mb-4 sm:mb-8">
+                  <h3 className="font-bold text-xs sm:text-lg border-b pb-1.5 sm:pb-2 mb-2 sm:mb-4 text-emerald-800">REVENUE (INCOME)</h3>
+                  <div className="space-y-1.5 sm:space-y-3 px-2 sm:px-4">
                     {filteredData.totalServiceCharge > 0 && (
-                      <div className="flex justify-between">
-                        <span className="text-muted-foreground">Service Charge & Rent Income</span>
+                      <div className="flex justify-between text-xs sm:text-base">
+                        <span className="text-muted-foreground text-[10px] sm:text-sm">Service Charge & Rent Income</span>
                         <span>₨ {filteredData.totalServiceCharge.toLocaleString()}</span>
                       </div>
                     )}
                     {filteredData.totalElectricity > 0 && (
-                      <div className="flex justify-between">
-                        <span className="text-muted-foreground">Electricity Income</span>
+                      <div className="flex justify-between text-xs sm:text-base">
+                        <span className="text-muted-foreground text-[10px] sm:text-sm">Electricity Income</span>
                         <span>₨ {filteredData.totalElectricity.toLocaleString()}</span>
                       </div>
                     )}
                     {filteredData.totalElectricityVat > 0 && (
-                      <div className="flex justify-between">
-                        <span className="text-muted-foreground">Electricity Vat 13%</span>
+                      <div className="flex justify-between text-xs sm:text-base">
+                        <span className="text-muted-foreground text-[10px] sm:text-sm">Electricity Vat 13%</span>
                         <span>₨ {filteredData.totalElectricityVat.toLocaleString()}</span>
                       </div>
                     )}
                     {filteredData.totalUtility > 0 && (
-                      <div className="flex justify-between">
-                        <span className="text-muted-foreground">Utility Income</span>
+                      <div className="flex justify-between text-xs sm:text-base">
+                        <span className="text-muted-foreground text-[10px] sm:text-sm">Utility Income</span>
                         <span>₨ {filteredData.totalUtility.toLocaleString()}</span>
                       </div>
                     )}
                     {filteredData.totalWater > 0 && (
-                      <div className="flex justify-between">
-                        <span className="text-muted-foreground">Water Income</span>
+                      <div className="flex justify-between text-xs sm:text-base">
+                        <span className="text-muted-foreground text-[10px] sm:text-sm">Water Income</span>
                         <span>₨ {filteredData.totalWater.toLocaleString()}</span>
                       </div>
                     )}
                     {filteredData.totalDiesel > 0 && (
-                      <div className="flex justify-between">
-                        <span className="text-muted-foreground">Diesel Cost Sharing</span>
+                      <div className="flex justify-between text-xs sm:text-base">
+                        <span className="text-muted-foreground text-[10px] sm:text-sm">Diesel Cost Sharing</span>
                         <span>₨ {filteredData.totalDiesel.toLocaleString()}</span>
                       </div>
                     )}
                     {filteredData.totalInsurance > 0 && (
-                      <div className="flex justify-between">
-                        <span className="text-muted-foreground">Insurance Sharing</span>
+                      <div className="flex justify-between text-xs sm:text-base">
+                        <span className="text-muted-foreground text-[10px] sm:text-sm">Insurance Sharing</span>
                         <span>₨ {filteredData.totalInsurance.toLocaleString()}</span>
                       </div>
                     )}
                     {filteredData.totalStructureMaintenance > 0 && (
-                      <div className="flex justify-between">
-                        <span className="text-muted-foreground">Structure Maintenance</span>
+                      <div className="flex justify-between text-xs sm:text-base">
+                        <span className="text-muted-foreground text-[10px] sm:text-sm">Structure Maintenance</span>
                         <span>₨ {filteredData.totalStructureMaintenance.toLocaleString()}</span>
                       </div>
                     )}
                     {filteredData.totalLatePenalty > 0 && (
-                      <div className="flex justify-between">
-                        <span className="text-muted-foreground">Late Penalties</span>
+                      <div className="flex justify-between text-xs sm:text-base">
+                        <span className="text-muted-foreground text-[10px] sm:text-sm">Late Penalties</span>
                         <span>₨ {filteredData.totalLatePenalty.toLocaleString()}</span>
                       </div>
                     )}
                     {filteredData.totalOther > 0 && (
-                      <div className="flex justify-between">
-                        <span className="text-muted-foreground">Other Income</span>
+                      <div className="flex justify-between text-xs sm:text-base">
+                        <span className="text-muted-foreground text-[10px] sm:text-sm">Other Income</span>
                         <span>₨ {filteredData.totalOther.toLocaleString()}</span>
                       </div>
                     )}
                     {filteredData.totalPartialPayment > 0 && (
-                      <div className="flex justify-between font-medium text-emerald-700">
-                        <span>Partial Payments (Unallocated)</span>
+                      <div className="flex justify-between font-medium text-emerald-700 text-xs sm:text-base">
+                        <span className="text-[10px] sm:text-sm">Partial Payments (Unallocated)</span>
                         <span>₨ {filteredData.totalPartialPayment.toLocaleString()}</span>
                       </div>
                     )}
                   </div>
-                  <div className="flex justify-between font-bold text-lg mt-4 px-4 pt-4 border-t border-dashed">
+                  <div className="flex justify-between font-bold text-xs sm:text-lg mt-2 sm:mt-4 px-2 sm:px-4 pt-2 sm:pt-4 border-t border-dashed">
                     <span>Total Revenue</span>
                     <span className="text-emerald-700">₨ {filteredData.totalRevenue.toLocaleString()}</span>
                   </div>
                 </div>
 
                 {/* Expenses Section */}
-                <div className="mb-8">
-                  <h3 className="font-bold text-lg border-b pb-2 mb-4 text-red-800">OPERATING EXPENSES</h3>
-                  <div className="space-y-3 px-4">
+                <div className="mb-4 sm:mb-8">
+                  <h3 className="font-bold text-xs sm:text-lg border-b pb-1.5 sm:pb-2 mb-2 sm:mb-4 text-red-800">OPERATING EXPENSES</h3>
+                  <div className="space-y-1.5 sm:space-y-3 px-2 sm:px-4">
                     {filteredData.sortedExpenseCategories.length === 0 ? (
-                      <p className="text-muted-foreground italic text-sm">No expenses recorded in this period.</p>
+                      <p className="text-muted-foreground italic text-[10px] sm:text-sm">No expenses recorded in this period.</p>
                     ) : (
                       filteredData.sortedExpenseCategories.map(cat => (
-                        <div key={cat} className="flex justify-between">
-                          <span className="text-muted-foreground">{cat}</span>
+                        <div key={cat} className="flex justify-between text-xs sm:text-base">
+                          <span className="text-muted-foreground text-[10px] sm:text-sm">{cat}</span>
                           <span>₨ {filteredData.expensesByCategory[cat].toLocaleString()}</span>
                         </div>
                       ))
                     )}
                   </div>
-                  <div className="flex justify-between font-bold text-lg mt-4 px-4 pt-4 border-t border-dashed">
+                  <div className="flex justify-between font-bold text-xs sm:text-lg mt-2 sm:mt-4 px-2 sm:px-4 pt-2 sm:pt-4 border-t border-dashed">
                     <span>Total Expenses</span>
                     <span className="text-red-700">₨ {filteredData.totalExpense.toLocaleString()}</span>
                   </div>
                 </div>
 
                 {/* Net Profit Section */}
-                <div className={`mt-12 flex justify-between items-center font-bold text-xl p-4 rounded-lg ${
+                <div className={`mt-6 sm:mt-12 flex justify-between items-center font-bold text-xs sm:text-xl p-2.5 sm:p-4 rounded-lg ${
                   filteredData.netProfit >= 0 ? 'bg-emerald-50 text-emerald-900 border border-emerald-200' : 'bg-red-50 text-red-900 border border-red-200'
                 }`}>
                   <span>NET {filteredData.netProfit >= 0 ? 'PROFIT' : 'LOSS'}</span>
@@ -320,15 +320,15 @@ export default function ProfitLossPage() {
                 </div>
                 
                 {/* Bank & Cash Balances Section */}
-                <div className="mt-8 border-t pt-8">
-                  <h3 className="font-bold text-lg border-b pb-2 mb-4 text-blue-800">BANK & CASH BALANCES</h3>
-                  <div className="space-y-3 px-4">
-                    <div className="flex justify-between">
-                      <span className="text-muted-foreground font-medium">IME Globle Bank</span>
+                <div className="mt-4 sm:mt-8 border-t pt-4 sm:pt-8">
+                  <h3 className="font-bold text-xs sm:text-lg border-b pb-1.5 sm:pb-2 mb-2 sm:mb-4 text-blue-800">BANK & CASH BALANCES</h3>
+                  <div className="space-y-1.5 sm:space-y-3 px-2 sm:px-4">
+                    <div className="flex justify-between text-xs sm:text-base">
+                      <span className="text-muted-foreground font-medium text-[10px] sm:text-sm">IME Globle Bank</span>
                       <span className="font-medium text-blue-900">₨ {filteredData.globalBankBalance.toLocaleString()}</span>
                     </div>
-                    <div className="flex justify-between">
-                      <span className="text-muted-foreground font-medium">Cash</span>
+                    <div className="flex justify-between text-xs sm:text-base">
+                      <span className="text-muted-foreground font-medium text-[10px] sm:text-sm">Cash</span>
                       <span className="font-medium text-blue-900">₨ {filteredData.globalCashBalance.toLocaleString()}</span>
                     </div>
                   </div>

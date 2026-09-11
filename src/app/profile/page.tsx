@@ -87,55 +87,55 @@ export default function ProfilePage() {
   }
 
   return (
-    <div className="container mx-auto p-4 max-w-4xl space-y-6">
-      <div className="flex flex-col gap-2">
-        <h1 className="text-3xl font-bold tracking-tight">My Profile</h1>
-        <p className="text-muted-foreground">
+    <div className="container mx-auto p-2 sm:p-4 max-w-4xl space-y-3 sm:space-y-6">
+      <div className="flex flex-col gap-1 sm:gap-2">
+        <h1 className="text-lg sm:text-3xl font-bold tracking-tight">My Profile</h1>
+        <p className="text-[10px] sm:text-sm text-muted-foreground">
           View and manage your personal information
         </p>
       </div>
 
-      <div className="grid gap-6 md:grid-cols-3">
+      <div className="grid gap-3 sm:gap-6 md:grid-cols-3">
         {/* Left Column: Read-Only Overview */}
         <Card className="md:col-span-1">
-          <CardHeader className="text-center pb-2">
-            <div className="mx-auto mb-4 relative w-24 h-24">
-              <Avatar className="w-24 h-24 border-4 border-background shadow-md">
+          <CardHeader className="text-center p-3 sm:p-6 pb-2">
+            <div className="mx-auto mb-2 sm:mb-4 relative w-16 h-16 sm:w-24 sm:h-24">
+              <Avatar className="w-16 h-16 sm:w-24 sm:h-24 border-2 sm:border-4 border-background shadow-md">
                 <AvatarImage src={profile.profileImage || ''} alt={profile.fullName} />
-                <AvatarFallback className="bg-primary/10 text-primary text-2xl font-bold">
+                <AvatarFallback className="bg-primary/10 text-primary text-sm sm:text-2xl font-bold">
                   {getInitials(profile.fullName || 'User')}
                 </AvatarFallback>
               </Avatar>
             </div>
-            <CardTitle>{profile.fullName}</CardTitle>
-            <CardDescription>{profile.email}</CardDescription>
+            <CardTitle className="text-sm sm:text-xl font-bold">{profile.fullName}</CardTitle>
+            <CardDescription className="text-[10px] sm:text-xs">{profile.email}</CardDescription>
           </CardHeader>
-          <CardContent className="space-y-4 pt-4">
+          <CardContent className="p-3 sm:p-6 space-y-2 sm:space-y-4 pt-2 sm:pt-4">
             <div className="flex items-center justify-between">
-              <div className="flex items-center text-sm text-muted-foreground">
-                <Shield className="w-4 h-4 mr-2" />
+              <div className="flex items-center text-[10px] sm:text-sm text-muted-foreground">
+                <Shield className="w-3.5 h-3.5 sm:w-4 sm:h-4 mr-1.5 sm:mr-2" />
                 Role
               </div>
-              <Badge variant="secondary" className="font-medium">
+              <Badge variant="secondary" className="font-medium text-[9px] sm:text-xs px-1.5 py-0.5">
                 {profile.role ? profile.role.replace('_', ' ') : 'UNKNOWN'}
               </Badge>
             </div>
             <div className="flex items-center justify-between">
-              <div className="flex items-center text-sm text-muted-foreground">
-                <Activity className="w-4 h-4 mr-2" />
+              <div className="flex items-center text-[10px] sm:text-sm text-muted-foreground">
+                <Activity className="w-3.5 h-3.5 sm:w-4 sm:h-4 mr-1.5 sm:mr-2" />
                 Status
               </div>
-              <Badge variant={profile.status === 'approved' ? 'default' : 'destructive'} className="font-medium capitalize">
+              <Badge variant={profile.status === 'approved' ? 'default' : 'destructive'} className="font-medium capitalize text-[9px] sm:text-xs px-1.5 py-0.5">
                 {profile.status}
               </Badge>
             </div>
             {profile.clearance_level && (
               <div className="flex items-center justify-between">
-                <div className="flex items-center text-sm text-muted-foreground">
-                  <Shield className="w-4 h-4 mr-2" />
+                <div className="flex items-center text-[10px] sm:text-sm text-muted-foreground">
+                  <Shield className="w-3.5 h-3.5 sm:w-4 sm:h-4 mr-1.5 sm:mr-2" />
                   Clearance
                 </div>
-                <span className="text-sm font-medium">Level {profile.clearance_level}</span>
+                <span className="text-[10px] sm:text-sm font-medium">Level {profile.clearance_level}</span>
               </div>
             )}
           </CardContent>
@@ -143,63 +143,63 @@ export default function ProfilePage() {
 
         {/* Right Column: Edit Form */}
         <Card className="md:col-span-2">
-          <CardHeader>
-            <CardTitle>Personal Details</CardTitle>
-            <CardDescription>
+          <CardHeader className="p-3 sm:p-6">
+            <CardTitle className="text-sm sm:text-xl font-bold">Personal Details</CardTitle>
+            <CardDescription className="text-[10px] sm:text-xs">
               Update your contact information and apartment details.
             </CardDescription>
           </CardHeader>
           <form onSubmit={handleUpdateProfile}>
-            <CardContent className="space-y-4">
+            <CardContent className="p-3 sm:p-6 space-y-3 sm:space-y-4 pt-0">
               {successMsg && (
-                <div className="p-3 bg-green-50 text-green-600 rounded-md text-sm border border-green-200">
+                <div className="p-2 sm:p-3 bg-green-50 text-green-600 rounded-md text-[10px] sm:text-sm border border-green-200">
                   {successMsg}
                 </div>
               )}
               {errorMsg && (
-                <div className="p-3 bg-red-50 text-red-600 rounded-md text-sm border border-red-200">
+                <div className="p-2 sm:p-3 bg-red-50 text-red-600 rounded-md text-[10px] sm:text-sm border border-red-200">
                   {errorMsg}
                 </div>
               )}
 
-              <div className="grid gap-4 md:grid-cols-2">
-                <div className="space-y-2">
-                  <Label htmlFor="fullName">Full Name</Label>
+              <div className="grid gap-3 sm:gap-4 md:grid-cols-2">
+                <div className="space-y-1 sm:space-y-2">
+                  <Label htmlFor="fullName" className="text-[10px] sm:text-sm font-semibold">Full Name</Label>
                   <div className="relative">
-                    <UserIcon className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
+                    <UserIcon className="absolute left-2.5 top-2 sm:top-2.5 h-3.5 w-3.5 sm:h-4 sm:w-4 text-muted-foreground" />
                     <Input
                       id="fullName"
                       placeholder="Your full name"
                       value={formData.fullName}
                       onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
-                      className={`pl-9 ${isRestricted ? 'bg-muted cursor-not-allowed opacity-75' : ''}`}
+                      className={`pl-8 sm:pl-9 h-8 sm:h-10 text-xs sm:text-sm ${isRestricted ? 'bg-muted cursor-not-allowed opacity-75' : ''}`}
                       disabled={isRestricted}
                       readOnly={isRestricted}
                       required
                     />
                   </div>
-                  {isRestricted && <p className="text-[10px] text-muted-foreground">Name cannot be changed without manager permission.</p>}
+                  {isRestricted && <p className="text-[9px] sm:text-[10px] text-muted-foreground">Name cannot be changed without manager permission.</p>}
                 </div>
 
-                <div className="space-y-2">
-                  <Label htmlFor="email">Email Address</Label>
+                <div className="space-y-1 sm:space-y-2">
+                  <Label htmlFor="email" className="text-[10px] sm:text-sm font-semibold">Email Address</Label>
                   <div className="relative">
-                    <Mail className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
+                    <Mail className="absolute left-2.5 top-2 sm:top-2.5 h-3.5 w-3.5 sm:h-4 sm:w-4 text-muted-foreground" />
                     <Input
                       id="email"
                       value={profile.email}
-                      className="pl-9 bg-muted cursor-not-allowed opacity-75"
+                      className="pl-8 sm:pl-9 h-8 sm:h-10 text-xs sm:text-sm bg-muted cursor-not-allowed opacity-75"
                       disabled
                       readOnly
                     />
                   </div>
-                  <p className="text-[10px] text-muted-foreground">Email cannot be changed here.</p>
+                  <p className="text-[9px] sm:text-[10px] text-muted-foreground">Email cannot be changed here.</p>
                 </div>
 
-                <div className="space-y-2">
-                  <Label htmlFor="phone">Phone Number</Label>
+                <div className="space-y-1 sm:space-y-2">
+                  <Label htmlFor="phone" className="text-[10px] sm:text-sm font-semibold">Phone Number</Label>
                   <div className="relative">
-                    <Phone className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
+                    <Phone className="absolute left-2.5 top-2 sm:top-2.5 h-3.5 w-3.5 sm:h-4 sm:w-4 text-muted-foreground" />
                     <Input
                       id="phone"
                       placeholder="e.g. 9841234567"
@@ -211,52 +211,52 @@ export default function ProfilePage() {
                       }}
                       pattern="^9\d{9}$"
                       title="Phone number must be exactly 10 digits and start with 9"
-                      className="pl-9"
+                      className="pl-8 sm:pl-9 h-8 sm:h-10 text-xs sm:text-sm"
                       required
                     />
                   </div>
                 </div>
 
-                <div className="space-y-2">
-                  <Label htmlFor="buildingId">Building - Tower</Label>
+                <div className="space-y-1 sm:space-y-2">
+                  <Label htmlFor="buildingId" className="text-[10px] sm:text-sm font-semibold">Building - Tower</Label>
                   <div className="relative">
-                    <Building2 className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
+                    <Building2 className="absolute left-2.5 top-2 sm:top-2.5 h-3.5 w-3.5 sm:h-4 sm:w-4 text-muted-foreground" />
                     <Input
                       id="buildingId"
                       placeholder="e.g. Tower A"
                       value={formData.buildingId}
                       onChange={(e) => setFormData({ ...formData, buildingId: e.target.value })}
-                      className={`pl-9 ${isRestricted ? 'bg-muted cursor-not-allowed opacity-75' : ''}`}
+                      className={`pl-8 sm:pl-9 h-8 sm:h-10 text-xs sm:text-sm ${isRestricted ? 'bg-muted cursor-not-allowed opacity-75' : ''}`}
                       disabled={isRestricted}
                       readOnly={isRestricted}
                     />
                   </div>
-                  {isRestricted && <p className="text-[10px] text-muted-foreground">Tower cannot be changed without manager permission.</p>}
+                  {isRestricted && <p className="text-[9px] sm:text-[10px] text-muted-foreground">Tower cannot be changed without manager permission.</p>}
                 </div>
 
-                <div className="space-y-2">
-                  <Label htmlFor="unitNumber">Unit / Apartment Number</Label>
+                <div className="space-y-1 sm:space-y-2">
+                  <Label htmlFor="unitNumber" className="text-[10px] sm:text-sm font-semibold">Unit / Apartment Number</Label>
                   <div className="relative">
-                    <Home className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
+                    <Home className="absolute left-2.5 top-2 sm:top-2.5 h-3.5 w-3.5 sm:h-4 sm:w-4 text-muted-foreground" />
                     <Input
                       id="unitNumber"
                       placeholder="e.g. A-101"
                       value={formData.unitNumber}
                       onChange={(e) => setFormData({ ...formData, unitNumber: e.target.value })}
-                      className={`pl-9 ${isRestricted ? 'bg-muted cursor-not-allowed opacity-75' : ''}`}
+                      className={`pl-8 sm:pl-9 h-8 sm:h-10 text-xs sm:text-sm ${isRestricted ? 'bg-muted cursor-not-allowed opacity-75' : ''}`}
                       disabled={isRestricted}
                       readOnly={isRestricted}
                     />
                   </div>
-                  {isRestricted && <p className="text-[10px] text-muted-foreground">Unit cannot be changed without manager permission.</p>}
+                  {isRestricted && <p className="text-[9px] sm:text-[10px] text-muted-foreground">Unit cannot be changed without manager permission.</p>}
                 </div>
               </div>
             </CardContent>
-            <CardFooter className="flex justify-end border-t pt-4">
-              <Button type="submit" disabled={loading}>
+            <CardFooter className="flex justify-end border-t p-3 sm:p-6 pt-3 sm:pt-4">
+              <Button type="submit" disabled={loading} size="sm" className="h-8 sm:h-10 text-xs sm:text-sm">
                 {loading ? (
                   <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    <Loader2 className="mr-2 h-3.5 w-3.5 sm:h-4 sm:w-4 animate-spin" />
                     Saving...
                   </>
                 ) : (
@@ -268,10 +268,10 @@ export default function ProfilePage() {
         </Card>
       </div>
 
-      <div className="flex justify-end pt-4">
-        <Button asChild style={{ backgroundColor: '#95DBAE', color: '#1a3622' }} className="hover:opacity-90 transition-opacity">
+      <div className="flex justify-end pt-2 sm:pt-4">
+        <Button asChild size="sm" style={{ backgroundColor: '#95DBAE', color: '#1a3622' }} className="hover:opacity-90 transition-opacity h-8 sm:h-10 text-xs sm:text-sm">
           <Link href="/dashboard">
-            <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+            <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4 mr-1.5 sm:mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
             Back to Dashboard
           </Link>
         </Button>
