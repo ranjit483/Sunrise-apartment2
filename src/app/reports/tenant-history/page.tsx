@@ -19,9 +19,9 @@ export default function TenantHistoryReportPage() {
 
   useEffect(() => {
     const q = query(collection(db, 'users'), orderBy('createdAt', 'desc'))
-    const unsub = onSnapshot(q, (snap) => {
+    const unsub = onSnapshot(q, (snap: any) => {
       const rData: any[] = []
-      snap.forEach((doc) => {
+      snap.forEach((doc: any) => {
         const d = doc.data()
         if (['SUPER_ADMIN', 'RESIDENT', 'TENANT', 'OWNER', 'MANAGER'].includes(d.role)) {
           rData.push({ id: doc.id, ...d })

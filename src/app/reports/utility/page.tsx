@@ -17,9 +17,9 @@ export default function UtilityReportPage() {
 
   useEffect(() => {
     const q = query(collection(db, 'invoices'), orderBy('createdAt', 'desc'))
-    const unsub = onSnapshot(q, (snap) => {
+    const unsub = onSnapshot(q, (snap: any) => {
       const invs: any[] = []
-      snap.forEach((doc) => invs.push({ id: doc.id, ...doc.data() }))
+      snap.forEach((doc: any) => invs.push({ id: doc.id, ...doc.data() }))
       setInvoices(invs)
       setLoading(false)
     })

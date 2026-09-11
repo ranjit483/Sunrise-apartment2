@@ -49,9 +49,9 @@ export default function OccupancyReportPage() {
 
   useEffect(() => {
     const q = query(collection(db, 'users'))
-    const unsub = onSnapshot(q, (snap) => {
+    const unsub = onSnapshot(q, (snap: any) => {
       const fetched: any[] = []
-      snap.forEach((doc) => fetched.push({ id: doc.id, ...doc.data() }))
+      snap.forEach((doc: any) => fetched.push({ id: doc.id, ...doc.data() }))
       setUsers(fetched)
       setLoading(false)
     })

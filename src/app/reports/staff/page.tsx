@@ -28,9 +28,9 @@ export default function StaffReportPage() {
 
   useEffect(() => {
     const qU = query(collection(db, 'users'), orderBy('createdAt', 'desc'))
-    const unsubU = onSnapshot(qU, (snap) => {
+    const unsubU = onSnapshot(qU, (snap: any) => {
       const sData: any[] = []
-      snap.forEach((doc) => {
+      snap.forEach((doc: any) => {
         const d = doc.data()
         if (!['SUPER_ADMIN', 'RESIDENT', 'TENANT', 'OWNER'].includes(d.role)) {
           sData.push({ id: doc.id, ...d })
@@ -39,9 +39,9 @@ export default function StaffReportPage() {
       setStaff(sData)
 
       const qT = query(collection(db, 'maintenance'))
-      onSnapshot(qT, (tSnap) => {
+      onSnapshot(qT, (tSnap: any) => {
         const tData: any[] = []
-        tSnap.forEach((doc) => tData.push({ id: doc.id, ...doc.data() }))
+        tSnap.forEach((doc: any) => tData.push({ id: doc.id, ...doc.data() }))
         setTickets(tData)
         setLoading(false)
       })

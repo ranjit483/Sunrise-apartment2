@@ -19,15 +19,15 @@ export default function MaintenanceReportPage() {
 
   useEffect(() => {
     const qT = query(collection(db, 'maintenance'), orderBy('createdAt', 'desc'))
-    const unsubT = onSnapshot(qT, (snap) => {
+    const unsubT = onSnapshot(qT, (snap: any) => {
       const tList: MaintenanceTicket[] = []
-      snap.forEach((doc) => tList.push({ id: doc.id, ...doc.data() } as MaintenanceTicket))
+      snap.forEach((doc: any) => tList.push({ id: doc.id, ...doc.data() } as MaintenanceTicket))
       setTickets(tList)
 
       const qU = query(collection(db, 'users'))
-      onSnapshot(qU, (uSnap) => {
+      onSnapshot(qU, (uSnap: any) => {
         const uList: any[] = []
-        uSnap.forEach((doc) => uList.push({ id: doc.id, ...doc.data() }))
+        uSnap.forEach((doc: any) => uList.push({ id: doc.id, ...doc.data() }))
         setUsers(uList)
         setLoading(false)
       })
