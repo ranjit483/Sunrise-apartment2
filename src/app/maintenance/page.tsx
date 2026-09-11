@@ -386,13 +386,13 @@ export default function MaintenancePage() {
       <div className="space-y-6 max-w-7xl mx-auto">
         
         {/* Header Section */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4">
           <div>
-            <h2 className="text-lg sm:text-xl font-extrabold tracking-tight text-gray-900 flex items-center gap-2">
-              <Wrench className="h-5 w-5 text-indigo-600 animate-pulse" />
+            <h2 className="text-base sm:text-xl font-extrabold tracking-tight text-gray-900 flex items-center gap-2">
+              <Wrench className="h-4 w-4 sm:h-5 sm:w-5 text-indigo-600 animate-pulse" />
               Repair & Maintenance
             </h2>
-            <p className="text-xs text-muted-foreground mt-1">
+            <p className="text-[10px] sm:text-xs text-muted-foreground mt-0.5 sm:mt-1">
               {isAdminOrManager 
                 ? 'Society Operations Control Center & Inventory Dispatch Panel' 
                 : isStaffOrTech 
@@ -405,18 +405,18 @@ export default function MaintenancePage() {
           {!isStaffOrTech && (
             <Dialog open={isNewRequestOpen} onOpenChange={setIsNewRequestOpen}>
               <DialogTrigger asChild>
-                <Button className="bg-indigo-600 hover:bg-indigo-700 text-white font-medium shadow-md transition-all duration-200 flex items-center gap-2">
-                  <Plus className="h-4 w-4" />
+                <Button className="bg-indigo-600 hover:bg-indigo-700 text-white text-xs sm:text-sm font-medium shadow-md transition-all duration-200 flex items-center justify-center gap-1.5 py-1.5 sm:py-2 h-8 sm:h-10">
+                  <Plus className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
                   Raise New Request
                 </Button>
               </DialogTrigger>
               <DialogContent className="max-w-lg rounded-xl shadow-2xl border-indigo-100 max-h-[90vh] flex flex-col">
                 <DialogHeader>
-                  <DialogTitle className="text-2xl font-bold text-gray-900 flex items-center gap-2">
-                    <Sparkles className="h-6 w-6 text-indigo-500" />
+                  <DialogTitle className="text-xl sm:text-2xl font-bold text-gray-900 flex items-center gap-2">
+                    <Sparkles className="h-5 w-5 sm:h-6 sm:w-6 text-indigo-500" />
                     File Maintenance Ticket
                   </DialogTitle>
-                  <DialogDescription>
+                  <DialogDescription className="text-xs sm:text-sm">
                     Fill in details about the issue. Our management team will triage and dispatch a specialized technician immediately.
                   </DialogDescription>
                 </DialogHeader>
@@ -425,13 +425,13 @@ export default function MaintenancePage() {
                   
                   {/* Scope Selector */}
                   <div className="space-y-2">
-                    <Label className="text-sm font-semibold">Scope of Issue *</Label>
+                    <Label className="text-xs sm:text-sm font-semibold">Scope of Issue *</Label>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                       <Button 
                         type="button" 
                         variant={scope === 'Internal_Unit' ? 'default' : 'outline'}
                         onClick={() => setScope('Internal_Unit')}
-                        className={`w-full justify-center h-auto py-2 whitespace-normal ${scope === 'Internal_Unit' ? 'bg-indigo-600 hover:bg-indigo-700 text-white' : ''}`}
+                        className={`w-full justify-center h-auto py-1.5 sm:py-2 text-xs sm:text-sm whitespace-normal ${scope === 'Internal_Unit' ? 'bg-indigo-600 hover:bg-indigo-700 text-white' : ''}`}
                       >
                         In-Apartment (Private Unit)
                       </Button>
@@ -439,7 +439,7 @@ export default function MaintenancePage() {
                         type="button" 
                         variant={scope === 'Common_Area' ? 'default' : 'outline'}
                         onClick={() => setScope('Common_Area')}
-                        className={`w-full justify-center h-auto py-2 whitespace-normal ${scope === 'Common_Area' ? 'bg-indigo-600 hover:bg-indigo-700 text-white' : ''}`}
+                        className={`w-full justify-center h-auto py-1.5 sm:py-2 text-xs sm:text-sm whitespace-normal ${scope === 'Common_Area' ? 'bg-indigo-600 hover:bg-indigo-700 text-white' : ''}`}
                       >
                         Common Area (Infrastructure)
                       </Button>
@@ -449,7 +449,7 @@ export default function MaintenancePage() {
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     {/* Category Selector */}
                     <div className="space-y-2">
-                      <Label className="text-sm font-semibold">Category *</Label>
+                      <Label className="text-xs sm:text-sm font-semibold">Category *</Label>
                       <Select required value={category} onValueChange={setCategory}>
                         <SelectTrigger><SelectValue placeholder="Select Category" /></SelectTrigger>
                         <SelectContent>
@@ -464,7 +464,7 @@ export default function MaintenancePage() {
                     {/* Conditional Structural Location Dropdown */}
                     {scope === 'Common_Area' && (
                       <div className="space-y-2">
-                        <Label className="text-sm font-semibold">Location *</Label>
+                        <Label className="text-xs sm:text-sm font-semibold">Location *</Label>
                         <Select required value={structuralLocation} onValueChange={setStructuralLocation}>
                           <SelectTrigger><SelectValue placeholder="Select Location" /></SelectTrigger>
                           <SelectContent>
@@ -476,41 +476,41 @@ export default function MaintenancePage() {
 
                     {/* Unit Number */}
                     <div className="space-y-2">
-                      <Label className="text-sm font-semibold">Unit Number</Label>
+                      <Label className="text-xs sm:text-sm font-semibold">Unit Number</Label>
                       <Input disabled value={profile?.unitNumber ? `${profile.buildingId || ''} - ${profile.unitNumber}` : 'General'} />
                     </div>
                   </div>
 
                   {/* Title */}
                   <div className="space-y-2">
-                    <Label className="text-sm font-semibold">Short Issue Title *</Label>
+                    <Label className="text-xs sm:text-sm font-semibold">Short Issue Title *</Label>
                     <Input required value={title} onChange={e => setTitle(e.target.value)} placeholder="e.g. Toilet tank leaking, Elevator B stuck" />
                   </div>
 
                   {/* Description */}
                   <div className="space-y-2">
-                    <Label className="text-sm font-semibold">Detailed Description *</Label>
+                    <Label className="text-xs sm:text-sm font-semibold">Detailed Description *</Label>
                     <textarea 
                       required 
                       value={description} 
                       onChange={e => setDescription(e.target.value)} 
                       rows={3} 
-                      className="w-full text-sm rounded-md border border-input bg-transparent px-3 py-2 shadow-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+                      className="w-full text-xs sm:text-sm rounded-md border border-input bg-transparent px-3 py-2 shadow-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
                       placeholder="Please provide precise details of the issue to speed up diagnostic assignment."
                     />
                   </div>
 
                   {/* Priority Indicators */}
                   <div className="space-y-2">
-                    <Label className="text-sm font-semibold">Priority Level *</Label>
-                    <div className="grid grid-cols-4 gap-2">
+                    <Label className="text-xs sm:text-sm font-semibold">Priority Level *</Label>
+                    <div className="grid grid-cols-4 gap-1.5 sm:gap-2">
                       {(['low', 'medium', 'high', 'critical'] as const).map(p => (
                         <Button
                           key={p}
                           type="button"
                           variant={priority === p ? 'default' : 'outline'}
                           onClick={() => setPriority(p)}
-                          className={`capitalize text-xs font-semibold h-9 ${
+                          className={`capitalize text-[10px] sm:text-xs font-semibold h-8 sm:h-9 px-1 sm:px-3 ${
                             priority === p 
                               ? p === 'critical' ? 'bg-rose-600 hover:bg-rose-700 text-white' 
                                 : p === 'high' ? 'bg-orange-600 hover:bg-orange-700 text-white' 
@@ -527,8 +527,8 @@ export default function MaintenancePage() {
 
                   {/* Emergency alert warning */}
                   {priority === 'critical' && (
-                    <div className="p-3 rounded-lg border border-red-200 bg-red-50 text-red-800 text-xs font-medium flex gap-2 animate-bounce">
-                      <AlertTriangle className="h-4 w-4 text-red-600 flex-shrink-0 mt-0.5" />
+                    <div className="p-2.5 sm:p-3 rounded-lg border border-red-200 bg-red-50 text-red-800 text-[10px] sm:text-xs font-medium flex gap-2 animate-bounce">
+                      <AlertTriangle className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-red-600 flex-shrink-0 mt-0.5" />
                       <div>
                         <span className="font-bold">EMERGENCY NOTICE:</span> For active gas leaks, structural fires, or active flooding, please contact the security desk immediately at <span className="font-bold text-red-900 underline">ext. 911</span>.
                       </div>
@@ -537,13 +537,13 @@ export default function MaintenancePage() {
 
                   {/* Multimedia Link */}
                   <div className="space-y-2">
-                    <Label className="text-sm font-semibold">Photo Evidence URL (Optional)</Label>
+                    <Label className="text-xs sm:text-sm font-semibold">Photo Evidence URL (Optional)</Label>
                     <Input value={photoUrl} onChange={e => setPhotoUrl(e.target.value)} placeholder="e.g. https://imagehost.com/evidence.jpg" />
                   </div>
 
-                  <div className="flex justify-end gap-3 pt-3">
-                    <Button type="button" variant="outline" onClick={() => setIsNewRequestOpen(false)}>Cancel</Button>
-                    <Button type="submit" disabled={isSubmitting} className="bg-indigo-600 hover:bg-indigo-700 text-white min-w-[140px]">
+                  <div className="flex justify-end gap-2 sm:gap-3 pt-3">
+                    <Button type="button" variant="outline" size="sm" onClick={() => setIsNewRequestOpen(false)}>Cancel</Button>
+                    <Button type="submit" size="sm" disabled={isSubmitting} className="bg-indigo-600 hover:bg-indigo-700 text-white min-w-[120px] sm:min-w-[140px]">
                       {isSubmitting ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Submit Request'}
                     </Button>
                   </div>
@@ -555,16 +555,16 @@ export default function MaintenancePage() {
       </div>
 
         {/* Dashboard Metric summary cards */}
-        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="grid gap-2.5 sm:gap-3 grid-cols-2 lg:grid-cols-4">
           <Card className="hover:shadow-md transition-all duration-300 border-l-4 border-l-blue-500 overflow-hidden relative">
-            <CardContent className="p-3">
+            <CardContent className="p-2.5 sm:p-3">
               <div className="flex justify-between items-center">
                 <div>
-                  <p className="text-xs font-medium text-gray-500 uppercase tracking-wider">Open / Triage</p>
-                  <p className="text-base font-extrabold text-gray-900 mt-0.5">{openCount}</p>
+                  <p className="text-[10px] sm:text-xs font-medium text-gray-500 uppercase tracking-wider">Open / Triage</p>
+                  <p className="text-sm sm:text-base font-extrabold text-gray-900 mt-0.5">{openCount}</p>
                 </div>
-                <div className="p-1.5 rounded-full bg-blue-50 text-blue-600">
-                  <Clock className="h-4 w-4" />
+                <div className="p-1 sm:p-1.5 rounded-full bg-blue-50 text-blue-600">
+                  <Clock className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
                 </div>
               </div>
               <div className="absolute bottom-0 right-0 w-24 h-1 bg-gradient-to-r from-blue-500 to-indigo-500" />
@@ -572,14 +572,14 @@ export default function MaintenancePage() {
           </Card>
 
           <Card className="hover:shadow-md transition-all duration-300 border-l-4 border-l-indigo-500 overflow-hidden relative">
-            <CardContent className="p-3">
+            <CardContent className="p-2.5 sm:p-3">
               <div className="flex justify-between items-center">
                 <div>
-                  <p className="text-xs font-medium text-gray-500 uppercase tracking-wider">In Progress</p>
-                  <p className="text-base font-extrabold text-gray-900 mt-0.5">{inProgressCount}</p>
+                  <p className="text-[10px] sm:text-xs font-medium text-gray-500 uppercase tracking-wider">In Progress</p>
+                  <p className="text-sm sm:text-base font-extrabold text-gray-900 mt-0.5">{inProgressCount}</p>
                 </div>
-                <div className="p-1.5 rounded-full bg-indigo-50 text-indigo-600">
-                  <Wrench className="h-4 w-4 animate-spin-slow" />
+                <div className="p-1 sm:p-1.5 rounded-full bg-indigo-50 text-indigo-600">
+                  <Wrench className="h-3.5 w-3.5 sm:h-4 sm:w-4 animate-spin-slow" />
                 </div>
               </div>
               <div className="absolute bottom-0 right-0 w-24 h-1 bg-gradient-to-r from-indigo-500 to-purple-500" />
@@ -587,14 +587,14 @@ export default function MaintenancePage() {
           </Card>
 
           <Card className="hover:shadow-md transition-all duration-300 border-l-4 border-l-emerald-500 overflow-hidden relative">
-            <CardContent className="p-3">
+            <CardContent className="p-2.5 sm:p-3">
               <div className="flex justify-between items-center">
                 <div>
-                  <p className="text-xs font-medium text-gray-500 uppercase tracking-wider">Completed</p>
-                  <p className="text-base font-extrabold text-gray-900 mt-0.5">{completedCount}</p>
+                  <p className="text-[10px] sm:text-xs font-medium text-gray-500 uppercase tracking-wider">Completed</p>
+                  <p className="text-sm sm:text-base font-extrabold text-gray-900 mt-0.5">{completedCount}</p>
                 </div>
-                <div className="p-1.5 rounded-full bg-emerald-50 text-emerald-600">
-                  <CheckCircle className="h-4 w-4" />
+                <div className="p-1 sm:p-1.5 rounded-full bg-emerald-50 text-emerald-600">
+                  <CheckCircle className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
                 </div>
               </div>
               <div className="absolute bottom-0 right-0 w-24 h-1 bg-gradient-to-r from-emerald-500 to-teal-500" />
@@ -602,14 +602,14 @@ export default function MaintenancePage() {
           </Card>
 
           <Card className="hover:shadow-md transition-all duration-300 border-l-4 border-l-rose-500 overflow-hidden relative bg-rose-50/10">
-            <CardContent className="p-3">
+            <CardContent className="p-2.5 sm:p-3">
               <div className="flex justify-between items-center">
                 <div>
-                  <p className="text-xs font-medium text-gray-500 uppercase tracking-wider">SLA Breaches</p>
-                  <p className="text-base font-extrabold text-rose-600 mt-0.5">{slaAlertCount}</p>
+                  <p className="text-[10px] sm:text-xs font-medium text-gray-500 uppercase tracking-wider">SLA Breaches</p>
+                  <p className="text-sm sm:text-base font-extrabold text-rose-600 mt-0.5">{slaAlertCount}</p>
                 </div>
-                <div className="p-1.5 rounded-full bg-rose-50 text-rose-600">
-                  <AlertTriangle className="h-4 w-4 animate-bounce" />
+                <div className="p-1 sm:p-1.5 rounded-full bg-rose-50 text-rose-600">
+                  <AlertTriangle className="h-3.5 w-3.5 sm:h-4 sm:w-4 animate-bounce" />
                 </div>
               </div>
               <div className="absolute bottom-0 right-0 w-24 h-1 bg-gradient-to-r from-rose-500 to-red-500" />
@@ -623,17 +623,17 @@ export default function MaintenancePage() {
           {/* Left panel - Work orders list */}
           <div className={`lg:col-span-2 space-y-4 min-w-0 ${currentTicket ? 'hidden lg:block' : 'block'}`}>
             <Card className="shadow-sm border-gray-200">
-              <CardHeader className="pb-3 border-b flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <CardHeader className="pb-2.5 sm:pb-3 border-b flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 p-3 sm:p-6">
                 <div>
-                  <CardTitle className="text-lg font-bold text-gray-800 flex items-center gap-2">
-                    <ListFilter className="h-5 w-5 text-gray-500" />
+                  <CardTitle className="text-sm sm:text-lg font-bold text-gray-800 flex items-center gap-1.5 sm:gap-2">
+                    <ListFilter className="h-4 w-4 sm:h-5 sm:w-5 text-gray-500" />
                     All Service Requests
                   </CardTitle>
-                  <CardDescription>Filter and search maintenance logs</CardDescription>
+                  <CardDescription className="text-[10px] sm:text-xs">Filter and search maintenance logs</CardDescription>
                 </div>
                 <div className="flex flex-col sm:flex-row gap-2 items-stretch sm:items-center w-full sm:w-auto">
                   <Select value={statusFilter} onValueChange={(v: any) => setStatusFilter(v)}>
-                    <SelectTrigger className="w-full sm:w-[130px] h-9"><SelectValue placeholder="All Status" /></SelectTrigger>
+                    <SelectTrigger className="w-full sm:w-[130px] h-8 sm:h-9 text-xs sm:text-sm"><SelectValue placeholder="All Status" /></SelectTrigger>
                     <SelectContent>
                       <SelectItem value="all">All Status</SelectItem>
                       <SelectItem value="open">Open</SelectItem>
@@ -644,7 +644,7 @@ export default function MaintenancePage() {
                   </Select>
                   <Input 
                     placeholder="Search query..." 
-                    className="w-full sm:w-[180px] h-9" 
+                    className="w-full sm:w-[180px] h-8 sm:h-9 text-xs sm:text-sm" 
                     value={searchQuery}
                     onChange={e => setSearchQuery(e.target.value)}
                   />
@@ -654,8 +654,8 @@ export default function MaintenancePage() {
                 {loading ? (
                   <div className="flex justify-center items-center py-12"><Loader2 className="h-8 w-8 animate-spin text-indigo-500" /></div>
                 ) : filteredTickets.length === 0 ? (
-                  <div className="text-center py-12 text-gray-500">
-                    <Wrench className="h-12 w-12 text-gray-300 mx-auto mb-2" />
+                  <div className="text-center py-12 text-gray-500 text-xs sm:text-sm">
+                    <Wrench className="h-10 w-10 sm:h-12 sm:w-12 text-gray-300 mx-auto mb-2" />
                     No matching requests or work orders found.
                   </div>
                 ) : (
@@ -664,39 +664,39 @@ export default function MaintenancePage() {
                       <div 
                         key={t.id} 
                         onClick={() => setSelectedTicket(t)}
-                        className={`p-3 sm:p-4 hover:bg-indigo-50/20 cursor-pointer transition-all flex items-start justify-between gap-2 sm:gap-4 ${
+                        className={`p-2.5 sm:p-4 hover:bg-indigo-50/20 cursor-pointer transition-all flex items-start justify-between gap-2 sm:gap-4 ${
                           selectedTicket?.id === t.id ? 'bg-indigo-50/40 border-l-4 border-l-indigo-600' : ''
                         }`}
                       >
-                        <div className="space-y-1.5 flex-1 min-w-0">
-                          <div className="flex items-center gap-2 flex-wrap">
-                            <span className="text-xs font-mono bg-gray-100 px-2 py-0.5 rounded text-gray-600 font-semibold">
+                        <div className="space-y-1 sm:space-y-1.5 flex-1 min-w-0">
+                          <div className="flex items-center gap-1.5 sm:gap-2 flex-wrap">
+                            <span className="text-[10px] sm:text-xs font-mono bg-gray-100 px-1.5 sm:px-2 py-0.5 rounded text-gray-600 font-semibold">
                               {(t as any).ticketNo || t.id.substring(0, 8)}
                             </span>
-                            <Badge variant="outline" className={`capitalize text-[10px] ${priorityColors[t.priority]}`}>
+                            <Badge variant="outline" className={`capitalize text-[9px] sm:text-[10px] px-1.5 py-0.5 ${priorityColors[t.priority]}`}>
                               {t.priority === 'critical' ? 'Emergency' : t.priority}
                             </Badge>
                             {checkSlaAlert(t) && (
-                              <Badge className="bg-rose-600 text-white animate-pulse text-[10px]">
+                              <Badge className="bg-rose-600 text-white animate-pulse text-[9px] sm:text-[10px] px-1.5 py-0.5">
                                 SLA Breach
                               </Badge>
                             )}
                           </div>
-                          <h4 className="font-bold text-gray-900 truncate">{t.title}</h4>
-                          <p className="text-sm text-gray-500 line-clamp-1">{t.description}</p>
+                          <h4 className="font-bold text-xs sm:text-sm text-gray-900 truncate">{t.title}</h4>
+                          <p className="text-xs sm:text-sm text-gray-500 line-clamp-1">{t.description}</p>
                           
-                          <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-gray-400 font-medium">
-                            <span className="flex items-center gap-1"><MapPin className="h-3 w-3" /> {t.unitId} {t.structuralLocation ? `(${t.structuralLocation})` : ''}</span>
-                            <span className="flex items-center gap-1"><User className="h-3 w-3" /> Reported: { (t as any).reportedByName || 'Resident' }</span>
-                            <span className="flex items-center gap-1"><Calendar className="h-3 w-3" /> {new Date(t.createdAt).toLocaleDateString()}</span>
+                          <div className="flex flex-wrap gap-x-3 sm:gap-x-4 gap-y-0.5 sm:gap-y-1 text-[10px] sm:text-xs text-gray-400 font-medium">
+                            <span className="flex items-center gap-0.5 sm:gap-1"><MapPin className="h-3 w-3" /> {t.unitId} {t.structuralLocation ? `(${t.structuralLocation})` : ''}</span>
+                            <span className="flex items-center gap-0.5 sm:gap-1"><User className="h-3 w-3" /> Reported: { (t as any).reportedByName || 'Resident' }</span>
+                            <span className="flex items-center gap-0.5 sm:gap-1"><Calendar className="h-3 w-3" /> {new Date(t.createdAt).toLocaleDateString()}</span>
                           </div>
                         </div>
 
-                        <div className="flex flex-col gap-2 items-end justify-between self-stretch flex-shrink-0 ml-2">
-                          <Badge variant="outline" className={`capitalize text-xs font-semibold whitespace-nowrap ${statusColors[t.status]}`}>
+                        <div className="flex flex-col gap-1.5 sm:gap-2 items-end justify-between self-stretch flex-shrink-0 ml-1 sm:ml-2">
+                          <Badge variant="outline" className={`capitalize text-[10px] sm:text-xs font-semibold whitespace-nowrap px-1.5 sm:px-2 py-0.5 ${statusColors[t.status]}`}>
                             {t.status.replace('_', ' ')}
                           </Badge>
-                          <ChevronRight className="h-5 w-5 text-gray-400" />
+                          <ChevronRight className="h-4 w-4 sm:h-5 sm:w-5 text-gray-400" />
                         </div>
                       </div>
                     ))}
@@ -710,54 +710,54 @@ export default function MaintenancePage() {
           <div className={`lg:col-span-1 min-w-0 ${!currentTicket ? 'hidden lg:block' : 'block'}`}>
             {currentTicket ? (
               <Card className="shadow-md border-indigo-100 sticky top-6">
-                <CardHeader className="bg-indigo-50/30 border-b pb-4">
+                <CardHeader className="bg-indigo-50/30 border-b pb-3 sm:pb-4 p-3 sm:p-6">
                   <div className="flex justify-between items-start gap-2">
                     <div>
-                      <span className="text-xs font-mono font-bold text-gray-500">{(currentTicket as any).ticketNo || currentTicket.id.substring(0, 8)}</span>
-                      <CardTitle className="text-xl font-black text-gray-900 mt-0.5">{currentTicket.title}</CardTitle>
+                      <span className="text-[10px] sm:text-xs font-mono font-bold text-gray-500">{(currentTicket as any).ticketNo || currentTicket.id.substring(0, 8)}</span>
+                      <CardTitle className="text-base sm:text-xl font-black text-gray-900 mt-0.5">{currentTicket.title}</CardTitle>
                     </div>
-                    <Button variant="ghost" size="icon" onClick={() => setSelectedTicket(null)}><X className="h-4 w-4" /></Button>
+                    <Button variant="ghost" size="icon" className="h-7 w-7 sm:h-8 sm:w-8" onClick={() => setSelectedTicket(null)}><X className="h-3.5 w-3.5 sm:h-4 sm:w-4" /></Button>
                   </div>
-                  <div className="flex flex-wrap gap-2 mt-2">
-                    <Badge className={`capitalize font-semibold ${priorityColors[currentTicket.priority]}`}>{currentTicket.priority === 'critical' ? 'Emergency' : currentTicket.priority}</Badge>
-                    <Badge className={`capitalize font-semibold ${statusColors[currentTicket.status]}`}>{currentTicket.status.replace('_', ' ')}</Badge>
+                  <div className="flex flex-wrap gap-1.5 sm:gap-2 mt-2">
+                    <Badge className={`capitalize font-semibold text-[10px] sm:text-xs ${priorityColors[currentTicket.priority]}`}>{currentTicket.priority === 'critical' ? 'Emergency' : currentTicket.priority}</Badge>
+                    <Badge className={`capitalize font-semibold text-[10px] sm:text-xs ${statusColors[currentTicket.status]}`}>{currentTicket.status.replace('_', ' ')}</Badge>
                   </div>
                 </CardHeader>
 
-                <CardContent className="p-5 space-y-5 text-sm">
+                <CardContent className="p-3 sm:p-5 space-y-3.5 sm:space-y-5 text-xs sm:text-sm">
                   
                   {/* Description Box */}
-                  <div className="space-y-1.5 bg-gray-50 p-3 rounded-lg border">
-                    <p className="text-xs font-bold text-gray-500 uppercase tracking-wider">Report Description</p>
-                    <p className="text-gray-700 leading-relaxed">{currentTicket.description}</p>
+                  <div className="space-y-1 bg-gray-50 p-2.5 sm:p-3 rounded-lg border">
+                    <p className="text-[10px] sm:text-xs font-bold text-gray-500 uppercase tracking-wider">Report Description</p>
+                    <p className="text-gray-700 leading-relaxed text-xs sm:text-sm">{currentTicket.description}</p>
                   </div>
 
                   {/* Metadata fields */}
-                  <div className="grid grid-cols-2 gap-4 border-b pb-4">
+                  <div className="grid grid-cols-2 gap-3 sm:gap-4 border-b pb-3 sm:pb-4">
                     <div>
-                      <p className="text-xs font-bold text-gray-400 uppercase">Scope & Location</p>
-                      <p className="font-semibold text-gray-800 mt-0.5 capitalize">{currentTicket.scope ? currentTicket.scope.replace('_', ' ') : 'Internal Unit'}</p>
-                      <p className="text-xs text-gray-500">{currentTicket.unitId} {currentTicket.structuralLocation ? `(${currentTicket.structuralLocation})` : ''}</p>
+                      <p className="text-[10px] sm:text-xs font-bold text-gray-400 uppercase">Scope & Location</p>
+                      <p className="font-semibold text-gray-800 text-xs sm:text-sm mt-0.5 capitalize">{currentTicket.scope ? currentTicket.scope.replace('_', ' ') : 'Internal Unit'}</p>
+                      <p className="text-[10px] sm:text-xs text-gray-500">{currentTicket.unitId} {currentTicket.structuralLocation ? `(${currentTicket.structuralLocation})` : ''}</p>
                     </div>
                     <div>
-                      <p className="text-xs font-bold text-gray-400 uppercase">Issue Category</p>
-                      <p className="font-semibold text-gray-800 mt-0.5">{currentTicket.category}</p>
+                      <p className="text-[10px] sm:text-xs font-bold text-gray-400 uppercase">Issue Category</p>
+                      <p className="font-semibold text-gray-800 text-xs sm:text-sm mt-0.5">{currentTicket.category}</p>
                     </div>
                     <div>
-                      <p className="text-xs font-bold text-gray-400 uppercase">Reported By</p>
-                      <p className="font-semibold text-gray-800 mt-0.5">{(currentTicket as any).reportedByName || 'Resident'}</p>
+                      <p className="text-[10px] sm:text-xs font-bold text-gray-400 uppercase">Reported By</p>
+                      <p className="font-semibold text-gray-800 text-xs sm:text-sm mt-0.5">{(currentTicket as any).reportedByName || 'Resident'}</p>
                     </div>
                     <div>
-                      <p className="text-xs font-bold text-gray-400 uppercase">Assigned Service Tech</p>
+                      <p className="text-[10px] sm:text-xs font-bold text-gray-400 uppercase">Assigned Service Tech</p>
                       <div className="flex items-center gap-1 mt-0.5">
-                        <p className="font-semibold text-indigo-700 flex items-center gap-1">
+                        <p className="font-semibold text-indigo-700 text-xs sm:text-sm flex items-center gap-1">
                           <User className="h-3 w-3" />
                           {currentTicket.assignedTo || 'Waiting Assignment'}
                         </p>
                         {isAdminOrManager && (currentTicket.status === 'open' || currentTicket.status === 'in_progress') && (
                           <button 
                             type="button"
-                            onClick={() => setIsAssignOpen(true)} 
+                            onClick={() => setIsAssignOpen(true)}  
                             className="text-[10px] bg-slate-100 hover:bg-indigo-50 text-indigo-600 px-1.5 py-0.5 rounded border border-indigo-100 font-bold ml-1"
                             title="Re-assign technician"
                           >
@@ -769,38 +769,38 @@ export default function MaintenancePage() {
                   </div>
 
                    {/* Consumed Spare Parts/Billing */}
-                   <div className="space-y-3 border-b pb-4">
+                   <div className="space-y-2.5 sm:space-y-3 border-b pb-3 sm:pb-4">
                      <div className="flex justify-between items-center">
-                       <p className="text-xs font-bold text-gray-400 uppercase tracking-wider flex items-center gap-1">
-                          <Package className="h-3.5 w-3.5" />
+                       <p className="text-[10px] sm:text-xs font-bold text-gray-400 uppercase tracking-wider flex items-center gap-1">
+                          <Package className="h-3 w-3 sm:h-3.5 sm:w-3.5" />
                           Consumable Spare Parts
                         </p>
                         {/* Allocate parts button visible only to admins and while ticket in-progress */}
                         {isAdminOrManager && currentTicket.status === 'in_progress' && (
                           <Dialog open={isPartsOpen} onOpenChange={setIsPartsOpen}>
                             <DialogTrigger asChild>
-                              <Button size="sm" variant="outline" className="text-xs border-indigo-200 text-indigo-700 hover:bg-indigo-50 h-7 px-2 font-medium">
-                                <Plus className="h-3 w-3 mr-1" /> Add Parts
+                              <Button size="sm" variant="outline" className="text-[10px] sm:text-xs border-indigo-200 text-indigo-700 hover:bg-indigo-50 h-6 sm:h-7 px-1.5 sm:px-2 font-medium">
+                                <Plus className="h-3 w-3 mr-0.5 sm:mr-1" /> Add Parts
                               </Button>
                             </DialogTrigger>
                             <DialogContent className="max-w-md rounded-xl border-indigo-50">
                               <DialogHeader>
-                                <DialogTitle className="font-bold flex items-center gap-2">
-                                  <Package className="h-5 w-5 text-indigo-600" />
+                                <DialogTitle className="font-bold text-sm sm:text-base flex items-center gap-2">
+                                  <Package className="h-4 w-4 sm:h-5 sm:w-5 text-indigo-600" />
                                   Deduct Society Store Inventory
                                 </DialogTitle>
-                                <DialogDescription>Select society inventory spare parts to allocate for this ticket. Estimated costs will update instantly.</DialogDescription>
+                                <DialogDescription className="text-xs sm:text-sm">Select society inventory spare parts to allocate for this ticket. Estimated costs will update instantly.</DialogDescription>
                               </DialogHeader>
-                              <div className="space-y-3 pt-2 max-h-[300px] overflow-y-auto">
+                              <div className="space-y-2 sm:space-y-3 pt-2 max-h-[300px] overflow-y-auto">
                                 {DEFAULT_INVENTORY.map(part => (
-                                  <div key={part.item_id} className="flex justify-between items-center p-3 rounded-lg border hover:bg-gray-50 transition">
+                                  <div key={part.item_id} className="flex justify-between items-center p-2.5 sm:p-3 rounded-lg border hover:bg-gray-50 transition">
                                     <div>
-                                      <p className="font-semibold text-gray-800">{part.item_name}</p>
-                                      <p className="text-xs text-gray-500">In Stock: {part.stock_quantity} | Price: ₨{part.unit_price}</p>
+                                      <p className="font-semibold text-xs sm:text-sm text-gray-800">{part.item_name}</p>
+                                      <p className="text-[10px] sm:text-xs text-gray-500">In Stock: {part.stock_quantity} | Price: ₨{part.unit_price}</p>
                                     </div>
                                     <Button 
                                       size="sm" 
-                                      className="bg-indigo-600 text-white hover:bg-indigo-700" 
+                                      className="bg-indigo-600 text-white hover:bg-indigo-700 text-xs h-7 sm:h-8" 
                                       onClick={() => handleAllocatePart(part)}
                                     >
                                       Allocate
@@ -815,39 +815,39 @@ export default function MaintenancePage() {
                       
                       {/* List allocated parts */}
                       {(currentTicket as any).allocatedParts && (currentTicket as any).allocatedParts.length > 0 ? (
-                        <div className="space-y-2 bg-gray-50 p-2.5 rounded-lg border border-gray-100">
+                        <div className="space-y-1.5 sm:space-y-2 bg-gray-50 p-2 sm:p-2.5 rounded-lg border border-gray-100">
                           {(currentTicket as any).allocatedParts.map((p: any, idx: number) => (
-                            <div key={idx} className="flex justify-between text-xs text-gray-700 font-medium">
+                            <div key={idx} className="flex justify-between text-[10px] sm:text-xs text-gray-700 font-medium">
                               <span>{p.name} (x{p.quantity})</span>
                               <span className="font-semibold">₨{p.cost}</span>
                             </div>
                           ))}
-                          <div className="flex justify-between text-xs border-t pt-2 font-bold text-gray-900">
+                          <div className="flex justify-between text-[10px] sm:text-xs border-t pt-1.5 sm:pt-2 font-bold text-gray-900">
                             <span>Estimated Parts Cost:</span>
                             <span>₨{(currentTicket as any).estimatedCost || 0}</span>
                           </div>
                         </div>
                       ) : (
-                        <p className="text-xs text-gray-400 italic">No society inventory parts allocated yet.</p>
+                        <p className="text-[10px] sm:text-xs text-gray-400 italic">No society inventory parts allocated yet.</p>
                       )}
                     </div>
 
                     {/* Financials & Costs summary */}
-                  <div className="bg-indigo-50/30 border border-indigo-100 p-3.5 rounded-xl space-y-2">
-                    <div className="flex justify-between text-xs font-medium text-gray-500">
+                  <div className="bg-indigo-50/30 border border-indigo-100 p-2.5 sm:p-3.5 rounded-xl space-y-1.5 sm:space-y-2">
+                    <div className="flex justify-between text-[10px] sm:text-xs font-medium text-gray-500">
                       <span>Inventory Estimate:</span>
                       <span>₨{(currentTicket as any).estimatedCost || 0}</span>
                     </div>
-                    <div className="flex justify-between text-sm font-bold text-gray-900 border-t border-indigo-100/60 pt-2">
+                    <div className="flex justify-between text-xs sm:text-sm font-bold text-gray-900 border-t border-indigo-100/60 pt-1.5 sm:pt-2">
                       <span>Total Actual cost:</span>
-                      <span className="text-indigo-700 text-lg">
+                      <span className="text-indigo-700 text-base sm:text-lg font-black">
                         ₨{currentTicket.actualCost && currentTicket.actualCost > 0 
                           ? currentTicket.actualCost 
                           : ((currentTicket as any).estimatedCost || 0)}
                       </span>
                     </div>
                     {(currentTicket.actualCost || ((currentTicket as any).estimatedCost && (currentTicket as any).estimatedCost > 0)) ? (
-                      <div className="p-2 rounded bg-indigo-50 border border-indigo-100 text-[11px] text-indigo-800 font-medium flex gap-1 items-start">
+                      <div className="p-1.5 sm:p-2 rounded bg-indigo-50 border border-indigo-100 text-[10px] sm:text-[11px] text-indigo-800 font-medium flex gap-1 items-start">
                         <FileText className="h-3 w-3 flex-shrink-0 mt-0.5" />
                         {currentTicket.status === 'resolved' || currentTicket.status === 'closed'
                           ? 'Actual cost has been automatically charged and posted to the Monthly Apartment Maintenance Ledger.'
@@ -857,39 +857,39 @@ export default function MaintenancePage() {
                   </div>
 
                   {/* Action workflows based on roles */}
-                  <div className="pt-2 space-y-2">
+                  <div className="pt-1.5 sm:pt-2 space-y-2">
                     
                      {/* 1. Admin Triage & Assignment */}
                     {isAdminOrManager && (currentTicket.status === 'open' || currentTicket.status === 'in_progress') && (
                       <Dialog open={isAssignOpen} onOpenChange={setIsAssignOpen}>
                         <DialogTrigger asChild>
-                          <Button className="w-full bg-indigo-600 text-white hover:bg-indigo-700 font-bold shadow flex items-center justify-center gap-2">
-                            <Activity className="h-4 w-4" />
+                          <Button className="w-full bg-indigo-600 text-white hover:bg-indigo-700 font-bold text-xs sm:text-sm shadow flex items-center justify-center gap-1.5 py-1.5 sm:py-2 h-8 sm:h-10">
+                            <Activity className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
                             {currentTicket.status === 'open' ? 'Dispatch Specialized Staff' : 'Re-assign / Change Staff'}
                           </Button>
                         </DialogTrigger>
                         <DialogContent className="max-w-md max-h-[90vh] overflow-y-auto rounded-xl border-indigo-50">
                           <DialogHeader>
-                            <DialogTitle className="font-bold flex items-center gap-2">
-                              <Sparkles className="h-5 w-5 text-indigo-600" />
+                            <DialogTitle className="font-bold text-sm sm:text-base flex items-center gap-2">
+                              <Sparkles className="h-4 w-4 sm:h-5 sm:w-5 text-indigo-600" />
                               Triage Assignment Engine
                             </DialogTitle>
-                            <DialogDescription>
+                            <DialogDescription className="text-xs sm:text-sm">
                               Select from specialized technicians with matching skills. The status will transition to "In Progress".
                             </DialogDescription>
                           </DialogHeader>
-                          <div className="space-y-3 pt-2 max-h-[300px] overflow-y-auto">
+                          <div className="space-y-2.5 sm:space-y-3 pt-2 max-h-[300px] overflow-y-auto">
                             {staffListToDisplay.map(tech => (
-                              <div key={tech.uid} className="flex justify-between items-center p-3 rounded-lg border hover:bg-gray-50 transition">
+                              <div key={tech.uid} className="flex justify-between items-center p-2.5 sm:p-3 rounded-lg border hover:bg-gray-50 transition">
                                 <div>
-                                  <p className="font-bold text-gray-800">{tech.fullName}</p>
-                                  <p className="text-xs text-gray-500">
+                                  <p className="font-bold text-xs sm:text-sm text-gray-800">{tech.fullName}</p>
+                                  <p className="text-[10px] sm:text-xs text-gray-500">
                                     Specialization: <span className="font-semibold text-indigo-600">{tech.specialization || tech.role.replace('_', ' ')}</span> | Status: <span className="font-semibold text-emerald-600">{tech.availability || 'Available'}</span>
                                   </p>
                                 </div>
                                 <Button 
                                   size="sm" 
-                                  className="bg-indigo-600 text-white hover:bg-indigo-700 text-xs font-semibold"
+                                  className="bg-indigo-600 text-white hover:bg-indigo-700 text-[10px] sm:text-xs font-semibold h-7 sm:h-8 px-2 sm:px-3"
                                   onClick={() => handleAssignTechnician(tech)}
                                 >
                                   Dispatch
@@ -909,44 +909,45 @@ export default function MaintenancePage() {
                         setIsResolveOpen(open)
                       }}>
                         <DialogTrigger asChild>
-                          <Button className="w-full bg-emerald-600 text-white hover:bg-emerald-700 font-bold flex items-center justify-center gap-2">
-                            <CheckCircle className="h-4 w-4" />
+                          <Button className="w-full bg-emerald-600 text-white hover:bg-emerald-700 text-xs sm:text-sm font-bold flex items-center justify-center gap-1.5 py-1.5 sm:py-2 h-8 sm:h-10">
+                            <CheckCircle className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
                             Mark Work Order Resolved
                           </Button>
                         </DialogTrigger>
                         <DialogContent className="max-w-md rounded-xl border-emerald-50">
                           <DialogHeader>
-                            <DialogTitle className="font-bold flex items-center gap-2 text-emerald-900">
-                              <CheckCircle className="h-5 w-5 text-emerald-600" />
+                            <DialogTitle className="font-bold text-sm sm:text-base flex items-center gap-2 text-emerald-900">
+                              <CheckCircle className="h-4 w-4 sm:h-5 sm:w-5 text-emerald-600" />
                               Complete Resolution Details
                             </DialogTitle>
-                            <DialogDescription>Provide details about the diagnostic fix and total material/labor cost to close out the task.</DialogDescription>
+                            <DialogDescription className="text-xs sm:text-sm">Provide details about the diagnostic fix and total material/labor cost to close out the task.</DialogDescription>
                           </DialogHeader>
-                          <form onSubmit={handleResolveTicket} className="space-y-4 pt-2">
-                            <div className="space-y-2">
-                              <Label className="text-sm font-semibold">Diagnostic Resolution Remarks *</Label>
+                          <form onSubmit={handleResolveTicket} className="space-y-3 sm:space-y-4 pt-2">
+                            <div className="space-y-1.5 sm:space-y-2">
+                              <Label className="text-xs sm:text-sm font-semibold">Diagnostic Resolution Remarks *</Label>
                               <textarea 
                                 required 
                                 value={resolutionSummary} 
                                 onChange={e => setResolutionSummary(e.target.value)} 
                                 rows={3}
-                                className="w-full text-sm rounded-md border border-input bg-transparent px-3 py-2 shadow-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+                                className="w-full text-xs sm:text-sm rounded-md border border-input bg-transparent px-3 py-2 shadow-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
                                 placeholder="Explain what was fixed, parts replaced, or general remarks..."
                               />
                             </div>
-                            <div className="space-y-2">
-                              <Label className="text-sm font-semibold">Total Material/Labor Cost (₨) *</Label>
+                            <div className="space-y-1.5 sm:space-y-2">
+                              <Label className="text-xs sm:text-sm font-semibold">Total Material/Labor Cost (₨) *</Label>
                               <Input 
                                 type="number" 
                                 required 
                                 value={actualCost} 
                                 onChange={e => setActualCost(e.target.value)} 
                                 placeholder="e.g. 1500" 
+                                className="text-xs sm:text-sm h-8 sm:h-9"
                               />
                             </div>
-                            <div className="flex justify-end gap-3 pt-2">
-                              <Button type="button" variant="outline" onClick={() => setIsResolveOpen(false)}>Cancel</Button>
-                              <Button type="submit" className="bg-emerald-600 text-white hover:bg-emerald-700">Complete & Resolve</Button>
+                            <div className="flex justify-end gap-2 sm:gap-3 pt-2">
+                              <Button type="button" variant="outline" size="sm" onClick={() => setIsResolveOpen(false)}>Cancel</Button>
+                              <Button type="submit" size="sm" className="bg-emerald-600 text-white hover:bg-emerald-700">Complete & Resolve</Button>
                             </div>
                           </form>
                         </DialogContent>
@@ -957,17 +958,17 @@ export default function MaintenancePage() {
                     {!isStaffOrTech && currentTicket.status === 'resolved' && (
                       <Button 
                         onClick={() => handleCloseTicket(currentTicket.id)}
-                        className="w-full bg-gray-900 hover:bg-gray-800 text-white font-bold flex items-center justify-center gap-2"
+                        className="w-full bg-gray-900 hover:bg-gray-800 text-white text-xs sm:text-sm font-bold flex items-center justify-center gap-1.5 py-1.5 sm:py-2 h-8 sm:h-10"
                       >
-                        <CheckCircle className="h-4 w-4" />
+                        <CheckCircle className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
                         Verify Fix & Close Ticket
                       </Button>
                     )}
 
                     {/* Final state */}
                     {currentTicket.status === 'closed' && (
-                      <div className="p-3 text-center rounded bg-gray-100 border text-gray-500 font-semibold text-xs uppercase tracking-wider flex items-center justify-center gap-2">
-                        <CheckCircle className="h-4 w-4 text-gray-400" />
+                      <div className="p-2.5 sm:p-3 text-center rounded bg-gray-100 border text-gray-500 font-semibold text-[10px] sm:text-xs uppercase tracking-wider flex items-center justify-center gap-1.5 sm:gap-2">
+                        <CheckCircle className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-gray-400" />
                         Completed & Archived
                       </div>
                     )}
