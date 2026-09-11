@@ -16,14 +16,16 @@ export default function ReportsPage() {
         </div>
 
         <div className="grid gap-2.5 sm:gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
-          <Card className="cursor-pointer hover:shadow-lg transition-shadow">
-            <CardContent className="p-3 sm:p-6">
-              <div className="flex items-center gap-2.5 sm:gap-4">
-                <div className="p-2 sm:p-3 rounded-lg bg-blue-100"><BarChart3 className="h-4 w-4 sm:h-6 sm:w-6 text-blue-600" /></div>
-                <div><p className="font-semibold text-xs sm:text-base">Occupancy Report</p><p className="text-[10px] sm:text-sm text-muted-foreground">Current occupancy status</p></div>
-              </div>
-            </CardContent>
-          </Card>
+          <Link href="/reports/occupancy">
+            <Card className="cursor-pointer hover:shadow-lg transition-shadow h-full">
+              <CardContent className="p-3 sm:p-6">
+                <div className="flex items-center gap-2.5 sm:gap-4">
+                  <div className="p-2 sm:p-3 rounded-lg bg-blue-100"><BarChart3 className="h-4 w-4 sm:h-6 sm:w-6 text-blue-600" /></div>
+                  <div><p className="font-semibold text-xs sm:text-base">Occupancy Report</p><p className="text-[10px] sm:text-sm text-muted-foreground">Current occupancy status</p></div>
+                </div>
+              </CardContent>
+            </Card>
+          </Link>
           <Link href="/reports/profit-loss">
             <Card className="cursor-pointer hover:shadow-lg transition-shadow h-full">
               <CardContent className="p-3 sm:p-6">
@@ -34,38 +36,46 @@ export default function ReportsPage() {
               </CardContent>
             </Card>
           </Link>
-          <Card className="cursor-pointer hover:shadow-lg transition-shadow">
-            <CardContent className="p-3 sm:p-6">
-              <div className="flex items-center gap-2.5 sm:gap-4">
-                <div className="p-2 sm:p-3 rounded-lg bg-purple-100"><BarChart3 className="h-4 w-4 sm:h-6 sm:w-6 text-purple-600" /></div>
-                <div><p className="font-semibold text-xs sm:text-base">Maintenance Report</p><p className="text-[10px] sm:text-sm text-muted-foreground">Ticket statistics</p></div>
-              </div>
-            </CardContent>
-          </Card>
-          <Card className="cursor-pointer hover:shadow-lg transition-shadow">
-            <CardContent className="p-3 sm:p-6">
-              <div className="flex items-center gap-2.5 sm:gap-4">
-                <div className="p-2 sm:p-3 rounded-lg bg-yellow-100"><FileText className="h-4 w-4 sm:h-6 sm:w-6 text-yellow-600" /></div>
-                <div><p className="font-semibold text-xs sm:text-base">Utility Report</p><p className="text-[10px] sm:text-sm text-muted-foreground">Consumption analytics</p></div>
-              </div>
-            </CardContent>
-          </Card>
-          <Card className="cursor-pointer hover:shadow-lg transition-shadow">
-            <CardContent className="p-3 sm:p-6">
-              <div className="flex items-center gap-2.5 sm:gap-4">
-                <div className="p-2 sm:p-3 rounded-lg bg-orange-100"><BarChart3 className="h-4 w-4 sm:h-6 sm:w-6 text-orange-600" /></div>
-                <div><p className="font-semibold text-xs sm:text-base">Staff Report</p><p className="text-[10px] sm:text-sm text-muted-foreground">Performance metrics</p></div>
-              </div>
-            </CardContent>
-          </Card>
-          <Card className="cursor-pointer hover:shadow-lg transition-shadow">
-            <CardContent className="p-3 sm:p-6">
-              <div className="flex items-center gap-2.5 sm:gap-4">
-                <div className="p-2 sm:p-3 rounded-lg bg-cyan-100"><FileText className="h-4 w-4 sm:h-6 sm:w-6 text-cyan-600" /></div>
-                <div><p className="font-semibold text-xs sm:text-base">Tenant History</p><p className="text-[10px] sm:text-sm text-muted-foreground">Tenant records</p></div>
-              </div>
-            </CardContent>
-          </Card>
+          <Link href="/reports/maintenance">
+            <Card className="cursor-pointer hover:shadow-lg transition-shadow h-full">
+              <CardContent className="p-3 sm:p-6">
+                <div className="flex items-center gap-2.5 sm:gap-4">
+                  <div className="p-2 sm:p-3 rounded-lg bg-purple-100"><BarChart3 className="h-4 w-4 sm:h-6 sm:w-6 text-purple-600" /></div>
+                  <div><p className="font-semibold text-xs sm:text-base">Maintenance Report</p><p className="text-[10px] sm:text-sm text-muted-foreground">Ticket statistics</p></div>
+                </div>
+              </CardContent>
+            </Card>
+          </Link>
+          <Link href="/reports/utility">
+            <Card className="cursor-pointer hover:shadow-lg transition-shadow h-full">
+              <CardContent className="p-3 sm:p-6">
+                <div className="flex items-center gap-2.5 sm:gap-4">
+                  <div className="p-2 sm:p-3 rounded-lg bg-yellow-100"><FileText className="h-4 w-4 sm:h-6 sm:w-6 text-yellow-600" /></div>
+                  <div><p className="font-semibold text-xs sm:text-base">Utility Report</p><p className="text-[10px] sm:text-sm text-muted-foreground">Consumption analytics</p></div>
+                </div>
+              </CardContent>
+            </Card>
+          </Link>
+          <Link href="/reports/staff">
+            <Card className="cursor-pointer hover:shadow-lg transition-shadow h-full">
+              <CardContent className="p-3 sm:p-6">
+                <div className="flex items-center gap-2.5 sm:gap-4">
+                  <div className="p-2 sm:p-3 rounded-lg bg-orange-100"><BarChart3 className="h-4 w-4 sm:h-6 sm:w-6 text-orange-600" /></div>
+                  <div><p className="font-semibold text-xs sm:text-base">Staff Report</p><p className="text-[10px] sm:text-sm text-muted-foreground">Performance metrics</p></div>
+                </div>
+              </CardContent>
+            </Card>
+          </Link>
+          <Link href="/reports/tenant-history">
+            <Card className="cursor-pointer hover:shadow-lg transition-shadow h-full">
+              <CardContent className="p-3 sm:p-6">
+                <div className="flex items-center gap-2.5 sm:gap-4">
+                  <div className="p-2 sm:p-3 rounded-lg bg-cyan-100"><FileText className="h-4 w-4 sm:h-6 sm:w-6 text-cyan-600" /></div>
+                  <div><p className="font-semibold text-xs sm:text-base">Tenant History</p><p className="text-[10px] sm:text-sm text-muted-foreground">Tenant records</p></div>
+                </div>
+              </CardContent>
+            </Card>
+          </Link>
         </div>
       </div>
     </DashboardLayout>
