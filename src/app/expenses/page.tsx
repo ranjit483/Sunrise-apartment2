@@ -133,67 +133,67 @@ export default function ExpensesPage() {
 
   return (
     <DashboardLayout title="Expenses">
-      <div className="space-y-6">
-        <div className="flex items-center justify-between">
+      <div className="space-y-3 sm:space-y-6">
+        <div className="flex items-center justify-between gap-2">
           <div>
-            <h2 className="text-3xl font-bold">Expenses</h2>
-            <p className="text-muted-foreground">Track and manage property expenses</p>
+            <h2 className="text-lg sm:text-3xl font-bold tracking-tight">Expenses</h2>
+            <p className="text-[10px] sm:text-sm text-muted-foreground mt-0.5 sm:mt-1">Track and manage property expenses</p>
           </div>
-          <Button onClick={() => setIsModalOpen(true)} className="gap-2">
-            <Plus className="h-4 w-4" /> Record Expense
+          <Button onClick={() => setIsModalOpen(true)} size="sm" className="gap-1.5 h-8 sm:h-10 text-xs sm:text-sm px-2.5 sm:px-4">
+            <Plus className="h-3.5 w-3.5 sm:h-4 sm:w-4" /> Record Expense
           </Button>
         </div>
 
-        <div className="grid gap-4 md:grid-cols-4">
-          <Card><CardContent className="p-6"><p className="text-sm text-muted-foreground">Total Approved</p><p className="text-2xl font-bold">₨ {totalExpenses.toLocaleString()}</p></CardContent></Card>
-          <Card><CardContent className="p-6"><p className="text-sm text-muted-foreground">Pending Approvals</p><p className="text-2xl font-bold text-yellow-600">{pendingCount}</p></CardContent></Card>
+        <div className="grid gap-2 sm:gap-4 grid-cols-2 md:grid-cols-4">
+          <Card><CardContent className="p-2.5 sm:p-6"><p className="text-[10px] sm:text-sm font-medium text-muted-foreground">Total Approved</p><p className="text-sm sm:text-2xl font-bold mt-0.5 sm:mt-1">₨ {totalExpenses.toLocaleString()}</p></CardContent></Card>
+          <Card><CardContent className="p-2.5 sm:p-6"><p className="text-[10px] sm:text-sm font-medium text-muted-foreground">Pending Approvals</p><p className="text-sm sm:text-2xl font-bold text-yellow-600 mt-0.5 sm:mt-1">{pendingCount}</p></CardContent></Card>
         </div>
 
         <Card>
-          <CardHeader><CardTitle>Recent Expenses</CardTitle></CardHeader>
-          <CardContent>
+          <CardHeader className="p-3 sm:p-6 pb-2 sm:pb-3"><CardTitle className="text-sm sm:text-xl font-bold">Recent Expenses</CardTitle></CardHeader>
+          <CardContent className="p-3 sm:p-6 pt-0">
             {loading ? (
-              <div className="flex justify-center py-8"><Loader2 className="h-8 w-8 animate-spin text-muted-foreground" /></div>
+              <div className="flex justify-center py-6 sm:py-8"><Loader2 className="h-6 w-6 sm:h-8 sm:w-8 animate-spin text-muted-foreground" /></div>
             ) : filteredExpenses.length === 0 ? (
-              <div className="text-center py-8 text-muted-foreground">No expenses found.</div>
+              <div className="text-center py-6 sm:py-8 text-xs sm:text-sm text-muted-foreground">No expenses found.</div>
             ) : (
               <div className="overflow-x-auto">
-                <table className="w-full text-left">
+                <table className="w-full text-left text-xs sm:text-sm">
                   <thead>
-                    <tr className="border-b">
-                      <th className="pb-3 px-2">Date</th>
-                      <th className="pb-3 px-2">Category</th>
-                      <th className="pb-3 px-2">Description</th>
-                      <th className="pb-3 px-2">Building</th>
-                      <th className="pb-3 px-2 text-right">Amount</th>
-                      <th className="pb-3 px-2 text-center">Status</th>
-                      {canApprove && <th className="pb-3 px-2 text-right">Actions</th>}
+                    <tr className="border-b text-[10px] sm:text-xs uppercase text-muted-foreground font-semibold">
+                      <th className="pb-2 px-1.5 sm:px-2">Date</th>
+                      <th className="pb-2 px-1.5 sm:px-2">Category</th>
+                      <th className="pb-2 px-1.5 sm:px-2">Description</th>
+                      <th className="pb-2 px-1.5 sm:px-2">Building</th>
+                      <th className="pb-2 px-1.5 sm:px-2 text-right">Amount</th>
+                      <th className="pb-2 px-1.5 sm:px-2 text-center">Status</th>
+                      {canApprove && <th className="pb-2 px-1.5 sm:px-2 text-right">Actions</th>}
                     </tr>
                   </thead>
                   <tbody>
                     {filteredExpenses.map((e) => (
-                      <tr key={e.id} className="border-b">
-                        <td className="py-3 px-2">{e.date}</td>
-                        <td className="py-3 px-2 font-medium">{e.category}</td>
-                        <td className="py-3 px-2">{e.description}</td>
-                        <td className="py-3 px-2 text-sm text-muted-foreground">
+                      <tr key={e.id} className="border-b hover:bg-muted/50 transition-colors">
+                        <td className="py-1.5 sm:py-3 px-1.5 sm:px-2 text-[10px] sm:text-sm">{e.date}</td>
+                        <td className="py-1.5 sm:py-3 px-1.5 sm:px-2 font-semibold text-xs sm:text-sm text-gray-900">{e.category}</td>
+                        <td className="py-1.5 sm:py-3 px-1.5 sm:px-2 text-[10px] sm:text-sm">{e.description}</td>
+                        <td className="py-1.5 sm:py-3 px-1.5 sm:px-2 text-[10px] sm:text-sm text-muted-foreground">
                           {buildings.find(b => b.id === e.buildingId)?.name || 'General'}
                         </td>
-                        <td className="py-3 px-2 text-right font-bold text-destructive">₨ {e.amount.toLocaleString()}</td>
-                        <td className="py-3 px-2 text-center">
-                          <Badge variant={e.status === 'approved' || e.status === 'paid' ? 'success' : e.status === 'rejected' ? 'destructive' : 'warning'}>
+                        <td className="py-1.5 sm:py-3 px-1.5 sm:px-2 text-right font-bold text-destructive text-xs sm:text-sm">₨ {e.amount.toLocaleString()}</td>
+                        <td className="py-1.5 sm:py-3 px-1.5 sm:px-2 text-center">
+                          <Badge variant={e.status === 'approved' || e.status === 'paid' ? 'success' : e.status === 'rejected' ? 'destructive' : 'warning'} className="text-[9px] sm:text-xs px-1.5 py-0.5">
                             {(e.status || 'approved').replace('_', ' ').toUpperCase()}
                           </Badge>
                         </td>
                         {canApprove && (
-                          <td className="py-3 px-2 text-right">
+                          <td className="py-1.5 sm:py-3 px-1.5 sm:px-2 text-right">
                             {e.status === 'pending_approval' && (
-                              <div className="flex items-center justify-end gap-2">
-                                <Button size="sm" variant="outline" className="text-green-600 hover:bg-green-50" onClick={() => handleUpdateStatus(e.id, 'approved')}>
-                                  <CheckCircle2 className="h-4 w-4" />
+                              <div className="flex items-center justify-end gap-1.5">
+                                <Button size="sm" variant="outline" className="h-7 w-7 p-0 text-green-600 hover:bg-green-50" onClick={() => handleUpdateStatus(e.id, 'approved')}>
+                                  <CheckCircle2 className="h-3.5 w-3.5" />
                                 </Button>
-                                <Button size="sm" variant="outline" className="text-red-600 hover:bg-red-50" onClick={() => handleUpdateStatus(e.id, 'rejected')}>
-                                  <XCircle className="h-4 w-4" />
+                                <Button size="sm" variant="outline" className="h-7 w-7 p-0 text-red-600 hover:bg-red-50" onClick={() => handleUpdateStatus(e.id, 'rejected')}>
+                                  <XCircle className="h-3.5 w-3.5" />
                                 </Button>
                               </div>
                             )}
@@ -210,16 +210,16 @@ export default function ExpensesPage() {
       </div>
 
       <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
-        <DialogContent>
+        <DialogContent className="max-w-md">
           <DialogHeader>
-            <DialogTitle>Record New Expense</DialogTitle>
-            <DialogDescription>Submit an expense for {canApprove ? 'direct recording' : 'approval'}.</DialogDescription>
+            <DialogTitle className="text-base sm:text-xl font-bold">Record New Expense</DialogTitle>
+            <DialogDescription className="text-xs sm:text-sm">Submit an expense for {canApprove ? 'direct recording' : 'approval'}.</DialogDescription>
           </DialogHeader>
-          <div className="space-y-4 pt-4">
-            <div className="space-y-2">
-              <Label>Expense Account Category *</Label>
+          <div className="space-y-3 pt-2">
+            <div className="space-y-1 sm:space-y-2">
+              <Label className="text-xs sm:text-sm font-semibold">Expense Account Category *</Label>
               <select 
-                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                className="flex h-8 sm:h-10 w-full rounded-md border border-input bg-background px-3 py-1.5 text-xs sm:text-sm"
                 value={formData.accountId}
                 onChange={(e) => setFormData({...formData, accountId: e.target.value})}
               >
@@ -230,10 +230,10 @@ export default function ExpensesPage() {
               </select>
             </div>
             
-            <div className="space-y-2">
-              <Label>Building (Optional)</Label>
+            <div className="space-y-1 sm:space-y-2">
+              <Label className="text-xs sm:text-sm font-semibold">Building (Optional)</Label>
               <select 
-                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                className="flex h-8 sm:h-10 w-full rounded-md border border-input bg-background px-3 py-1.5 text-xs sm:text-sm"
                 value={formData.buildingId}
                 onChange={(e) => setFormData({...formData, buildingId: e.target.value})}
               >
@@ -242,37 +242,40 @@ export default function ExpensesPage() {
               </select>
             </div>
 
-            <div className="space-y-2">
-              <Label>Description</Label>
+            <div className="space-y-1 sm:space-y-2">
+              <Label className="text-xs sm:text-sm font-semibold">Description</Label>
               <Input 
                 placeholder="e.g. Fixing pipe in Building A" 
                 value={formData.description} 
                 onChange={(e) => setFormData({...formData, description: e.target.value})} 
+                className="h-8 sm:h-10 text-xs sm:text-sm"
               />
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label>Amount (₨) *</Label>
+            <div className="grid grid-cols-2 gap-3">
+              <div className="space-y-1 sm:space-y-2">
+                <Label className="text-xs sm:text-sm font-semibold">Amount (₨) *</Label>
                 <Input 
                   type="number"
                   placeholder="0.00" 
                   value={formData.amount} 
                   onChange={(e) => setFormData({...formData, amount: e.target.value})} 
+                  className="h-8 sm:h-10 text-xs sm:text-sm"
                 />
               </div>
-              <div className="space-y-2">
-                <Label>Date *</Label>
+              <div className="space-y-1 sm:space-y-2">
+                <Label className="text-xs sm:text-sm font-semibold">Date *</Label>
                 <Input 
                   type="date"
                   value={formData.date} 
                   onChange={(e) => setFormData({...formData, date: e.target.value})} 
+                  className="h-8 sm:h-10 text-xs sm:text-sm"
                 />
               </div>
             </div>
 
-            <Button className="w-full mt-4" onClick={handleSave} disabled={isSaving || !formData.accountId || !formData.amount}>
-              {isSaving ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
+            <Button className="w-full mt-3 h-8 sm:h-10 text-xs sm:text-sm" onClick={handleSave} disabled={isSaving || !formData.accountId || !formData.amount}>
+              {isSaving ? <Loader2 className="h-3.5 w-3.5 sm:h-4 sm:w-4 animate-spin mr-2" /> : null}
               {canApprove ? 'Save Expense' : 'Submit for Approval'}
             </Button>
           </div>
