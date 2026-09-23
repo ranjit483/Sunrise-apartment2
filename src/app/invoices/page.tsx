@@ -304,7 +304,7 @@ export default function InvoicesPage() {
         const eReading = readingData?.city ? readingData.city.currentReading : 0;
         const eConsumed = readingData?.city ? readingData.city.totalConsumed : 0;
         const eAmount = readingData?.city ? readingData.city.totalBill : 0;
-        const eVatAmount = Math.round(eAmount * 0.13);
+        const eVatAmount = Math.round(eAmount * 0.1679);
         const gReading = readingData?.generator ? readingData.generator.currentReading : 0;
         const gAmount = readingData?.generator ? readingData.generator.totalBill : 0;
 
@@ -543,7 +543,7 @@ export default function InvoicesPage() {
     if (!editingInvoice) return
     setIsUpdating(true)
     try {
-      const eVatAmount = Math.round(Number(editingInvoice.electricityAmount || 0) * 0.13);
+      const eVatAmount = Math.round(Number(editingInvoice.electricityAmount || 0) * 0.1679);
       
       const ref = doc(db, 'invoices', editingInvoice.id)
       await updateDoc(ref, {
@@ -955,7 +955,7 @@ export default function InvoicesPage() {
                   <tr className="border-b border-black">
                     <td className="border border-black p-0.5 text-center align-middle">1.1</td>
                     <td className="border border-black p-0.5 flex items-center justify-between">
-                      <strong>Electricity VAT (13%)</strong>
+                      <strong>Electricity VAT (16.79%)</strong>
                       <span className="text-[7px] text-gray-600">Government Tax</span>
                     </td>
                     <td className="border border-black p-0.5 text-right font-medium align-middle">₨ {(viewingInvoice.electricityVatAmount || 0).toLocaleString()}</td>
@@ -1504,7 +1504,7 @@ export default function InvoicesPage() {
                     <tr className="border-b border-black">
                       <td className="border border-black p-2 text-center">1.1</td>
                       <td className="border border-black p-2">
-                        <div><strong>Electricity VAT (13%)</strong></div>
+                        <div><strong>Electricity VAT (16.79%)</strong></div>
                         <span className="text-[10px] text-gray-600">Government Tax</span>
                       </td>
                       <td className="border border-black p-2 text-right font-medium">₨ {(viewingInvoice.electricityVatAmount || 0).toLocaleString()}</td>

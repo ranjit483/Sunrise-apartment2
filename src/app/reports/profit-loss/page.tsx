@@ -231,7 +231,7 @@ export default function ProfitLossPage() {
                     )}
                     {filteredData.totalElectricityVat > 0 && (
                       <div className="flex justify-between text-xs sm:text-sm">
-                        <span className="text-muted-foreground text-[10px] sm:text-xs">Electricity Vat 13%</span>
+                        <span className="text-muted-foreground text-[10px] sm:text-xs">Electricity Vat 16.79%</span>
                         <span className="font-medium">₨ {filteredData.totalElectricityVat.toLocaleString()}</span>
                       </div>
                     )}
