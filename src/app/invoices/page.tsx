@@ -137,6 +137,7 @@ export default function InvoicesPage() {
   const [isPostingDrafts, setIsPostingDrafts] = useState(false)
   
   const [invoiceMonth, setInvoiceMonth] = useState('')
+  const [invoiceDate, setInvoiceDate] = useState('')
   const [invoiceDueDate, setInvoiceDueDate] = useState('')
 
   // Receive payment wizard states
@@ -163,6 +164,7 @@ export default function InvoicesPage() {
     const now = new Date()
     const monthStr = now.toLocaleString('default', { month: 'long', year: 'numeric' })
     setInvoiceMonth(monthStr)
+    setInvoiceDate(now.toISOString().split('T')[0])
     
     const nextMonth = new Date(now.getFullYear(), now.getMonth() + 1, 5)
     setInvoiceDueDate(nextMonth.toISOString().split('T')[0])
@@ -200,8 +202,8 @@ export default function InvoicesPage() {
   }, [profile, canManageInvoices])
 
   const handleGenerateDrafts = async () => {
-    if (!invoiceMonth || !invoiceDueDate) {
-      alert('Please provide the billing month and due date.')
+    if (!invoiceMonth || !invoiceDueDate || !invoiceDate) {
+      alert('Please provide the billing month, generate date, and due date.')
       return
     }
 
@@ -334,6 +336,7 @@ export default function InvoicesPage() {
         const prevDue = prevDueCalculated + (user.previousPendingOutstandingDue || 0);
         const latePenaltyAmount = Math.round(prevDue * (lateFeePercent / 100));
 
+        const createdDateIso = invoiceDate ? new Date(invoiceDate + 'T12:00:00.000Z').toISOString() : new Date().toISOString()
         const invoiceRef = doc(collection(db, 'invoices'))
         batch.set(invoiceRef, {
           id: invoiceRef.id,
@@ -360,7 +363,7 @@ export default function InvoicesPage() {
           latePenaltyAmount: latePenaltyAmount,
           dueDate: invoiceDueDate,
           status: 'draft',
-          createdAt: new Date().toISOString(),
+          createdAt: createdDateIso,
           updatedAt: new Date().toISOString()
         })
         count++
@@ -562,6 +565,7 @@ export default function InvoicesPage() {
         structureMaintenanceAmount: Number(editingInvoice.structureMaintenanceAmount || 0),
         otherAmount: Number(editingInvoice.otherAmount || 0),
         dueDate: editingInvoice.dueDate,
+        createdAt: editingInvoice.createdAt,
         updatedAt: new Date().toISOString()
       })
       setIsEditModalOpen(false)
@@ -658,6 +662,14 @@ export default function InvoicesPage() {
                         placeholder="e.g. Baishakh 2083" 
                         value={invoiceMonth} 
                         onChange={e => setInvoiceMonth(e.target.value)} 
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label>Generate Date (Invoice Date)</Label>
+                      <Input 
+                        type="date" 
+                        value={invoiceDate} 
+                        onChange={e => setInvoiceDate(e.target.value)} 
                       />
                     </div>
                     <div className="space-y-2">
@@ -1138,13 +1150,26 @@ export default function InvoicesPage() {
                 <p><strong>Unit:</strong> {editingInvoice.unitNumber || editingInvoice.unitId}</p>
                 <p><strong>Tenant:</strong> {formatTenantName(editingInvoice.tenantName || editingInvoice.tenantId, editingInvoice.tenantId)}</p>
               </div>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 <div className="space-y-2">
                   <Label>Service Charge Amount (₨)</Label>
                   <Input 
                     type="number" 
                     value={editingInvoice.amount} 
                     onChange={e => setEditingInvoice({...editingInvoice, amount: Number(e.target.value)})} 
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label>Invoice Date (AD)</Label>
+                  <Input 
+                    type="date" 
+                    value={editingInvoice.createdAt ? editingInvoice.createdAt.split('T')[0] : ''} 
+                    onChange={e => {
+                      const dVal = e.target.value;
+                      if (!dVal) return;
+                      const iso = new Date(dVal + 'T12:00:00.000Z').toISOString();
+                      setEditingInvoice({...editingInvoice, createdAt: iso});
+                    }} 
                   />
                 </div>
                 <div className="space-y-2">
