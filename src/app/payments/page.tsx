@@ -488,6 +488,7 @@ export default function PaymentsPage() {
                       <th className="py-2 px-2.5 text-left">Tenant ID</th>
                       <th className="py-2 px-2.5 text-left">Amount</th>
                       <th className="py-2 px-2.5 text-left">Method</th>
+                      <th className="py-2 px-2.5 text-left">Receipt Date</th>
                       <th className="py-2 px-2.5 text-left">Date (AD)</th>
                       <th className="py-2 px-2.5 text-left">Status</th>
                       <th className="py-2 px-2.5 text-left">Actions</th>
@@ -500,7 +501,8 @@ export default function PaymentsPage() {
                         <td className="py-2 px-2.5 font-mono text-[10px] sm:text-xs">{p.tenantId.substring(0, 10)}...</td>
                         <td className="py-2 px-2.5 font-bold text-emerald-600 text-xs sm:text-sm">₨ {p.amount.toLocaleString()}</td>
                         <td className="py-2 px-2.5 font-semibold text-[10px] sm:text-xs uppercase text-indigo-700">{p.method.replace('_', ' ')}</td>
-                        <td className="py-2 px-2.5 text-xs sm:text-sm">{getNepaliDate(p.createdAt).ad}</td>
+                        <td className="py-2 px-2.5 text-xs sm:text-sm font-medium whitespace-nowrap">{getNepaliDate(p.createdAt).bs.split(' (')[0]}</td>
+                        <td className="py-2 px-2.5 text-[10px] sm:text-xs text-muted-foreground whitespace-nowrap">{getNepaliDate(p.createdAt).ad}</td>
                         <td className="py-2 px-2.5">
                           <Badge variant="warning" className="uppercase font-semibold text-[10px] sm:text-xs px-1.5 py-0.5 rounded-full bg-amber-100 text-amber-800">
                             PENDING VERIFICATION
@@ -554,6 +556,7 @@ export default function PaymentsPage() {
                       {!isResident && <th className="py-2 px-2.5 text-left font-medium">Tenant Details</th>}
                       <th className="py-2 px-2.5 text-left font-medium">Amount</th>
                       <th className="py-2 px-2.5 text-left font-medium">Method</th>
+                      <th className="py-2 px-2.5 text-left font-medium">Receipt Date</th>
                       <th className="py-2 px-2.5 text-left font-medium">Date (AD)</th>
                       <th className="py-2 px-2.5 text-left font-medium">Status</th>
                       <th className="py-2 px-2.5 text-left font-medium">Actions</th>
@@ -572,7 +575,8 @@ export default function PaymentsPage() {
                         )}
                         <td className="py-2 px-2.5 font-bold text-emerald-600 text-xs sm:text-sm">₨ {p.amount.toLocaleString()}</td>
                         <td className="py-2 px-2.5 font-semibold text-[10px] sm:text-xs uppercase text-indigo-700">{p.method.replace('_', ' ')}</td>
-                        <td className="py-2 px-2.5 text-xs sm:text-sm">{getNepaliDate(p.paidAt || p.createdAt).ad}</td>
+                        <td className="py-2 px-2.5 text-xs sm:text-sm font-medium whitespace-nowrap">{getNepaliDate(p.paidAt || p.createdAt).bs.split(' (')[0]}</td>
+                        <td className="py-2 px-2.5 text-[10px] sm:text-xs text-muted-foreground whitespace-nowrap">{getNepaliDate(p.paidAt || p.createdAt).ad}</td>
                         <td className="py-2 px-2.5">
                           <Badge 
                             variant={p.status === 'completed' ? 'success' : p.status === 'rejected' ? 'destructive' : 'warning'} 
