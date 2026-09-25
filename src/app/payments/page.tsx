@@ -9,7 +9,7 @@ import { Input } from '@/components/ui/input'
 import { db } from '@/config/firebase'
 import { collection, onSnapshot, query, where, doc, writeBatch, getDoc, getDocs, updateDoc, orderBy, limit } from 'firebase/firestore'
 import { Payment, Invoice } from '@/types/models'
-import { Loader2, DollarSign, Eye, Printer, FileText, QrCode, CheckCircle2, AlertCircle, Search } from 'lucide-react'
+import { Loader2, DollarSign, Eye, Printer, FileText, QrCode, CheckCircle2, AlertCircle, Search, Edit } from 'lucide-react'
 import { useAuth } from '@/context/AuthContext'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog'
 import { numberToWords } from '@/lib/utils'
@@ -110,6 +110,12 @@ export default function PaymentsPage() {
   const [checkoutStep, setCheckoutStep] = useState<'statement' | 'online' | 'qr'>('statement')
   const [qrTransactionId, setQrTransactionId] = useState('')
   const [payAmount, setPayAmount] = useState('')
+
+  // Edit Payment Date states
+  const [isEditDateModalOpen, setIsEditDateModalOpen] = useState(false)
+  const [editingPayment, setEditingPayment] = useState<Payment | null>(null)
+  const [newPaymentDate, setNewPaymentDate] = useState('')
+  const [isUpdatingDate, setIsUpdatingDate] = useState(false)
 
   useEffect(() => {
     if (!profile?.role) return;
@@ -387,6 +393,36 @@ export default function PaymentsPage() {
     return name.includes(q) || unit.includes(q) || receipt.includes(q) || method.includes(q) || tx.includes(q)
   })
 
+  const openEditDateModal = (payment: Payment) => {
+    setEditingPayment(payment)
+    const currentDate = payment.paidAt || payment.createdAt
+    if (currentDate) {
+      setNewPaymentDate(new Date(currentDate).toISOString().split('T')[0])
+    }
+    setIsEditDateModalOpen(true)
+  }
+
+  const handleUpdatePaymentDate = async () => {
+    if (!editingPayment || !newPaymentDate) return
+    setIsUpdatingDate(true)
+    try {
+      const isoDate = new Date(newPaymentDate + 'T12:00:00.000Z').toISOString()
+      const ref = doc(db, 'payments', editingPayment.id)
+      await updateDoc(ref, {
+        paidAt: isoDate,
+        createdAt: isoDate
+      })
+      setIsEditDateModalOpen(false)
+      setEditingPayment(null)
+      alert('Payment date updated successfully!')
+    } catch (error: any) {
+      console.error('Error updating payment date:', error)
+      alert('Failed to update payment date: ' + error.message)
+    } finally {
+      setIsUpdatingDate(false)
+    }
+  }
+
   return (
     <DashboardLayout title="Payments">
       <div className="space-y-4 sm:space-y-6 no-print">
@@ -590,15 +626,28 @@ export default function PaymentsPage() {
                           </Badge>
                         </td>
                         <td className="py-2 px-2.5">
-                          <Button 
-                            variant="ghost" 
-                            size="sm" 
-                            className="h-7 w-7 sm:h-8 sm:w-8 p-0" 
-                            onClick={() => handleOpenReceipt(p)} 
-                            title="View/Print Receipt"
-                          >
-                            <FileText className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-emerald-600 hover:text-emerald-800" />
-                          </Button>
+                          <div className="flex items-center gap-1">
+                            <Button 
+                              variant="ghost" 
+                              size="sm" 
+                              className="h-7 w-7 sm:h-8 sm:w-8 p-0" 
+                              onClick={() => handleOpenReceipt(p)} 
+                              title="View/Print Receipt"
+                            >
+                              <FileText className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-emerald-600 hover:text-emerald-800" />
+                            </Button>
+                            {!isResident && (
+                              <Button 
+                                variant="ghost" 
+                                size="sm" 
+                                className="h-7 w-7 sm:h-8 sm:w-8 p-0" 
+                                onClick={() => openEditDateModal(p)} 
+                                title="Edit Payment Date"
+                              >
+                                <Edit className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-amber-600 hover:text-amber-800" />
+                              </Button>
+                            )}
+                          </div>
                         </td>
                       </tr>
                     ))}
@@ -1033,6 +1082,38 @@ export default function PaymentsPage() {
               </div>
             </div>
           )}
+        </DialogContent>
+      </Dialog>
+      {/* EDIT PAYMENT DATE MODAL */}
+      <Dialog open={isEditDateModalOpen} onOpenChange={setIsEditDateModalOpen}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Edit Payment Date</DialogTitle>
+            <DialogDescription>
+              Update the date when this payment was made. This will reflect in reports and Nepali date generation.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-2">
+            <div className="space-y-2">
+              <label className="text-sm font-medium">New Payment Date (AD)</label>
+              <Input
+                type="date"
+                value={newPaymentDate}
+                onChange={(e) => setNewPaymentDate(e.target.value)}
+              />
+            </div>
+          </div>
+          <div className="flex justify-end gap-2 pt-4">
+            <Button variant="outline" onClick={() => setIsEditDateModalOpen(false)}>Cancel</Button>
+            <Button 
+              onClick={handleUpdatePaymentDate}
+              disabled={isUpdatingDate || !newPaymentDate}
+              className="bg-indigo-600 hover:bg-indigo-700"
+            >
+              {isUpdatingDate && <Loader2 className="h-3.5 w-3.5 animate-spin mr-1.5" />}
+              Save Changes
+            </Button>
+          </div>
         </DialogContent>
       </Dialog>
     </DashboardLayout>
