@@ -594,12 +594,12 @@ export default function InvoicesPage() {
     }
   }
 
-  const handleDeleteDraft = async (invoiceId: string) => {
-    if (!window.confirm('Are you sure you want to delete this draft invoice?')) return;
+  const handleDeleteInvoice = async (invoiceId: string) => {
+    if (!window.confirm('Are you sure you want to delete this invoice?')) return;
     try {
       await deleteDoc(doc(db, 'invoices', invoiceId));
     } catch (error: any) {
-      console.error('Error deleting draft invoice:', error);
+      console.error('Error deleting invoice:', error);
       alert('Failed to delete invoice: ' + error.message);
     }
   }
@@ -839,13 +839,13 @@ export default function InvoicesPage() {
                                 </Button>
                               )}
 
-                              {inv.status === 'draft' && profile?.role === 'SUPER_ADMIN' && (
+                              {profile?.role === 'SUPER_ADMIN' && (
                                 <Button 
                                   variant="ghost" 
                                   size="sm" 
                                   className="h-7 w-7 p-0" 
-                                  onClick={() => handleDeleteDraft(inv.id)} 
-                                  title="Delete Draft"
+                                  onClick={() => handleDeleteInvoice(inv.id)} 
+                                  title="Delete Invoice"
                                 >
                                   <Trash2 className="h-3.5 w-3.5 text-red-500 hover:text-red-700" />
                                 </Button>
