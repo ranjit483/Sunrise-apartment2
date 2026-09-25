@@ -149,6 +149,8 @@ export default function InvoicesPage() {
   const [receiveAmount, setReceiveAmount] = useState('')
   const [chequeAmount, setChequeAmount] = useState('')
   const [isPaying, setIsPaying] = useState(false)
+  const [isBackdated, setIsBackdated] = useState(false)
+  const [backdateValue, setBackdateValue] = useState('')
 
   // Document viewing states
   const [viewingInvoice, setViewingInvoice] = useState<Invoice | null>(null)
@@ -440,6 +442,8 @@ export default function InvoicesPage() {
     const totalAmount = invoice.amount + (invoice.electricityAmount || 0) + (invoice.generatorAmount || 0) + (invoice.utilityAmount || 0) + (invoice.waterAmount || 0) + (invoice.insuranceAmount || 0) + (invoice.dieselAmount || 0) + (invoice.structureMaintenanceAmount || 0) + (invoice.otherAmount || 0) + (invoice.previousPendingOutstandingDue || 0) + (invoice.latePenaltyAmount || 0) + (invoice.electricityVatAmount || 0) - (invoice.paidAmount || 0)
     setReceiveAmount(totalAmount.toString())
     setChequeAmount(totalAmount.toString())
+    setIsBackdated(false)
+    setBackdateValue(new Date().toISOString().split('T')[0])
     setIsReceiveModalOpen(true)
   }
 
@@ -472,6 +476,11 @@ export default function InvoicesPage() {
 
       // Removed the check that prevents overpayment to allow advance payments
       
+      let paymentDateISO = new Date().toISOString()
+      if (isBackdated && backdateValue) {
+        paymentDateISO = new Date(backdateValue + 'T12:00:00.000Z').toISOString()
+      }
+      
       const newPayment: Payment = {
         id: paymentRef.id,
         invoiceId: payingInvoice.id,
@@ -480,8 +489,8 @@ export default function InvoicesPage() {
         method: paymentMethod === 'cash' ? 'cash' : paymentMethod === 'cheque' ? 'cheque' : 'qr',
         transactionId: paymentMethod === 'qr' ? 'FON-QR-' + Math.random().toString(36).substring(2, 10).toUpperCase() : 'REC-' + Math.random().toString(36).substring(2, 10).toUpperCase(),
         status: isCheque ? 'pending_clearance' : 'completed',
-        paidAt: new Date().toISOString(),
-        createdAt: new Date().toISOString(),
+        paidAt: paymentDateISO,
+        createdAt: paymentDateISO,
         receiptNo: 'No.: ' + Math.floor(1000 + Math.random() * 9000),
         receivedFor: `Monthly Bill - ${payingInvoice.month}`
       }
@@ -1374,6 +1383,26 @@ export default function InvoicesPage() {
                     )
                   })()}
                 </div>
+              </div>
+
+              <div className="flex items-center justify-between border-t border-b py-2 my-2 border-gray-100">
+                <Label className="text-sm font-semibold cursor-pointer flex items-center gap-2 text-gray-700">
+                  <input 
+                    type="checkbox" 
+                    checked={isBackdated} 
+                    onChange={e => setIsBackdated(e.target.checked)} 
+                    className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-600 cursor-pointer" 
+                  />
+                  Backdate Payment?
+                </Label>
+                {isBackdated && (
+                  <Input 
+                    type="date" 
+                    className="h-8 text-xs w-[140px]" 
+                    value={backdateValue}
+                    onChange={e => setBackdateValue(e.target.value)}
+                  />
+                )}
               </div>
 
               <div className="space-y-2">
