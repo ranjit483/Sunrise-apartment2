@@ -214,16 +214,23 @@ export default function InvoicesPage() {
       const usersQuery = query(collection(db, 'users'), where('status', '==', 'approved'))
       const usersSnapshot = await getDocs(usersQuery)
       
+      // Find users who already have an invoice for this month
+      const existingInvoices = invoices.filter(i => i.month === invoiceMonth)
+      const usersWithInvoices = new Set(existingInvoices.map(i => i.tenantId))
+
       const targetUsers: any[] = []
       usersSnapshot.forEach((doc: any) => {
         const u = doc.data()
         if (['TENANT', 'RESIDENT', 'OWNER'].includes(u.role)) {
-          targetUsers.push(u)
+          // Only generate if they don't already have an invoice for this month
+          if (!usersWithInvoices.has(u.uid) && !usersWithInvoices.has(u.id)) {
+            targetUsers.push(u)
+          }
         }
       })
 
       if (targetUsers.length === 0) {
-        alert('No active or approved tenants/owners found to generate invoices for.')
+        alert('All active residents already have an invoice for this month, or no active residents found.')
         setIsGenerating(false)
         return
       }
