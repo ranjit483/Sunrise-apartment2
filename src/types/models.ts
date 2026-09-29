@@ -193,6 +193,8 @@ export interface SystemSettings {
   dieselCostFlatFee?: number
   structureMaintenanceRatePerSqFt?: number
   otherChargesFlatFee?: number
+  enableVat?: boolean
+  vatPercent?: number
 }
 
 export interface UserSettings {

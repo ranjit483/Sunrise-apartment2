@@ -302,6 +302,8 @@ export default function InvoicesPage() {
       const structureRate = settingsData.structureMaintenanceRatePerSqFt || 0
       const otherFlatFee = settingsData.otherChargesFlatFee || 0
       const lateFeePercent = settingsData.lateFeePercent || 0
+      const enableVat = settingsData.enableVat !== undefined ? settingsData.enableVat : true
+      const vatPercent = settingsData.vatPercent !== undefined ? settingsData.vatPercent : 16.79
 
       const batch = writeBatch(db)
       let count = 0
@@ -315,7 +317,7 @@ export default function InvoicesPage() {
         const eReading = readingData?.city ? readingData.city.currentReading : 0;
         const eConsumed = readingData?.city ? readingData.city.totalConsumed : 0;
         const eAmount = readingData?.city ? readingData.city.totalBill : 0;
-        const eVatAmount = Math.round(eAmount * 0.1679);
+        const eVatAmount = enableVat ? Math.round(eAmount * (vatPercent / 100)) : 0;
         const gReading = readingData?.generator ? readingData.generator.currentReading : 0;
         const gAmount = readingData?.generator ? readingData.generator.totalBill : 0;
 
@@ -562,7 +564,12 @@ export default function InvoicesPage() {
     if (!editingInvoice) return
     setIsUpdating(true)
     try {
-      const eVatAmount = Math.round(Number(editingInvoice.electricityAmount || 0) * 0.1679);
+      const settingsDoc = await getDoc(doc(db, 'settings', 'general'))
+      const settingsData = settingsDoc.exists() ? settingsDoc.data() : {}
+      const enableVat = settingsData.enableVat !== undefined ? settingsData.enableVat : true
+      const vatPercent = settingsData.vatPercent !== undefined ? settingsData.vatPercent : 16.79
+
+      const eVatAmount = enableVat ? Math.round(Number(editingInvoice.electricityAmount || 0) * (vatPercent / 100)) : 0;
       
       const ref = doc(db, 'invoices', editingInvoice.id)
       await updateDoc(ref, {
@@ -983,7 +990,7 @@ export default function InvoicesPage() {
                   <tr className="border-b border-black">
                     <td className="border border-black p-0.5 text-center align-middle">1.1</td>
                     <td className="border border-black p-0.5 flex items-center justify-between">
-                      <strong>Electricity VAT (16.79%)</strong>
+                      <strong>Electricity VAT ({(viewingInvoice.electricityAmount && viewingInvoice.electricityVatAmount) ? (Math.round((viewingInvoice.electricityVatAmount / viewingInvoice.electricityAmount) * 10000) / 100) : 16.79}%)</strong>
                       <span className="text-[7px] text-gray-600">Government Tax</span>
                     </td>
                     <td className="border border-black p-0.5 text-right font-medium align-middle">₨ {(viewingInvoice.electricityVatAmount || 0).toLocaleString()}</td>
@@ -1565,7 +1572,7 @@ export default function InvoicesPage() {
                     <tr className="border-b border-black">
                       <td className="border border-black p-2 text-center">1.1</td>
                       <td className="border border-black p-2">
-                        <div><strong>Electricity VAT (16.79%)</strong></div>
+                        <div><strong>Electricity VAT ({(viewingInvoice.electricityAmount && viewingInvoice.electricityVatAmount) ? (Math.round((viewingInvoice.electricityVatAmount / viewingInvoice.electricityAmount) * 10000) / 100) : 16.79}%)</strong></div>
                         <span className="text-[10px] text-gray-600">Government Tax</span>
                       </td>
                       <td className="border border-black p-2 text-right font-medium">₨ {(viewingInvoice.electricityVatAmount || 0).toLocaleString()}</td>

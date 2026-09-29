@@ -26,6 +26,8 @@ const defaultSystemSettings: SystemSettings = {
   generatorPricePerUnit: 25,
   waterSupplyFlatFee: 0,
   insuranceRatePerSqFt: 0,
+  enableVat: true,
+  vatPercent: 16.79,
 }
 
 const defaultUserSettings: UserSettings = {
@@ -250,6 +252,22 @@ export default function SettingsPage() {
                     <Label className="text-xs sm:text-sm">Other Charges Flat Fee (Rs.)</Label>
                     <Input className="h-8 text-xs sm:h-10 sm:text-sm" value={globalSettings.otherChargesFlatFee || ''} onChange={(e) => handleChangeGlobal('otherChargesFlatFee', parseFloat(e.target.value) || 0)} type="number" />
                     <p className="text-[10px] sm:text-xs text-muted-foreground">This is the fixed monthly flat fee for Other Charges.</p>
+                  </div>
+                  <div className="pt-1.5 sm:pt-2 border-t mt-1.5 sm:mt-2 space-y-2.5">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <Label className="text-xs sm:text-sm">Enable VAT Calculation</Label>
+                        <p className="text-[10px] sm:text-xs text-muted-foreground">Automatically calculate VAT on Electricity bills during invoice generation.</p>
+                      </div>
+                      <Switch className="scale-75 sm:scale-100 origin-right" checked={globalSettings.enableVat ?? true} onCheckedChange={(c) => handleChangeGlobal('enableVat', c)} />
+                    </div>
+                    {(globalSettings.enableVat ?? true) && (
+                      <div className="space-y-1 sm:space-y-2">
+                        <Label className="text-xs sm:text-sm">VAT Rate (%)</Label>
+                        <Input className="h-8 text-xs sm:h-10 sm:text-sm" value={globalSettings.vatPercent !== undefined ? globalSettings.vatPercent : 16.79} onChange={(e) => handleChangeGlobal('vatPercent', parseFloat(e.target.value) || 0)} type="number" step="0.01" />
+                        <p className="text-[10px] sm:text-xs text-muted-foreground">Percentage rate used to calculate VAT on Electricity bill amount (e.g. 16.79%).</p>
+                      </div>
+                    )}
                   </div>
                   <div className="flex items-center justify-between pt-1.5 sm:pt-2 border-t mt-1.5 sm:mt-2">
                     <Label className="text-xs sm:text-sm">Send Email Reminders</Label>
