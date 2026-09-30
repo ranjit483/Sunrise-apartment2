@@ -565,12 +565,27 @@ export default function InvoicesPage() {
   const handleViewReceiptForInvoice = async (invoice: Invoice) => {
     try {
       const q = query(collection(db, 'payments'), where('invoiceId', '==', invoice.id))
-      const snapshot = await getDocs(q)
-      if (snapshot.empty) {
+      let snapshot = await getDocs(q)
+      let pDoc: Payment | null = null
+      
+      if (!snapshot.empty) {
+        pDoc = snapshot.docs[0].data() as Payment
+      } else if (invoice.tenantId) {
+        const q2 = query(collection(db, 'payments'), where('tenantId', '==', invoice.tenantId))
+        const snap2 = await getDocs(q2)
+        const match = snap2.docs.find((d: any) => {
+          const data = d.data()
+          return data.receivedFor && data.receivedFor.includes(invoice.month)
+        })
+        if (match) {
+          pDoc = match.data() as Payment
+        }
+      }
+
+      if (!pDoc) {
         alert('No payment record found for this invoice.')
         return
       }
-      const pDoc = snapshot.docs[0].data() as Payment
       setReceiptInvoice(invoice)
       setActiveReceipt(pDoc)
       setIsReceiptModalOpen(true)

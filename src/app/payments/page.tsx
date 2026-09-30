@@ -342,18 +342,26 @@ export default function PaymentsPage() {
 
   const handleOpenReceipt = async (payment: Payment) => {
     try {
-      const invRef = doc(db, 'invoices', payment.invoiceId)
-      const invSnap = await getDoc(invRef)
-      if (invSnap.exists()) {
-        setReceiptInvoice(invSnap.data() as Invoice)
+      let invData: Invoice | null = null
+      if (payment.invoiceId) {
+        const invRef = doc(db, 'invoices', payment.invoiceId)
+        const invSnap = await getDoc(invRef)
+        if (invSnap.exists()) {
+          invData = invSnap.data() as Invoice
+        }
+      }
+
+      if (invData) {
+        setReceiptInvoice(invData)
       } else {
+        const inferredMonth = payment.receivedFor ? payment.receivedFor.replace('Monthly Bill - ', '').trim() : 'N/A'
         setReceiptInvoice({
-          id: payment.invoiceId,
+          id: payment.invoiceId || payment.id,
           unitId: 'N/A',
           tenantId: payment.tenantId,
-          unitNumber: 'N/A',
-          tenantName: 'Resident',
-          month: 'N/A',
+          unitNumber: payment.unitNumber || (payment.tenantId ? unitsMap[payment.tenantId] : '') || 'N/A',
+          tenantName: payment.tenantName || (payment.tenantId ? usersMap[payment.tenantId] : '') || 'Resident',
+          month: inferredMonth,
           amount: payment.amount,
           dueDate: '',
           status: 'paid',

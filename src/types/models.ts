@@ -68,6 +68,8 @@ export interface Payment {
   bankName?: string
   receiptNo?: string
   receivedFor?: string
+  unitNumber?: string
+  tenantName?: string
 }
 
 export interface MaintenanceTicket {

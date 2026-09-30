@@ -212,7 +212,7 @@ export default function TenantLedgerPage() {
 
         // Sum of completed payments for this invoice
         const completedPaySum = payments
-          .filter(p => p.invoiceId === inv.id && p.status === 'completed')
+          .filter(p => (p.invoiceId === inv.id || (p.receivedFor && p.receivedFor.includes(inv.month))) && p.status === 'completed')
           .reduce((acc, p) => acc + (p.amount || 0), 0)
 
         const actualPaid = Math.max(inv.paidAmount || 0, completedPaySum)
