@@ -12,6 +12,7 @@ import { Payment, Invoice } from '@/types/models'
 import { Loader2, DollarSign, Eye, Printer, FileText, QrCode, CheckCircle2, AlertCircle, Search, Edit } from 'lucide-react'
 import { useAuth } from '@/context/AuthContext'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { numberToWords } from '@/lib/utils'
 
 // Approximation for 2026 AD -> 2083 BS Nepalese date
@@ -111,11 +112,15 @@ export default function PaymentsPage() {
   const [qrTransactionId, setQrTransactionId] = useState('')
   const [payAmount, setPayAmount] = useState('')
 
-  // Edit Payment Date states
-  const [isEditDateModalOpen, setIsEditDateModalOpen] = useState(false)
+  // Edit Payment states
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false)
   const [editingPayment, setEditingPayment] = useState<Payment | null>(null)
-  const [newPaymentDate, setNewPaymentDate] = useState('')
-  const [isUpdatingDate, setIsUpdatingDate] = useState(false)
+  const [editPaymentDate, setEditPaymentDate] = useState('')
+  const [editPaymentMethod, setEditPaymentMethod] = useState<string>('cash')
+  const [editChequeNumber, setEditChequeNumber] = useState('')
+  const [editBankName, setEditBankName] = useState('')
+  const [editTransactionId, setEditTransactionId] = useState('')
+  const [isUpdatingPayment, setIsUpdatingPayment] = useState(false)
 
   useEffect(() => {
     if (!profile?.role) return;
@@ -393,33 +398,50 @@ export default function PaymentsPage() {
     return name.includes(q) || unit.includes(q) || receipt.includes(q) || method.includes(q) || tx.includes(q)
   })
 
-  const openEditDateModal = (payment: Payment) => {
+  const openEditModal = (payment: Payment) => {
     setEditingPayment(payment)
     const currentDate = payment.paidAt || payment.createdAt
     if (currentDate) {
-      setNewPaymentDate(new Date(currentDate).toISOString().split('T')[0])
+      setEditPaymentDate(new Date(currentDate).toISOString().split('T')[0])
     }
-    setIsEditDateModalOpen(true)
+    setEditPaymentMethod(payment.method || 'cash')
+    setEditChequeNumber(payment.chequeNumber || '')
+    setEditBankName(payment.bankName || '')
+    setEditTransactionId(payment.transactionId || '')
+    setIsEditModalOpen(true)
   }
 
-  const handleUpdatePaymentDate = async () => {
-    if (!editingPayment || !newPaymentDate) return
-    setIsUpdatingDate(true)
+  const handleUpdatePaymentDetails = async () => {
+    if (!editingPayment || !editPaymentDate) return
+    setIsUpdatingPayment(true)
     try {
-      const isoDate = new Date(newPaymentDate + 'T12:00:00.000Z').toISOString()
+      const isoDate = new Date(editPaymentDate + 'T12:00:00.000Z').toISOString()
       const ref = doc(db, 'payments', editingPayment.id)
-      await updateDoc(ref, {
+      
+      const updates: any = {
         paidAt: isoDate,
-        createdAt: isoDate
-      })
-      setIsEditDateModalOpen(false)
+        createdAt: isoDate,
+        method: editPaymentMethod,
+        updatedAt: new Date().toISOString()
+      }
+
+      if (editPaymentMethod === 'cheque') {
+        updates.chequeNumber = editChequeNumber.trim()
+        updates.bankName = editBankName.trim()
+      } else if (editPaymentMethod === 'qr' || editPaymentMethod === 'online') {
+        updates.transactionId = editTransactionId.trim() || editingPayment.transactionId || ''
+      }
+
+      await updateDoc(ref, updates)
+
+      setIsEditModalOpen(false)
       setEditingPayment(null)
-      alert('Payment date updated successfully!')
+      alert('Payment details updated successfully!')
     } catch (error: any) {
-      console.error('Error updating payment date:', error)
-      alert('Failed to update payment date: ' + error.message)
+      console.error('Error updating payment details:', error)
+      alert('Failed to update payment details: ' + error.message)
     } finally {
-      setIsUpdatingDate(false)
+      setIsUpdatingPayment(false)
     }
   }
 
@@ -641,8 +663,8 @@ export default function PaymentsPage() {
                                 variant="ghost" 
                                 size="sm" 
                                 className="h-7 w-7 sm:h-8 sm:w-8 p-0" 
-                                onClick={() => openEditDateModal(p)} 
-                                title="Edit Payment Date"
+                                onClick={() => openEditModal(p)} 
+                                title="Edit Payment Details"
                               >
                                 <Edit className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-amber-600 hover:text-amber-800" />
                               </Button>
@@ -1084,33 +1106,87 @@ export default function PaymentsPage() {
           )}
         </DialogContent>
       </Dialog>
-      {/* EDIT PAYMENT DATE MODAL */}
-      <Dialog open={isEditDateModalOpen} onOpenChange={setIsEditDateModalOpen}>
+      {/* EDIT PAYMENT DETAILS MODAL */}
+      <Dialog open={isEditModalOpen} onOpenChange={setIsEditModalOpen}>
         <DialogContent className="max-w-md">
           <DialogHeader>
-            <DialogTitle>Edit Payment Date</DialogTitle>
+            <DialogTitle>Edit Payment Details</DialogTitle>
             <DialogDescription>
-              Update the date when this payment was made. This will reflect in reports and Nepali date generation.
+              Update payment date, method (Cash, QR, Cheque, Online), and details.
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-4 py-2">
-            <div className="space-y-2">
-              <label className="text-sm font-medium">New Payment Date (AD)</label>
+            <div className="space-y-1.5">
+              <label className="text-xs sm:text-sm font-medium">Payment Date (AD)</label>
               <Input
                 type="date"
-                value={newPaymentDate}
-                onChange={(e) => setNewPaymentDate(e.target.value)}
+                className="h-9 text-xs sm:text-sm"
+                value={editPaymentDate}
+                onChange={(e) => setEditPaymentDate(e.target.value)}
               />
             </div>
+
+            <div className="space-y-1.5">
+              <label className="text-xs sm:text-sm font-medium">Payment Method</label>
+              <Select value={editPaymentMethod} onValueChange={(val) => setEditPaymentMethod(val)}>
+                <SelectTrigger className="h-9 text-xs sm:text-sm">
+                  <SelectValue placeholder="Select Payment Method" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="cash">Cash</SelectItem>
+                  <SelectItem value="qr">QR / Fonepay</SelectItem>
+                  <SelectItem value="cheque">Cheque</SelectItem>
+                  <SelectItem value="online">Online Transfer</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            {(editPaymentMethod === 'qr' || editPaymentMethod === 'online') && (
+              <div className="space-y-1.5">
+                <label className="text-xs sm:text-sm font-medium">Transaction ID</label>
+                <Input
+                  type="text"
+                  placeholder="e.g. epn-1324 or TRX-12345"
+                  className="h-9 text-xs sm:text-sm font-mono"
+                  value={editTransactionId}
+                  onChange={(e) => setEditTransactionId(e.target.value)}
+                />
+              </div>
+            )}
+
+            {editPaymentMethod === 'cheque' && (
+              <>
+                <div className="space-y-1.5">
+                  <label className="text-xs sm:text-sm font-medium">Cheque Number</label>
+                  <Input
+                    type="text"
+                    placeholder="Enter Cheque Number"
+                    className="h-9 text-xs sm:text-sm font-mono"
+                    value={editChequeNumber}
+                    onChange={(e) => setEditChequeNumber(e.target.value)}
+                  />
+                </div>
+                <div className="space-y-1.5">
+                  <label className="text-xs sm:text-sm font-medium">Bank Name</label>
+                  <Input
+                    type="text"
+                    placeholder="e.g. Nabil Bank"
+                    className="h-9 text-xs sm:text-sm"
+                    value={editBankName}
+                    onChange={(e) => setEditBankName(e.target.value)}
+                  />
+                </div>
+              </>
+            )}
           </div>
-          <div className="flex justify-end gap-2 pt-4">
-            <Button variant="outline" onClick={() => setIsEditDateModalOpen(false)}>Cancel</Button>
+          <div className="flex justify-end gap-2 pt-4 border-t">
+            <Button variant="outline" onClick={() => setIsEditModalOpen(false)}>Cancel</Button>
             <Button 
-              onClick={handleUpdatePaymentDate}
-              disabled={isUpdatingDate || !newPaymentDate}
-              className="bg-indigo-600 hover:bg-indigo-700"
+              onClick={handleUpdatePaymentDetails}
+              disabled={isUpdatingPayment || !editPaymentDate}
+              className="bg-indigo-600 hover:bg-indigo-700 text-white"
             >
-              {isUpdatingDate && <Loader2 className="h-3.5 w-3.5 animate-spin mr-1.5" />}
+              {isUpdatingPayment && <Loader2 className="h-3.5 w-3.5 animate-spin mr-1.5" />}
               Save Changes
             </Button>
           </div>
