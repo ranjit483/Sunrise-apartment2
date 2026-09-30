@@ -79,7 +79,7 @@ export default function TenantLedgerPage() {
       const batch = writeBatch(db)
       const paymentRef = doc(collection(db, 'payments'))
       
-      const invoiceTotal = payingInvoice.amount + (payingInvoice.electricityAmount || 0) + (payingInvoice.generatorAmount || 0) + (payingInvoice.utilityAmount || 0) + (payingInvoice.waterAmount || 0) + (payingInvoice.insuranceAmount || 0) + (payingInvoice.dieselAmount || 0) + (payingInvoice.structureMaintenanceAmount || 0) + (payingInvoice.otherAmount || 0) + (payingInvoice.previousPendingOutstandingDue || 0) + (payingInvoice.latePenaltyAmount || 0) + (payingInvoice.electricityVatAmount || 0)
+      const invoiceTotal = payingInvoice.amount + (payingInvoice.electricityAmount || 0) + (payingInvoice.electricityVatAmount || 0) + (payingInvoice.generatorAmount || 0) + (payingInvoice.utilityAmount || 0) + (payingInvoice.waterAmount || 0) + (payingInvoice.insuranceAmount || 0) + (payingInvoice.dieselAmount || 0) + (payingInvoice.structureMaintenanceAmount || 0) + (payingInvoice.otherAmount || 0) + (payingInvoice.previousPendingOutstandingDue || 0) + (payingInvoice.latePenaltyAmount || 0)
       const prevPaid = payingInvoice.paidAmount || 0
       const remainingTotal = invoiceTotal - prevPaid
 
@@ -125,7 +125,7 @@ export default function TenantLedgerPage() {
       
       if (!isCheque) {
         const newPaidAmount = prevPaid + paymentAmount
-        const newStatus = newPaidAmount >= invoiceTotal ? 'paid' : 'partial'
+        const newStatus = newPaidAmount >= invoiceTotal - 0.99 ? 'paid' : 'partial'
         
         batch.update(ref, {
           paidAmount: newPaidAmount,
@@ -202,11 +202,31 @@ export default function TenantLedgerPage() {
     let billed = 0
     let paid = 0
 
+    const invoicesToSync: { id: string, paidAmount: number, status: string }[] = []
+
     // Process Invoices (Debits)
     invoices.forEach(inv => {
       if (inv.status !== 'draft' && inv.status !== 'cancelled') {
-        const totalAmount = inv.amount + (inv.electricityAmount || 0) + (inv.generatorAmount || 0) + (inv.utilityAmount || 0) + (inv.waterAmount || 0) + (inv.insuranceAmount || 0) + (inv.dieselAmount || 0) + (inv.structureMaintenanceAmount || 0) + (inv.otherAmount || 0) + (inv.previousPendingOutstandingDue || 0) + (inv.latePenaltyAmount || 0)
+        const totalAmount = inv.amount + (inv.electricityAmount || 0) + (inv.electricityVatAmount || 0) + (inv.generatorAmount || 0) + (inv.utilityAmount || 0) + (inv.waterAmount || 0) + (inv.insuranceAmount || 0) + (inv.dieselAmount || 0) + (inv.structureMaintenanceAmount || 0) + (inv.otherAmount || 0) + (inv.previousPendingOutstandingDue || 0) + (inv.latePenaltyAmount || 0)
         billed += totalAmount
+
+        // Sum of completed payments for this invoice
+        const completedPaySum = payments
+          .filter(p => p.invoiceId === inv.id && p.status === 'completed')
+          .reduce((acc, p) => acc + (p.amount || 0), 0)
+
+        const actualPaid = Math.max(inv.paidAmount || 0, completedPaySum)
+        let computedStatus = inv.status
+        if (actualPaid >= totalAmount - 0.99) {
+          computedStatus = 'paid'
+        } else if (actualPaid > 0) {
+          computedStatus = 'partial'
+        }
+
+        if (inv.status !== computedStatus || inv.paidAmount !== actualPaid) {
+          invoicesToSync.push({ id: inv.id, paidAmount: actualPaid, status: computedStatus })
+        }
+
         rawEntries.push({
           id: inv.id,
           date: inv.createdAt ? inv.createdAt.split('T')[0] : inv.month + '-01',
@@ -215,7 +235,7 @@ export default function TenantLedgerPage() {
           description: `Invoice for ${inv.month} (${inv.unitNumber || 'Unit'})`,
           debit: totalAmount,
           credit: 0,
-          status: inv.status
+          status: computedStatus
         })
       }
     })
@@ -259,12 +279,26 @@ export default function TenantLedgerPage() {
       }
     })
 
-    // finalEntries.reverse()
-
     setEntries(finalEntries)
     setTotalBilled(billed)
     setTotalPaid(paid)
     setBalanceDue(billed - paid)
+
+    if (invoicesToSync.length > 0) {
+      try {
+        const batch = writeBatch(db)
+        invoicesToSync.forEach(item => {
+          batch.update(doc(db, 'invoices', item.id), {
+            paidAmount: item.paidAmount,
+            status: item.status,
+            updatedAt: new Date().toISOString()
+          })
+        })
+        batch.commit().catch((err: any) => console.error('Error auto-syncing invoice statuses:', err))
+      } catch (e) {
+        console.error('Error auto-syncing invoice statuses:', e)
+      }
+    }
   }
 
   const [tenantSearch, setTenantSearch] = useState('')
