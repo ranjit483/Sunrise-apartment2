@@ -135,6 +135,7 @@ export default function InvoicesPage() {
   const [editingInvoice, setEditingInvoice] = useState<Invoice | null>(null)
   const [isUpdating, setIsUpdating] = useState(false)
   const [isPostingDrafts, setIsPostingDrafts] = useState(false)
+  const [isSyncingDues, setIsSyncingDues] = useState(false)
   
   const [invoiceMonth, setInvoiceMonth] = useState('')
   const [invoiceDate, setInvoiceDate] = useState('')
@@ -417,6 +418,25 @@ export default function InvoicesPage() {
       alert('Failed to post drafts: ' + error.message)
     } finally {
       setIsPostingDrafts(false)
+    }
+  }
+
+  const handleSyncPreviousDues = async () => {
+    if (!window.confirm('Sync previous outstanding dues from Excel to all users and Asadh 2083 invoices?')) return
+    setIsSyncingDues(true)
+    try {
+      const res = await fetch('/api/import-dues', { method: 'POST' })
+      const data = await res.json()
+      if (data.success) {
+        alert(`Successfully refixed previous dues!\n\nUpdated Users: ${data.userUpdatesCount?.updated || 0}\nUpdated Invoices: ${data.invoiceUpdatesCount?.updated || 0}`)
+      } else {
+        alert('Failed to sync previous dues: ' + (data.error || 'Unknown error'))
+      }
+    } catch (error: any) {
+      console.error('Error syncing previous dues:', error)
+      alert('Failed to sync previous dues: ' + error.message)
+    } finally {
+      setIsSyncingDues(false)
     }
   }
 
@@ -716,6 +736,13 @@ export default function InvoicesPage() {
                   </div>
                 </DialogContent>
               </Dialog>
+
+              {canManageInvoices && (
+                <Button onClick={handleSyncPreviousDues} disabled={isSyncingDues} variant="outline" className="w-full sm:w-auto gap-2 text-xs sm:text-sm">
+                  {isSyncingDues ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
+                  Sync Previous Dues
+                </Button>
+              )}
 
               {profile?.role === 'SUPER_ADMIN' && (
                 <Button onClick={handleClearAllInvoices} variant="destructive" className="w-full sm:w-auto gap-2">
