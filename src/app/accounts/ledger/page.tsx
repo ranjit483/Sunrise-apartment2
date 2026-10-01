@@ -14,6 +14,8 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 
+import { getPaymentDateForMonth } from '@/lib/utils'
+
 interface UserData {
   uid: string
   fullName: string
@@ -100,19 +102,20 @@ export default function TenantLedgerPage() {
         return
       }
       
-      const newPayment: Payment = {
-        id: paymentRef.id,
-        invoiceId: payingInvoice.id,
-        tenantId: payingInvoice.tenantId,
-        amount: paymentAmount,
-        method: paymentMethod === 'cash' ? 'cash' : paymentMethod === 'cheque' ? 'cheque' : 'qr',
-        transactionId: paymentMethod === 'qr' ? 'FON-QR-' + Math.random().toString(36).substring(2, 10).toUpperCase() : 'REC-' + Math.random().toString(36).substring(2, 10).toUpperCase(),
-        status: isCheque ? 'pending_clearance' : 'completed',
-        paidAt: new Date().toISOString(),
-        createdAt: new Date().toISOString(),
-        receiptNo: 'No.: ' + Math.floor(1000 + Math.random() * 9000),
-        receivedFor: `Monthly Bill - ${payingInvoice.month}`
-      }
+        const payDateISO = getPaymentDateForMonth(payingInvoice.month)
+        const newPayment: Payment = {
+          id: paymentRef.id,
+          invoiceId: payingInvoice.id,
+          tenantId: payingInvoice.tenantId,
+          amount: paymentAmount,
+          method: paymentMethod === 'cash' ? 'cash' : paymentMethod === 'cheque' ? 'cheque' : 'qr',
+          transactionId: paymentMethod === 'qr' ? 'FON-QR-' + Math.random().toString(36).substring(2, 10).toUpperCase() : 'REC-' + Math.random().toString(36).substring(2, 10).toUpperCase(),
+          status: isCheque ? 'pending_clearance' : 'completed',
+          paidAt: payDateISO,
+          createdAt: payDateISO,
+          receiptNo: 'No.: ' + Math.floor(1000 + Math.random() * 9000),
+          receivedFor: `Monthly Bill - ${payingInvoice.month}`
+        }
 
       if (isCheque) {
         newPayment.bankName = bankName

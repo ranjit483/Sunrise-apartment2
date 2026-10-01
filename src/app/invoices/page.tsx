@@ -14,7 +14,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { useAuth } from '@/context/AuthContext'
-import { numberToWords } from '@/lib/utils'
+import { numberToWords, getDueDateForMonth, getPaymentDateForMonth } from '@/lib/utils'
 
 const statusColors: Record<string, string> = {
   draft: 'bg-gray-100 text-gray-800',
@@ -505,9 +505,9 @@ export default function InvoicesPage() {
 
       // Removed the check that prevents overpayment to allow advance payments
       
-      let paymentDateISO = new Date().toISOString()
+      let paymentDateISO = getPaymentDateForMonth(payingInvoice.month)
       if (isBackdated && backdateValue) {
-        paymentDateISO = new Date(backdateValue + 'T12:00:00.000Z').toISOString()
+        paymentDateISO = getPaymentDateForMonth(payingInvoice.month, backdateValue)
       }
       
       const newPayment: Payment = {

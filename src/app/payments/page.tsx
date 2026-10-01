@@ -13,7 +13,7 @@ import { Loader2, DollarSign, Eye, Printer, FileText, QrCode, CheckCircle2, Aler
 import { useAuth } from '@/context/AuthContext'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { numberToWords } from '@/lib/utils'
+import { numberToWords, getPaymentDateForMonth, getDueDateForMonth } from '@/lib/utils'
 
 // Approximation for 2026 AD -> 2083 BS Nepalese date
 function getNepaliDate(dateStr: string | Date): { bs: string, ad: string } {
@@ -237,6 +237,7 @@ export default function PaymentsPage() {
       
       const isResidentPayment = isResident
       
+      const payDateISO = getPaymentDateForMonth(viewingInvoice.month)
       const newPayment: any = {
         id: paymentRef.id,
         invoiceId: viewingInvoice.id,
@@ -245,13 +246,14 @@ export default function PaymentsPage() {
         method: checkoutStep === 'qr' ? 'qr' : 'online',
         transactionId: transactionId,
         status: isResidentPayment ? 'pending_verification' : 'completed',
-        createdAt: new Date().toISOString(),
+        createdAt: payDateISO,
+        paidAt: payDateISO,
         receiptNo: 'No.: ' + Math.floor(1000 + Math.random() * 9000),
         receivedFor: `Monthly Bill - ${viewingInvoice.month}`
       }
 
       if (!isResidentPayment) {
-        newPayment.paidAt = new Date().toISOString()
+        newPayment.paidAt = payDateISO
       }
 
       batch.set(paymentRef, newPayment)

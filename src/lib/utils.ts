@@ -96,3 +96,30 @@ export function numberToWords(num: number): string {
   const result = convert(roundedNum)
   return result ? result + ' Rupees Only' : 'Zero Rupees Only'
 }
+
+export function getDueDateForMonth(month: string): string {
+  if (!month) return '2026-08-17'
+  const m = month.toLowerCase()
+  if (m.includes('asadh') || m.includes('asad') || m.includes('ashadh')) {
+    return '2026-08-17'
+  }
+  if (m.includes('shrawan') || m.includes('shravan') || m.includes('sawan')) {
+    return '2026-09-17'
+  }
+  if (m.includes('bhadra') || m.includes('bhadau')) {
+    return '2026-10-18'
+  }
+  return '2026-08-17'
+}
+
+export function getPaymentDateForMonth(month: string, customDate?: string): string {
+  const targetDueDate = getDueDateForMonth(month)
+  if (!customDate) {
+    return `${targetDueDate}T12:00:00.000Z`
+  }
+  const customDateOnly = customDate.split('T')[0]
+  if (customDateOnly > targetDueDate) {
+    return `${targetDueDate}T12:00:00.000Z`
+  }
+  return customDate.includes('T') ? customDate : `${customDate}T12:00:00.000Z`
+}
