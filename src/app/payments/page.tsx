@@ -120,6 +120,9 @@ export default function PaymentsPage() {
   const [editChequeNumber, setEditChequeNumber] = useState('')
   const [editBankName, setEditBankName] = useState('')
   const [editTransactionId, setEditTransactionId] = useState('')
+  const [editTenantName, setEditTenantName] = useState('')
+  const [editUnitNumber, setEditUnitNumber] = useState('')
+  const [editAmount, setEditAmount] = useState('')
   const [isUpdatingPayment, setIsUpdatingPayment] = useState(false)
 
   useEffect(() => {
@@ -398,8 +401,8 @@ export default function PaymentsPage() {
   const filteredPayments = payments.filter(p => {
     if (!searchQuery) return true
     const q = searchQuery.toLowerCase()
-    const name = formatTenantName(null, p.tenantId).toLowerCase()
-    const unit = (unitsMap[p.tenantId] || '').toLowerCase()
+    const name = (p.tenantName || formatTenantName(null, p.tenantId)).toLowerCase()
+    const unit = (p.unitNumber || unitsMap[p.tenantId] || '').toLowerCase()
     const receipt = (p.receiptNo || '').toLowerCase()
     const method = (p.method || '').toLowerCase()
     const tx = (p.transactionId || '').toLowerCase()
@@ -416,11 +419,21 @@ export default function PaymentsPage() {
     setEditChequeNumber(payment.chequeNumber || '')
     setEditBankName(payment.bankName || '')
     setEditTransactionId(payment.transactionId || '')
+    setEditTenantName(payment.tenantName || formatTenantName(null, payment.tenantId) || '')
+    setEditUnitNumber(payment.unitNumber || unitsMap[payment.tenantId] || '')
+    setEditAmount(payment.amount?.toString() || '0')
     setIsEditModalOpen(true)
   }
 
   const handleUpdatePaymentDetails = async () => {
     if (!editingPayment || !editPaymentDate) return
+    
+    const parsedAmount = parseFloat(editAmount)
+    if (isNaN(parsedAmount) || parsedAmount < 0) {
+      alert('Please enter a valid payment amount.')
+      return
+    }
+
     setIsUpdatingPayment(true)
     try {
       const isoDate = new Date(editPaymentDate + 'T12:00:00.000Z').toISOString()
@@ -430,6 +443,9 @@ export default function PaymentsPage() {
         paidAt: isoDate,
         createdAt: isoDate,
         method: editPaymentMethod,
+        tenantName: editTenantName.trim(),
+        unitNumber: editUnitNumber.trim(),
+        amount: parsedAmount,
         updatedAt: new Date().toISOString()
       }
 
@@ -441,6 +457,69 @@ export default function PaymentsPage() {
       }
 
       await updateDoc(ref, updates)
+
+      // Sync linked invoice paidAmount and status if payment amount was edited
+      let invIdToUpdate = editingPayment.invoiceId
+      if (!invIdToUpdate && editingPayment.tenantId) {
+        const invQ = query(collection(db, 'invoices'), where('tenantId', '==', editingPayment.tenantId))
+        const invSnap = await getDocs(invQ)
+        const match = invSnap.docs.find((d: any) => {
+          const data = d.data()
+          return data.month && editingPayment.receivedFor && editingPayment.receivedFor.includes(data.month)
+        })
+        if (match) {
+          invIdToUpdate = match.id
+        }
+      }
+
+      if (invIdToUpdate) {
+        const invRef = doc(db, 'invoices', invIdToUpdate)
+        const invSnap = await getDoc(invRef)
+        if (invSnap.exists()) {
+          const inv = invSnap.data() as Invoice
+          const totalInvoiceAmount = (inv.amount || 0) + 
+            (inv.electricityAmount || 0) + 
+            (inv.electricityVatAmount || 0) + 
+            (inv.generatorAmount || 0) + 
+            (inv.utilityAmount || 0) + 
+            (inv.waterAmount || 0) + 
+            (inv.insuranceAmount || 0) + 
+            (inv.dieselAmount || 0) + 
+            (inv.structureMaintenanceAmount || 0) + 
+            (inv.otherAmount || 0) + 
+            (inv.previousPendingOutstandingDue || 0) + 
+            (inv.latePenaltyAmount || 0)
+
+          const pQ = query(collection(db, 'payments'), where('invoiceId', '==', invIdToUpdate))
+          const pSnap = await getDocs(pQ)
+          let newTotalPaid = 0
+          pSnap.forEach((d: any) => {
+            const p = d.data()
+            if (p.status === 'completed') {
+              if (d.id === editingPayment.id) {
+                newTotalPaid += parsedAmount
+              } else {
+                newTotalPaid += (p.amount || 0)
+              }
+            }
+          })
+
+          let newStatus = inv.status
+          if (newTotalPaid >= totalInvoiceAmount - 0.99) {
+            newStatus = 'paid'
+          } else if (newTotalPaid > 0) {
+            newStatus = 'partial'
+          } else {
+            newStatus = 'pending'
+          }
+
+          await updateDoc(invRef, {
+            paidAmount: newTotalPaid,
+            status: newStatus,
+            updatedAt: new Date().toISOString()
+          })
+        }
+      }
 
       setIsEditModalOpen(false)
       setEditingPayment(null)
@@ -635,8 +714,8 @@ export default function PaymentsPage() {
                         <td className="py-2 px-2.5 font-mono text-[10px] sm:text-xs">{p.transactionId || p.id.substring(0, 10).toUpperCase()}</td>
                         {!isResident && (
                           <td className="py-2 px-2.5">
-                            <div className="font-medium text-xs sm:text-sm">{formatTenantName(null, p.tenantId)}</div>
-                            <div className="text-[10px] sm:text-xs text-muted-foreground">Unit: {unitsMap[p.tenantId] || 'N/A'}</div>
+                            <div className="font-medium text-xs sm:text-sm">{p.tenantName || formatTenantName(null, p.tenantId)}</div>
+                            <div className="text-[10px] sm:text-xs text-muted-foreground">Unit: {p.unitNumber || unitsMap[p.tenantId] || 'N/A'}</div>
                           </td>
                         )}
                         <td className="py-2 px-2.5 font-bold text-emerald-600 text-xs sm:text-sm">₨ {p.amount.toLocaleString()}</td>
@@ -1120,18 +1199,53 @@ export default function PaymentsPage() {
           <DialogHeader>
             <DialogTitle>Edit Payment Details</DialogTitle>
             <DialogDescription>
-              Update payment date, method (Cash, QR, Cheque, Online), and details.
+              Correct payment resident name, unit, amount, date, method, and transaction details.
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-4 py-2">
-            <div className="space-y-1.5">
-              <label className="text-xs sm:text-sm font-medium">Payment Date (AD)</label>
-              <Input
-                type="date"
-                className="h-9 text-xs sm:text-sm"
-                value={editPaymentDate}
-                onChange={(e) => setEditPaymentDate(e.target.value)}
-              />
+            <div className="grid grid-cols-2 gap-3">
+              <div className="space-y-1.5">
+                <label className="text-xs sm:text-sm font-medium">Resident Name</label>
+                <Input
+                  type="text"
+                  placeholder="e.g. Kalpana Pradhan"
+                  className="h-9 text-xs sm:text-sm"
+                  value={editTenantName}
+                  onChange={(e) => setEditTenantName(e.target.value)}
+                />
+              </div>
+              <div className="space-y-1.5">
+                <label className="text-xs sm:text-sm font-medium">Unit Number</label>
+                <Input
+                  type="text"
+                  placeholder="e.g. B-2"
+                  className="h-9 text-xs sm:text-sm"
+                  value={editUnitNumber}
+                  onChange={(e) => setEditUnitNumber(e.target.value)}
+                />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-3">
+              <div className="space-y-1.5">
+                <label className="text-xs sm:text-sm font-medium">Payment Amount (Rs)</label>
+                <Input
+                  type="number"
+                  placeholder="e.g. 5328"
+                  className="h-9 text-xs sm:text-sm font-bold text-emerald-700"
+                  value={editAmount}
+                  onChange={(e) => setEditAmount(e.target.value)}
+                />
+              </div>
+              <div className="space-y-1.5">
+                <label className="text-xs sm:text-sm font-medium">Payment Date (AD)</label>
+                <Input
+                  type="date"
+                  className="h-9 text-xs sm:text-sm"
+                  value={editPaymentDate}
+                  onChange={(e) => setEditPaymentDate(e.target.value)}
+                />
+              </div>
             </div>
 
             <div className="space-y-1.5">
