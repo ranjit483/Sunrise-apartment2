@@ -388,6 +388,7 @@ export default function PaymentsPage() {
   }
 
   const isResident = profile?.role === 'RESIDENT' || profile?.role === 'TENANT' || profile?.role === 'OWNER'
+  const isSuperAdmin = profile?.role === 'SUPER_ADMIN'
   const totalCollected = payments.filter(p => p.status === 'completed').reduce((acc, p) => acc + p.amount, 0)
   
   const currentMonth = new Date().getMonth()
@@ -538,6 +539,10 @@ export default function PaymentsPage() {
   }
 
   const handleDeletePayment = async (payment: Payment) => {
+    if (!isSuperAdmin) {
+      alert('Only Super Admin can delete payment records.')
+      return
+    }
     if (!confirm(`Are you sure you want to delete payment ${payment.receiptNo || payment.transactionId || ''}?`)) return
     try {
       await deleteDoc(doc(db, 'payments', payment.id))
@@ -820,15 +825,17 @@ export default function PaymentsPage() {
                                 >
                                   <Edit className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-amber-600 hover:text-amber-800" />
                                 </Button>
-                                <Button 
-                                  variant="ghost" 
-                                  size="sm" 
-                                  className="h-7 w-7 sm:h-8 sm:w-8 p-0" 
-                                  onClick={() => handleDeletePayment(p)} 
-                                  title="Delete Payment Record"
-                                >
-                                  <Trash2 className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-red-600 hover:text-red-800" />
-                                </Button>
+                                {isSuperAdmin && (
+                                  <Button 
+                                    variant="ghost" 
+                                    size="sm" 
+                                    className="h-7 w-7 sm:h-8 sm:w-8 p-0" 
+                                    onClick={() => handleDeletePayment(p)} 
+                                    title="Delete Payment Record"
+                                  >
+                                    <Trash2 className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-red-600 hover:text-red-800" />
+                                  </Button>
+                                )}
                               </>
                             )}
                           </div>
