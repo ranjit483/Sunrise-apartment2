@@ -7,9 +7,9 @@ import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { db } from '@/config/firebase'
-import { collection, onSnapshot, query, where, doc, writeBatch, getDoc, getDocs, updateDoc, orderBy, limit } from 'firebase/firestore'
+import { collection, onSnapshot, query, where, doc, writeBatch, getDoc, getDocs, updateDoc, orderBy, limit, deleteDoc } from 'firebase/firestore'
 import { Payment, Invoice } from '@/types/models'
-import { Loader2, DollarSign, Eye, Printer, FileText, QrCode, CheckCircle2, AlertCircle, Search, Edit } from 'lucide-react'
+import { Loader2, DollarSign, Eye, Printer, FileText, QrCode, CheckCircle2, AlertCircle, Search, Edit, Trash2 } from 'lucide-react'
 import { useAuth } from '@/context/AuthContext'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
@@ -537,6 +537,65 @@ export default function PaymentsPage() {
     }
   }
 
+  const handleDeletePayment = async (payment: Payment) => {
+    if (!confirm(`Are you sure you want to delete payment ${payment.receiptNo || payment.transactionId || ''}?`)) return
+    try {
+      await deleteDoc(doc(db, 'payments', payment.id))
+      
+      if (payment.invoiceId) {
+        const invRef = doc(db, 'invoices', payment.invoiceId)
+        const invSnap = await getDoc(invRef)
+        if (invSnap.exists()) {
+          const inv = invSnap.data() as Invoice
+          const totalInvoiceAmount = (inv.amount || 0) + 
+            (inv.electricityAmount || 0) + 
+            (inv.electricityVatAmount || 0) + 
+            (inv.generatorAmount || 0) + 
+            (inv.utilityAmount || 0) + 
+            (inv.waterAmount || 0) + 
+            (inv.insuranceAmount || 0) + 
+            (inv.dieselAmount || 0) + 
+            (inv.structureMaintenanceAmount || 0) + 
+            (inv.otherAmount || 0) + 
+            (inv.previousPendingOutstandingDue || 0) + 
+            (inv.latePenaltyAmount || 0)
+
+          const pQ = query(collection(db, 'payments'), where('invoiceId', '==', payment.invoiceId))
+          const pSnap = await getDocs(pQ)
+          let newTotalPaid = 0
+          pSnap.forEach((d: any) => {
+            if (d.id !== payment.id) {
+              const p = d.data()
+              if (p.status === 'completed') {
+                newTotalPaid += (p.amount || 0)
+              }
+            }
+          })
+
+          let newStatus = inv.status
+          if (newTotalPaid >= totalInvoiceAmount - 0.99) {
+            newStatus = 'paid'
+          } else if (newTotalPaid > 0) {
+            newStatus = 'partial'
+          } else {
+            newStatus = 'pending'
+          }
+
+          await updateDoc(invRef, {
+            paidAmount: newTotalPaid,
+            status: newStatus,
+            updatedAt: new Date().toISOString()
+          })
+        }
+      }
+
+      alert('Payment deleted successfully!')
+    } catch (error: any) {
+      console.error('Error deleting payment:', error)
+      alert('Failed to delete payment: ' + error.message)
+    }
+  }
+
   return (
     <DashboardLayout title="Payments">
       <div className="space-y-4 sm:space-y-6 no-print">
@@ -751,15 +810,26 @@ export default function PaymentsPage() {
                               <FileText className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-emerald-600 hover:text-emerald-800" />
                             </Button>
                             {!isResident && (
-                              <Button 
-                                variant="ghost" 
-                                size="sm" 
-                                className="h-7 w-7 sm:h-8 sm:w-8 p-0" 
-                                onClick={() => openEditModal(p)} 
-                                title="Edit Payment Details"
-                              >
-                                <Edit className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-amber-600 hover:text-amber-800" />
-                              </Button>
+                              <>
+                                <Button 
+                                  variant="ghost" 
+                                  size="sm" 
+                                  className="h-7 w-7 sm:h-8 sm:w-8 p-0" 
+                                  onClick={() => openEditModal(p)} 
+                                  title="Edit Payment Details"
+                                >
+                                  <Edit className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-amber-600 hover:text-amber-800" />
+                                </Button>
+                                <Button 
+                                  variant="ghost" 
+                                  size="sm" 
+                                  className="h-7 w-7 sm:h-8 sm:w-8 p-0" 
+                                  onClick={() => handleDeletePayment(p)} 
+                                  title="Delete Payment Record"
+                                >
+                                  <Trash2 className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-red-600 hover:text-red-800" />
+                                </Button>
+                              </>
                             )}
                           </div>
                         </td>
