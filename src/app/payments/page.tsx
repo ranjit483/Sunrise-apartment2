@@ -123,6 +123,7 @@ export default function PaymentsPage() {
   const [editTenantName, setEditTenantName] = useState('')
   const [editUnitNumber, setEditUnitNumber] = useState('')
   const [editAmount, setEditAmount] = useState('')
+  const [editReceiptNo, setEditReceiptNo] = useState('')
   const [isUpdatingPayment, setIsUpdatingPayment] = useState(false)
 
   useEffect(() => {
@@ -424,6 +425,7 @@ export default function PaymentsPage() {
     setEditTenantName(payment.tenantName || formatTenantName(null, payment.tenantId) || '')
     setEditUnitNumber(payment.unitNumber || unitsMap[payment.tenantId] || '')
     setEditAmount(payment.amount?.toString() || '0')
+    setEditReceiptNo(payment.receiptNo || '')
     setIsEditModalOpen(true)
   }
 
@@ -448,6 +450,7 @@ export default function PaymentsPage() {
         tenantName: editTenantName.trim(),
         unitNumber: editUnitNumber.trim(),
         amount: parsedAmount,
+        receiptNo: editReceiptNo.trim(),
         updatedAt: new Date().toISOString()
       }
 
@@ -1250,19 +1253,31 @@ export default function PaymentsPage() {
               </div>
             </div>
 
-            <div className="space-y-1.5">
-              <label className="text-xs sm:text-sm font-medium">Payment Method</label>
-              <Select value={editPaymentMethod} onValueChange={(val) => setEditPaymentMethod(val)}>
-                <SelectTrigger className="h-9 text-xs sm:text-sm">
-                  <SelectValue placeholder="Select Payment Method" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="cash">Cash</SelectItem>
-                  <SelectItem value="qr">QR / Fonepay</SelectItem>
-                  <SelectItem value="cheque">Cheque</SelectItem>
-                  <SelectItem value="online">Online Transfer</SelectItem>
-                </SelectContent>
-              </Select>
+            <div className="grid grid-cols-2 gap-3">
+              <div className="space-y-1.5">
+                <label className="text-xs sm:text-sm font-medium">Receipt Number</label>
+                <Input
+                  type="text"
+                  placeholder="e.g. No.: 2015"
+                  className="h-9 text-xs sm:text-sm font-mono"
+                  value={editReceiptNo}
+                  onChange={(e) => setEditReceiptNo(e.target.value)}
+                />
+              </div>
+              <div className="space-y-1.5">
+                <label className="text-xs sm:text-sm font-medium">Payment Method</label>
+                <Select value={editPaymentMethod} onValueChange={(val) => setEditPaymentMethod(val)}>
+                  <SelectTrigger className="h-9 text-xs sm:text-sm">
+                    <SelectValue placeholder="Select Payment Method" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="cash">Cash</SelectItem>
+                    <SelectItem value="qr">QR / Fonepay</SelectItem>
+                    <SelectItem value="cheque">Cheque</SelectItem>
+                    <SelectItem value="online">Online Transfer</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
             </div>
 
             {(editPaymentMethod === 'qr' || editPaymentMethod === 'online') && (
