@@ -17,10 +17,12 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 import { getPaymentDateForMonth } from '@/lib/utils'
 
 interface UserData {
+  id?: string
   uid: string
   fullName: string
   role: string
   unitNumber?: string
+  email?: string
 }
 
 interface LedgerEntry {
@@ -153,18 +155,65 @@ export default function TenantLedgerPage() {
     }
   }
 
-  // Fetch all users who are tenants or residents
+  // Fetch all users who are tenants, residents, or owners (or have a unit assigned)
   useEffect(() => {
     const fetchTenants = async () => {
-      const q = query(collection(db, 'users'), where('role', 'in', ['TENANT', 'OWNER']))
-      const snap = await getDocs(q)
-      const data: UserData[] = []
-      snap.forEach((doc: any) => {
-        data.push(doc.data() as UserData)
-      })
-      // Sort alphabetically
-      data.sort((a, b) => a.fullName.localeCompare(b.fullName))
-      setTenants(data)
+      try {
+        const snap = await getDocs(collection(db, 'users'))
+        const dataMap = new Map<string, UserData>()
+        
+        const staffRoles = ['SUPER_ADMIN', 'ADMIN', 'MANAGER', 'GUARD', 'OFFICE_STAFF', 'ACCOUNTANT', 'PLUMBER']
+
+        snap.forEach((doc: any) => {
+          const uData = doc.data()
+          const uid = uData.uid || doc.id
+          const role = (uData.role || '').toUpperCase()
+          
+          // Include users whose role is tenant/resident/owner, or non-staff, or who have a unit number
+          const isResidentRole = ['TENANT', 'OWNER', 'RESIDENT', 'TENANT_USER', 'RESIDENT_USER'].includes(role) || !staffRoles.includes(role)
+          
+          if (isResidentRole || uData.unitNumber) {
+            dataMap.set(uid, {
+              id: doc.id,
+              uid: uid,
+              fullName: uData.fullName || uData.name || 'Unknown Resident',
+              role: uData.role || 'RESIDENT',
+              unitNumber: uData.unitNumber || '',
+              email: uData.email || ''
+            })
+          }
+        })
+
+        // Also check invoices collection to guarantee any tenant with an invoice is selectable
+        const invSnap = await getDocs(collection(db, 'invoices'))
+        invSnap.forEach((doc: any) => {
+          const inv = doc.data()
+          const tenantId = inv.tenantId
+          if (tenantId && !dataMap.has(tenantId)) {
+            dataMap.set(tenantId, {
+              id: tenantId,
+              uid: tenantId,
+              fullName: inv.tenantName || 'Resident',
+              role: 'RESIDENT',
+              unitNumber: inv.unitNumber || ''
+            })
+          }
+        })
+
+        const data = Array.from(dataMap.values())
+        // Sort by unit number (natural sort if present), then by full name
+        data.sort((a, b) => {
+          if (a.unitNumber && b.unitNumber) {
+            return a.unitNumber.localeCompare(b.unitNumber, undefined, { numeric: true, sensitivity: 'base' })
+          }
+          if (a.unitNumber) return -1
+          if (b.unitNumber) return 1
+          return (a.fullName || '').localeCompare(b.fullName || '')
+        })
+        setTenants(data)
+      } catch (err) {
+        console.error('Error fetching tenants for ledger:', err)
+      }
     }
     fetchTenants()
   }, [])
@@ -182,26 +231,53 @@ export default function TenantLedgerPage() {
 
     setLoading(true)
 
-    // Listen to Invoices
-    const qInvoices = query(collection(db, 'invoices'), where('tenantId', '==', selectedTenant))
+    const tenantObj = tenants.find(t => t.uid === selectedTenant || t.id === selectedTenant)
+
+    // Listen to all invoices and filter in-memory by tenantId, doc ID, unitNumber, or tenantName
+    const qInvoices = query(collection(db, 'invoices'))
     const unsubInvoices = onSnapshot(qInvoices, (invSnap: any) => {
-      const invoices: any[] = []
-      invSnap.forEach((doc: any) => invoices.push({ id: doc.id, ...doc.data() }))
-      setRawInvoices(invoices)
+      const allInvoices: any[] = []
+      invSnap.forEach((doc: any) => allInvoices.push({ id: doc.id, ...doc.data() }))
+
+      const filteredInvoices = allInvoices.filter(inv => {
+        if (!inv) return false
+        if (inv.tenantId === selectedTenant) return true
+        if (tenantObj) {
+          if (tenantObj.uid && inv.tenantId === tenantObj.uid) return true
+          if (tenantObj.id && inv.tenantId === tenantObj.id) return true
+          if (tenantObj.unitNumber && inv.unitNumber && inv.unitNumber.toLowerCase().trim() === tenantObj.unitNumber.toLowerCase().trim()) return true
+          if (tenantObj.fullName && inv.tenantName && inv.tenantName.toLowerCase().trim() === tenantObj.fullName.toLowerCase().trim()) return true
+        }
+        return false
+      })
+
+      setRawInvoices(filteredInvoices)
       
-      // Listen to Payments
-      const qPayments = query(collection(db, 'payments'), where('tenantId', '==', selectedTenant))
+      // Fetch Payments and filter similarly
+      const qPayments = query(collection(db, 'payments'))
       getDocs(qPayments).then((paySnap: any) => {
-        const payments: any[] = []
-        paySnap.forEach((doc: any) => payments.push({ id: doc.id, ...doc.data() }))
+        const allPayments: any[] = []
+        paySnap.forEach((doc: any) => allPayments.push({ id: doc.id, ...doc.data() }))
+
+        const filteredPayments = allPayments.filter(pay => {
+          if (!pay) return false
+          if (pay.tenantId === selectedTenant) return true
+          if (tenantObj) {
+            if (tenantObj.uid && pay.tenantId === tenantObj.uid) return true
+            if (tenantObj.id && pay.tenantId === tenantObj.id) return true
+            if (tenantObj.unitNumber && pay.unitNumber && pay.unitNumber.toLowerCase().trim() === tenantObj.unitNumber.toLowerCase().trim()) return true
+            if (tenantObj.fullName && pay.tenantName && pay.tenantName.toLowerCase().trim() === tenantObj.fullName.toLowerCase().trim()) return true
+          }
+          return false
+        })
         
-        processLedger(invoices, payments)
+        processLedger(filteredInvoices, filteredPayments)
         setLoading(false)
       })
     })
 
     return () => unsubInvoices()
-  }, [selectedTenant])
+  }, [selectedTenant, tenants])
 
   const processLedger = (invoices: any[], payments: any[]) => {
     let rawEntries: Omit<LedgerEntry, 'balance'>[] = []
@@ -312,10 +388,11 @@ export default function TenantLedgerPage() {
 
   const filteredTenants = tenants.filter(t => {
     if (!tenantSearch) return true;
-    const q = tenantSearch.toLowerCase();
+    const q = tenantSearch.toLowerCase().trim();
     const name = (t.fullName || '').toLowerCase();
     const unit = (t.unitNumber || '').toLowerCase();
-    return name.includes(q) || unit.includes(q);
+    const email = (t.email || '').toLowerCase();
+    return name.includes(q) || unit.includes(q) || email.includes(q);
   });
 
   const [isDropdownOpen, setIsDropdownOpen] = useState(false)
