@@ -468,9 +468,17 @@ export default function InvoicesPage() {
     setPaymentMethod('cash')
     setBankName('')
     setChequeNumber('')
-    const totalAmount = invoice.amount + (invoice.electricityAmount || 0) + (invoice.generatorAmount || 0) + (invoice.utilityAmount || 0) + (invoice.waterAmount || 0) + (invoice.insuranceAmount || 0) + (invoice.dieselAmount || 0) + (invoice.structureMaintenanceAmount || 0) + (invoice.otherAmount || 0) + (invoice.previousPendingOutstandingDue || 0) + (invoice.latePenaltyAmount || 0) + (invoice.electricityVatAmount || 0) - (invoice.paidAmount || 0)
-    setReceiveAmount(totalAmount.toString())
-    setChequeAmount(totalAmount.toString())
+    const invoiceTotal = invoice.amount + (invoice.electricityAmount || 0) + (invoice.generatorAmount || 0) + (invoice.utilityAmount || 0) + (invoice.waterAmount || 0) + (invoice.insuranceAmount || 0) + (invoice.dieselAmount || 0) + (invoice.structureMaintenanceAmount || 0) + (invoice.otherAmount || 0) + (invoice.previousPendingOutstandingDue || 0) + (invoice.latePenaltyAmount || 0) + (invoice.electricityVatAmount || 0)
+    const prevPaid = invoice.paidAmount || 0
+    const remainingAmount = invoiceTotal - prevPaid
+
+    if (invoice.status === 'paid' || remainingAmount <= 0) {
+      setReceiveAmount('')
+      setChequeAmount('')
+    } else {
+      setReceiveAmount(remainingAmount.toString())
+      setChequeAmount(remainingAmount.toString())
+    }
     setIsBackdated(false)
     setBackdateValue(new Date().toISOString().split('T')[0])
     setIsReceiveModalOpen(true)
@@ -510,6 +518,7 @@ export default function InvoicesPage() {
         paymentDateISO = getPaymentDateForMonth(payingInvoice.month, backdateValue)
       }
       
+      const isAdvancePayment = payingInvoice.status === 'paid' || remainingTotal <= 0
       const newPayment: Payment = {
         id: paymentRef.id,
         invoiceId: payingInvoice.id,
@@ -521,7 +530,7 @@ export default function InvoicesPage() {
         paidAt: paymentDateISO,
         createdAt: paymentDateISO,
         receiptNo: 'No.: ' + Math.floor(1000 + Math.random() * 9000),
-        receivedFor: `Monthly Bill - ${payingInvoice.month}`
+        receivedFor: isAdvancePayment ? `Advance Payment - ${payingInvoice.month}` : `Monthly Bill - ${payingInvoice.month}`
       }
 
       if (isCheque) {
@@ -900,14 +909,18 @@ export default function InvoicesPage() {
                                 </Button>
                               )}
 
-                              {(inv.status === 'pending' || inv.status === 'partial') && canManageInvoices && (
+                              {canManageInvoices && inv.status !== 'draft' && inv.status !== 'cancelled' && (
                                 <Button 
                                   variant="outline" 
                                   size="sm" 
-                                  className="text-xs h-7 px-2 bg-emerald-50 text-emerald-700 hover:bg-emerald-100 border-emerald-200" 
+                                  className={`text-xs h-7 px-2 ${
+                                    inv.status === 'paid'
+                                      ? 'bg-blue-50 text-blue-700 hover:bg-blue-100 border-blue-200 font-semibold'
+                                      : 'bg-emerald-50 text-emerald-700 hover:bg-emerald-100 border-emerald-200'
+                                  }`}
                                   onClick={() => handleOpenReceivePayment(inv)}
                                 >
-                                  Receive Pay
+                                  {inv.status === 'paid' ? '+ Advance Pay' : 'Receive Pay'}
                                 </Button>
                               )}
 
@@ -915,7 +928,7 @@ export default function InvoicesPage() {
                                 <Button 
                                   variant="ghost" 
                                   size="sm" 
-                                  className="h-8 w-8 p-0" 
+                                  className="h-7 w-7 p-0" 
                                   onClick={() => handleViewReceiptForInvoice(inv)} 
                                   title="Print Receipt slip"
                                 >
@@ -1396,6 +1409,12 @@ export default function InvoicesPage() {
           </DialogHeader>
           {payingInvoice && (
             <div className="space-y-4 pt-3">
+              {payingInvoice.status === 'paid' && (
+                <div className="bg-emerald-50 border border-emerald-200 text-emerald-800 p-2.5 rounded-md text-xs font-semibold flex items-center gap-2">
+                  <CheckCircle2 className="h-4 w-4 text-emerald-600 shrink-0" />
+                  <span>Invoice is fully paid. Any amount entered will be recorded as <strong>Advance Payment</strong> credit for the resident.</span>
+                </div>
+              )}
               <div className="bg-gray-50 border p-3.5 rounded-lg space-y-1 text-sm">
                 <p><strong>Resident Name:</strong> {formatTenantName(payingInvoice.tenantName, payingInvoice.tenantId)}</p>
                 <p><strong>Unit / Apartment:</strong> {payingInvoice.unitNumber}</p>
@@ -1403,17 +1422,21 @@ export default function InvoicesPage() {
                 <div className="pt-2 mt-2 border-t space-y-2">
                   <div className="flex justify-between items-center text-base text-indigo-700 font-bold">
                     <span>Grand Total Receivable:</span>
-                    <span>₨ {(payingInvoice.amount + (payingInvoice.electricityAmount || 0) + (payingInvoice.generatorAmount || 0) + (payingInvoice.utilityAmount || 0) + (payingInvoice.waterAmount || 0) + (payingInvoice.insuranceAmount || 0) + (payingInvoice.dieselAmount || 0) + (payingInvoice.structureMaintenanceAmount || 0) + (payingInvoice.otherAmount || 0) + (payingInvoice.previousPendingOutstandingDue || 0) + (payingInvoice.latePenaltyAmount || 0) + (payingInvoice.electricityVatAmount || 0) - (payingInvoice.paidAmount || 0)).toLocaleString()}</span>
+                    {(() => {
+                      const totalAmt = (payingInvoice.amount + (payingInvoice.electricityAmount || 0) + (payingInvoice.generatorAmount || 0) + (payingInvoice.utilityAmount || 0) + (payingInvoice.waterAmount || 0) + (payingInvoice.insuranceAmount || 0) + (payingInvoice.dieselAmount || 0) + (payingInvoice.structureMaintenanceAmount || 0) + (payingInvoice.otherAmount || 0) + (payingInvoice.previousPendingOutstandingDue || 0) + (payingInvoice.latePenaltyAmount || 0) + (payingInvoice.electricityVatAmount || 0) - (payingInvoice.paidAmount || 0))
+                      return <span>{totalAmt <= 0 ? '₨ 0 (Fully Paid)' : `₨ ${totalAmt.toLocaleString()}`}</span>
+                    })()}
                   </div>
                   
                   <div className="flex justify-between items-center bg-white p-2 rounded border border-indigo-100">
                     <Label className="text-sm font-semibold">
-                      {paymentMethod === 'cheque' ? 'Cheque Amount:' : 'Total Pay Amount:'}
+                      {paymentMethod === 'cheque' ? 'Cheque Amount:' : payingInvoice.status === 'paid' ? 'Advance Pay Amount:' : 'Total Pay Amount:'}
                     </Label>
                     <div className="flex items-center gap-1 w-1/2">
                       <span className="font-semibold text-gray-500">₨</span>
                       <Input 
                         type="number"
+                        placeholder={payingInvoice.status === 'paid' ? 'e.g. 5000' : ''}
                         className="h-8 text-right font-bold"
                         value={paymentMethod === 'cheque' ? chequeAmount : receiveAmount}
                         onChange={e => paymentMethod === 'cheque' ? setChequeAmount(e.target.value) : setReceiveAmount(e.target.value)}
@@ -1424,16 +1447,25 @@ export default function InvoicesPage() {
                   {(() => {
                     const invoiceTotal = payingInvoice.amount + (payingInvoice.electricityAmount || 0) + (payingInvoice.generatorAmount || 0) + (payingInvoice.utilityAmount || 0) + (payingInvoice.waterAmount || 0) + (payingInvoice.insuranceAmount || 0) + (payingInvoice.dieselAmount || 0) + (payingInvoice.structureMaintenanceAmount || 0) + (payingInvoice.otherAmount || 0) + (payingInvoice.previousPendingOutstandingDue || 0) + (payingInvoice.latePenaltyAmount || 0) + (payingInvoice.electricityVatAmount || 0)
                     const prevPaid = payingInvoice.paidAmount || 0
-                    const remainingTotal = invoiceTotal - prevPaid
+                    const remainingTotal = Math.max(0, invoiceTotal - prevPaid)
                     const parsedAmount = parseFloat(paymentMethod === 'cheque' ? chequeAmount : receiveAmount)
                     const currentPayment = isNaN(parsedAmount) ? 0 : parsedAmount
                     const newRemaining = remainingTotal - currentPayment
+
+                    if (payingInvoice.status === 'paid' || remainingTotal <= 0) {
+                      return (
+                        <div className="text-[11px] text-emerald-600 font-bold px-1 flex justify-between pt-1">
+                          <span>Credit Type: Advance Payment</span>
+                          <span>+ Advance Credit: ₨ {currentPayment.toLocaleString()}</span>
+                        </div>
+                      )
+                    }
 
                     return (
                       <div className="text-[11px] text-gray-500 font-medium px-1 flex justify-between">
                         <span>Calculate: ₨ {remainingTotal.toLocaleString()} - ₨ {currentPayment.toLocaleString()}</span>
                         <span className={newRemaining > 0 ? "text-amber-600 font-bold" : "text-green-600 font-bold"}>
-                          = Remaining: ₨ {newRemaining.toLocaleString()}
+                          {newRemaining < 0 ? `= + Advance Credit: ₨ ${Math.abs(newRemaining).toLocaleString()}` : `= Remaining: ₨ ${newRemaining.toLocaleString()}`}
                         </span>
                       </div>
                     )

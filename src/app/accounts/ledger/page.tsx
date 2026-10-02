@@ -9,7 +9,7 @@ import { Invoice, Payment } from '@/types/models'
 import { Label } from '@/components/ui/label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Badge } from '@/components/ui/badge'
-import { Loader2, Download, Search } from 'lucide-react'
+import { Loader2, Download, Search, CheckCircle2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog'
@@ -62,8 +62,17 @@ export default function TenantLedgerPage() {
   const handleOpenReceivePayment = (inv: any) => {
     setPayingInvoice(inv)
     setPaymentMethod('cash')
-    setReceiveAmount('')
-    setChequeAmount('')
+    const invoiceTotal = inv.amount + (inv.electricityAmount || 0) + (inv.electricityVatAmount || 0) + (inv.generatorAmount || 0) + (inv.utilityAmount || 0) + (inv.waterAmount || 0) + (inv.insuranceAmount || 0) + (inv.dieselAmount || 0) + (inv.structureMaintenanceAmount || 0) + (inv.otherAmount || 0) + (inv.previousPendingOutstandingDue || 0) + (inv.latePenaltyAmount || 0)
+    const prevPaid = inv.paidAmount || 0
+    const remainingAmount = invoiceTotal - prevPaid
+
+    if (inv.status === 'paid' || remainingAmount <= 0) {
+      setReceiveAmount('')
+      setChequeAmount('')
+    } else {
+      setReceiveAmount(remainingAmount > 0 ? remainingAmount.toString() : '')
+      setChequeAmount(remainingAmount > 0 ? remainingAmount.toString() : '')
+    }
     setBankName('')
     setChequeNumber('')
     setIsReceiveModalOpen(true)
@@ -96,26 +105,21 @@ export default function TenantLedgerPage() {
         return
       }
 
-      if (paymentAmount > remainingTotal) {
-        alert('Payment amount cannot be greater than the remaining balance.')
-        setIsPaying(false)
-        return
+      const payDateISO = getPaymentDateForMonth(payingInvoice.month)
+      const isAdvancePayment = payingInvoice.status === 'paid' || remainingTotal <= 0
+      const newPayment: Payment = {
+        id: paymentRef.id,
+        invoiceId: payingInvoice.id,
+        tenantId: payingInvoice.tenantId,
+        amount: paymentAmount,
+        method: paymentMethod === 'cash' ? 'cash' : paymentMethod === 'cheque' ? 'cheque' : 'qr',
+        transactionId: paymentMethod === 'qr' ? 'FON-QR-' + Math.random().toString(36).substring(2, 10).toUpperCase() : 'REC-' + Math.random().toString(36).substring(2, 10).toUpperCase(),
+        status: isCheque ? 'pending_clearance' : 'completed',
+        paidAt: payDateISO,
+        createdAt: payDateISO,
+        receiptNo: 'No.: ' + Math.floor(1000 + Math.random() * 9000),
+        receivedFor: isAdvancePayment ? `Advance Payment - ${payingInvoice.month}` : `Monthly Bill - ${payingInvoice.month}`
       }
-      
-        const payDateISO = getPaymentDateForMonth(payingInvoice.month)
-        const newPayment: Payment = {
-          id: paymentRef.id,
-          invoiceId: payingInvoice.id,
-          tenantId: payingInvoice.tenantId,
-          amount: paymentAmount,
-          method: paymentMethod === 'cash' ? 'cash' : paymentMethod === 'cheque' ? 'cheque' : 'qr',
-          transactionId: paymentMethod === 'qr' ? 'FON-QR-' + Math.random().toString(36).substring(2, 10).toUpperCase() : 'REC-' + Math.random().toString(36).substring(2, 10).toUpperCase(),
-          status: isCheque ? 'pending_clearance' : 'completed',
-          paidAt: payDateISO,
-          createdAt: payDateISO,
-          receiptNo: 'No.: ' + Math.floor(1000 + Math.random() * 9000),
-          receivedFor: `Monthly Bill - ${payingInvoice.month}`
-        }
 
       if (isCheque) {
         newPayment.bankName = bankName
@@ -498,6 +502,12 @@ export default function TenantLedgerPage() {
           </DialogHeader>
           {payingInvoice && (
             <div className="space-y-4 pt-3">
+              {payingInvoice.status === 'paid' && (
+                <div className="bg-emerald-50 border border-emerald-200 text-emerald-800 p-2.5 rounded-md text-xs font-semibold flex items-center gap-2">
+                  <CheckCircle2 className="h-4 w-4 text-emerald-600 shrink-0" />
+                  <span>Invoice is fully paid. Any amount entered will be recorded as <strong>Advance Payment</strong> credit for the resident.</span>
+                </div>
+              )}
               <div className="bg-gray-50 border p-3.5 rounded-lg space-y-1 text-sm">
                 <p><strong>Resident Name:</strong> {formatTenantName(payingInvoice.tenantName, payingInvoice.tenantId)}</p>
                 <p><strong>Unit / Apartment:</strong> {payingInvoice.unitNumber}</p>
@@ -505,17 +515,21 @@ export default function TenantLedgerPage() {
                 <div className="pt-2 mt-2 border-t space-y-2">
                   <div className="flex justify-between items-center text-base text-indigo-700 font-bold">
                     <span>Grand Total Receivable:</span>
-                    <span>₨ {(payingInvoice.amount + (payingInvoice.electricityAmount || 0) + (payingInvoice.generatorAmount || 0) + (payingInvoice.utilityAmount || 0) + (payingInvoice.waterAmount || 0) + (payingInvoice.insuranceAmount || 0) + (payingInvoice.dieselAmount || 0) + (payingInvoice.structureMaintenanceAmount || 0) + (payingInvoice.otherAmount || 0) + (payingInvoice.previousPendingOutstandingDue || 0) + (payingInvoice.latePenaltyAmount || 0) + (payingInvoice.electricityVatAmount || 0) - (payingInvoice.paidAmount || 0)).toLocaleString()}</span>
+                    {(() => {
+                      const totalAmt = (payingInvoice.amount + (payingInvoice.electricityAmount || 0) + (payingInvoice.generatorAmount || 0) + (payingInvoice.utilityAmount || 0) + (payingInvoice.waterAmount || 0) + (payingInvoice.insuranceAmount || 0) + (payingInvoice.dieselAmount || 0) + (payingInvoice.structureMaintenanceAmount || 0) + (payingInvoice.otherAmount || 0) + (payingInvoice.previousPendingOutstandingDue || 0) + (payingInvoice.latePenaltyAmount || 0) + (payingInvoice.electricityVatAmount || 0) - (payingInvoice.paidAmount || 0))
+                      return <span>{totalAmt <= 0 ? '₨ 0 (Fully Paid)' : `₨ ${totalAmt.toLocaleString()}`}</span>
+                    })()}
                   </div>
                   
                   <div className="flex justify-between items-center bg-white p-2 rounded border border-indigo-100">
                     <Label className="text-sm font-semibold">
-                      {paymentMethod === 'cheque' ? 'Cheque Amount:' : 'Total Pay Amount:'}
+                      {paymentMethod === 'cheque' ? 'Cheque Amount:' : payingInvoice.status === 'paid' ? 'Advance Pay Amount:' : 'Total Pay Amount:'}
                     </Label>
                     <div className="flex items-center gap-1 w-1/2">
                       <span className="font-semibold text-gray-500">₨</span>
                       <Input 
                         type="number"
+                        placeholder={payingInvoice.status === 'paid' ? 'e.g. 5000' : ''}
                         className="h-8 text-right font-bold"
                         value={paymentMethod === 'cheque' ? chequeAmount : receiveAmount}
                         onChange={e => paymentMethod === 'cheque' ? setChequeAmount(e.target.value) : setReceiveAmount(e.target.value)}
@@ -526,10 +540,19 @@ export default function TenantLedgerPage() {
                   {(() => {
                     const invoiceTotal = payingInvoice.amount + (payingInvoice.electricityAmount || 0) + (payingInvoice.generatorAmount || 0) + (payingInvoice.utilityAmount || 0) + (payingInvoice.waterAmount || 0) + (payingInvoice.insuranceAmount || 0) + (payingInvoice.dieselAmount || 0) + (payingInvoice.structureMaintenanceAmount || 0) + (payingInvoice.otherAmount || 0) + (payingInvoice.previousPendingOutstandingDue || 0) + (payingInvoice.latePenaltyAmount || 0) + (payingInvoice.electricityVatAmount || 0)
                     const prevPaid = payingInvoice.paidAmount || 0
-                    const remainingTotal = invoiceTotal - prevPaid
+                    const remainingTotal = Math.max(0, invoiceTotal - prevPaid)
                     const parsedAmount = parseFloat(paymentMethod === 'cheque' ? chequeAmount : receiveAmount)
                     const currentPayment = isNaN(parsedAmount) ? 0 : parsedAmount
                     const newRemaining = remainingTotal - currentPayment
+
+                    if (payingInvoice.status === 'paid' || remainingTotal <= 0) {
+                      return (
+                        <div className="text-[11px] text-emerald-600 font-bold px-1 flex justify-between pt-1">
+                          <span>Credit Type: Advance Payment</span>
+                          <span>+ Advance Credit: ₨ {currentPayment.toLocaleString()}</span>
+                        </div>
+                      )
+                    }
 
                     return (
                       <div className="text-[11px] text-gray-500 font-medium px-1 flex justify-between">

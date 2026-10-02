@@ -49,7 +49,7 @@ export interface Invoice {
   latePenaltyAmount?: number
   paidAmount?: number
   dueDate: string
-  status: 'draft' | 'pending' | 'partial' | 'paid' | 'overdue' | 'carried_forward'
+  status: 'draft' | 'pending' | 'partial' | 'paid' | 'overdue' | 'carried_forward' | 'cancelled'
   createdAt: string
   updatedAt: string
 }
