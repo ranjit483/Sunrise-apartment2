@@ -111,7 +111,7 @@ export function Sidebar({ collapsed, setCollapsed, mobileOpen, setMobileOpen }: 
             {!collapsed && (
               <Link href="/dashboard" className="flex items-center gap-2">
                 <div className="h-9 w-9 rounded-lg overflow-hidden border shadow-sm flex items-center justify-center bg-white">
-                  <img src="/logo.jpg" alt="Sunrise Logo" className="h-full w-full object-cover" />
+                  <img src="/logo.png" alt="Sunrise Logo" className="h-full w-full object-cover" />
                 </div>
                 <span className="font-bold text-lg text-foreground">Sunrise</span>
               </Link>
