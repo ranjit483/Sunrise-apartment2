@@ -345,7 +345,7 @@ export default function InvoicesPage() {
           });
         }
 
-        const prevDue = prevDueCalculated + (user.previousPendingOutstandingDue || 0);
+        const prevDue = userInvoices.length === 0 ? (user.previousPendingOutstandingDue || 0) : prevDueCalculated;
         const latePenaltyAmount = Math.round(prevDue * (lateFeePercent / 100));
 
         const createdDateIso = invoiceDate ? new Date(invoiceDate + 'T12:00:00.000Z').toISOString() : new Date().toISOString()
