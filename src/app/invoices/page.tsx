@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo, useCallback } from 'react'
 import { DashboardLayout } from '@/components/layout/DashboardLayout'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
@@ -123,10 +123,10 @@ export default function InvoicesPage() {
     fetchUsers()
   }, [])
 
-  const formatTenantName = (name: string | null | undefined, tenantId?: string) => {
+  const formatTenantName = useCallback((name: string | null | undefined, tenantId?: string) => {
     if (tenantId && usersMap[tenantId]) return usersMap[tenantId]
     return name || 'Unknown'
-  }
+  }, [usersMap])
   
   const [isGenerateModalOpen, setIsGenerateModalOpen] = useState(false)
   const [isGenerating, setIsGenerating] = useState(false)
@@ -669,16 +669,16 @@ export default function InvoicesPage() {
     window.print()
   }
 
-  const draftCount = invoices.filter(i => i.status === 'draft').length
-  const pendingCount = invoices.filter(i => i.status === 'pending').length
-  const overdueCount = invoices.filter(i => i.status === 'overdue').length
-  const collectedAmount = invoices.reduce((acc, i) => acc + (i.paidAmount || 0), 0)
-  const outstandingAmount = invoices.filter(i => i.status !== 'draft' && i.status !== 'carried_forward').reduce((acc, i) => {
+  const draftCount = useMemo(() => invoices.filter(i => i.status === 'draft').length, [invoices])
+  const pendingCount = useMemo(() => invoices.filter(i => i.status === 'pending').length, [invoices])
+  const overdueCount = useMemo(() => invoices.filter(i => i.status === 'overdue').length, [invoices])
+  const collectedAmount = useMemo(() => invoices.reduce((acc, i) => acc + (i.paidAmount || 0), 0), [invoices])
+  const outstandingAmount = useMemo(() => invoices.filter(i => i.status !== 'draft' && i.status !== 'carried_forward').reduce((acc, i) => {
     const total = i.amount + (i.electricityAmount || 0) + (i.generatorAmount || 0) + (i.utilityAmount || 0) + (i.waterAmount || 0) + (i.insuranceAmount || 0) + (i.dieselAmount || 0) + (i.structureMaintenanceAmount || 0) + (i.otherAmount || 0) + (i.previousPendingOutstandingDue || 0) + (i.latePenaltyAmount || 0) + (i.electricityVatAmount || 0);
     return acc + (total - (i.paidAmount || 0));
-  }, 0)
+  }, 0), [invoices])
 
-  const filteredInvoices = invoices.filter(inv => {
+  const filteredInvoices = useMemo(() => invoices.filter(inv => {
     if (statusFilter !== 'all' && inv.status !== statusFilter) return false
     if (!searchQuery.trim()) return true
     const q = searchQuery.toLowerCase().trim()
@@ -687,7 +687,7 @@ export default function InvoicesPage() {
     const unit = (inv.unitNumber || inv.unitId || '').toLowerCase()
     const month = (inv.month || '').toLowerCase()
     return tName.includes(q) || id.includes(q) || unit.includes(q) || month.includes(q)
-  })
+  }), [invoices, statusFilter, searchQuery, formatTenantName])
 
   return (
     <DashboardLayout title="Invoices & Billing">
@@ -839,10 +839,10 @@ export default function InvoicesPage() {
                     </tr>
                   </thead>
                   <tbody>
-                    {filteredInvoices.map((inv) => {
+                    {filteredInvoices.map((inv, idx) => {
                       const total = inv.amount + (inv.electricityAmount || 0) + (inv.generatorAmount || 0) + (inv.utilityAmount || 0) + (inv.waterAmount || 0) + (inv.insuranceAmount || 0) + (inv.dieselAmount || 0) + (inv.structureMaintenanceAmount || 0) + (inv.otherAmount || 0) + (inv.previousPendingOutstandingDue || 0) + (inv.latePenaltyAmount || 0) + (inv.electricityVatAmount || 0)
                       return (
-                        <tr key={inv.id || Math.random().toString()} className="border-b hover:bg-gray-50/50">
+                        <tr key={inv.id || `inv-${idx}`} className="border-b hover:bg-gray-50/50">
                           <td className="py-2 px-2.5 font-medium whitespace-nowrap">{(inv.id || '').substring(0, 8)}...</td>
                           <td className="py-2 px-2.5 font-semibold text-gray-700 whitespace-nowrap">{inv.unitNumber || (inv.unitId && inv.unitId !== 'N/A' ? inv.unitId.substring(0,8) + '...' : 'N/A')}</td>
                           <td className="py-2 px-2.5 whitespace-nowrap">{formatTenantName(inv.tenantName, inv.tenantId)}</td>
