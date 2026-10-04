@@ -1402,7 +1402,7 @@ export default function InvoicesPage() {
 
       {/* RECEIVE PAYMENT WIZARD DIALOG */}
       <Dialog open={isReceiveModalOpen} onOpenChange={setIsReceiveModalOpen}>
-        <DialogContent className="max-w-md no-print">
+        <DialogContent className="max-w-md max-h-[90vh] overflow-y-auto no-print">
           <DialogHeader>
             <DialogTitle>Receive Payment - Counter Registry</DialogTitle>
             <DialogDescription>Process resident payments at the society front-desk counter.</DialogDescription>
