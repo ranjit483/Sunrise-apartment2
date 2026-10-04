@@ -187,7 +187,7 @@ export default function InvoicesPage() {
     const unsubscribe = onSnapshot(q, (snapshot: any) => {
       const bData: Invoice[] = []
       snapshot.forEach((doc: any) => {
-        bData.push(doc.data() as Invoice)
+        bData.push({ id: doc.id, ...doc.data() } as Invoice)
       })
       
       if (!canManageInvoices) {
@@ -680,12 +680,12 @@ export default function InvoicesPage() {
 
   const filteredInvoices = invoices.filter(inv => {
     if (statusFilter !== 'all' && inv.status !== statusFilter) return false
-    if (!searchQuery) return true
-    const q = searchQuery.toLowerCase()
+    if (!searchQuery.trim()) return true
+    const q = searchQuery.toLowerCase().trim()
     const tName = formatTenantName(inv.tenantName, inv.tenantId).toLowerCase()
-    const id = inv.id.toLowerCase()
-    const unit = (inv.unitNumber || inv.unitId).toLowerCase()
-    const month = inv.month.toLowerCase()
+    const id = (inv.id || '').toLowerCase()
+    const unit = (inv.unitNumber || inv.unitId || '').toLowerCase()
+    const month = (inv.month || '').toLowerCase()
     return tName.includes(q) || id.includes(q) || unit.includes(q) || month.includes(q)
   })
 
@@ -842,9 +842,9 @@ export default function InvoicesPage() {
                     {filteredInvoices.map((inv) => {
                       const total = inv.amount + (inv.electricityAmount || 0) + (inv.generatorAmount || 0) + (inv.utilityAmount || 0) + (inv.waterAmount || 0) + (inv.insuranceAmount || 0) + (inv.dieselAmount || 0) + (inv.structureMaintenanceAmount || 0) + (inv.otherAmount || 0) + (inv.previousPendingOutstandingDue || 0) + (inv.latePenaltyAmount || 0) + (inv.electricityVatAmount || 0)
                       return (
-                        <tr key={inv.id} className="border-b hover:bg-gray-50/50">
-                          <td className="py-2 px-2.5 font-medium whitespace-nowrap">{inv.id.substring(0, 8)}...</td>
-                          <td className="py-2 px-2.5 font-semibold text-gray-700 whitespace-nowrap">{inv.unitNumber || (inv.unitId !== 'N/A' ? inv.unitId.substring(0,8) + '...' : 'N/A')}</td>
+                        <tr key={inv.id || Math.random().toString()} className="border-b hover:bg-gray-50/50">
+                          <td className="py-2 px-2.5 font-medium whitespace-nowrap">{(inv.id || '').substring(0, 8)}...</td>
+                          <td className="py-2 px-2.5 font-semibold text-gray-700 whitespace-nowrap">{inv.unitNumber || (inv.unitId && inv.unitId !== 'N/A' ? inv.unitId.substring(0,8) + '...' : 'N/A')}</td>
                           <td className="py-2 px-2.5 whitespace-nowrap">{formatTenantName(inv.tenantName, inv.tenantId)}</td>
                           <td className="py-2 px-2.5 whitespace-nowrap">{inv.month}</td>
                           <td className="py-2 px-2.5 whitespace-nowrap">{inv.dueDate}</td>
@@ -1612,7 +1612,7 @@ export default function InvoicesPage() {
 
               <div className="grid grid-cols-2 gap-y-1.5 text-xs mb-5 border p-3 rounded-md bg-gray-50">
                 <div><strong>Unit Number:</strong> {viewingInvoice.unitNumber}</div>
-                <div className="text-right"><strong>Invoice No:</strong> {viewingInvoice.id.substring(0, 10).toUpperCase()}</div>
+                <div className="text-right"><strong>Invoice No:</strong> {(viewingInvoice.id || '').substring(0, 10).toUpperCase()}</div>
                 <div><strong>Owner/Tenant:</strong> {formatTenantName(viewingInvoice.tenantName, viewingInvoice.tenantId)}</div>
                 <div className="text-right"><strong>Date (AD):</strong> {getNepaliDate(viewingInvoice.createdAt).ad}</div>
                 <div><strong>Billing Month:</strong> <span className="uppercase font-bold">{viewingInvoice.month}</span></div>

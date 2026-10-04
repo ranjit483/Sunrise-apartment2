@@ -141,7 +141,7 @@ export default function PaymentsPage() {
     
     const unsubscribePayments = onSnapshot(q, (snapshot: any) => {
       const pData: Payment[] = []
-      snapshot.forEach((doc: any) => pData.push(doc.data() as Payment))
+      snapshot.forEach((doc: any) => pData.push({ id: doc.id, ...doc.data() } as Payment))
       // Sort in JavaScript to guarantee it works without composite indexes
       pData.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
       setPayments(pData)
@@ -711,8 +711,8 @@ export default function PaymentsPage() {
                   <tbody>
                     {payments.filter(p => p.status === 'pending_verification').map((p) => (
                       <tr key={p.id} className="border-b hover:bg-amber-50/30">
-                        <td className="py-2 px-2.5 font-mono text-[10px] sm:text-xs">{p.transactionId || p.id.substring(0, 10).toUpperCase()}</td>
-                        <td className="py-2 px-2.5 font-mono text-[10px] sm:text-xs">{p.tenantId.substring(0, 10)}...</td>
+                        <td className="py-2 px-2.5 font-mono text-[10px] sm:text-xs">{p.transactionId || (p.id ? p.id.substring(0, 10).toUpperCase() : 'N/A')}</td>
+                        <td className="py-2 px-2.5 font-mono text-[10px] sm:text-xs">{(p.tenantId || '').substring(0, 10)}...</td>
                         <td className="py-2 px-2.5 font-bold text-emerald-600 text-xs sm:text-sm">₨ {p.amount.toLocaleString()}</td>
                         <td className="py-2 px-2.5 font-semibold text-[10px] sm:text-xs uppercase text-indigo-700">{p.method.replace('_', ' ')}</td>
                         <td className="py-2 px-2.5 text-xs sm:text-sm font-medium whitespace-nowrap">{getNepaliDate(p.createdAt).bs.split(' (')[0]}</td>
@@ -780,7 +780,7 @@ export default function PaymentsPage() {
                     {filteredPayments.map((p) => (
                       <tr key={p.id} className="border-b hover:bg-gray-50/50">
                         <td className="py-2 px-2.5 font-semibold text-gray-700 text-xs sm:text-sm">{p.receiptNo || 'N/A'}</td>
-                        <td className="py-2 px-2.5 font-mono text-[10px] sm:text-xs">{p.transactionId || p.id.substring(0, 10).toUpperCase()}</td>
+                        <td className="py-2 px-2.5 font-mono text-[10px] sm:text-xs">{p.transactionId || (p.id ? p.id.substring(0, 10).toUpperCase() : 'N/A')}</td>
                         {!isResident && (
                           <td className="py-2 px-2.5">
                             <div className="font-medium text-xs sm:text-sm">{p.tenantName || formatTenantName(null, p.tenantId)}</div>
