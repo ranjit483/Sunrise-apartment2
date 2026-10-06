@@ -631,6 +631,8 @@ export default function InvoicesPage() {
         dieselAmount: Number(editingInvoice.dieselAmount || 0),
         structureMaintenanceAmount: Number(editingInvoice.structureMaintenanceAmount || 0),
         otherAmount: Number(editingInvoice.otherAmount || 0),
+        previousPendingOutstandingDue: Number(editingInvoice.previousPendingOutstandingDue || 0),
+        latePenaltyAmount: Number(editingInvoice.latePenaltyAmount || 0),
         dueDate: editingInvoice.dueDate,
         createdAt: editingInvoice.createdAt,
         updatedAt: new Date().toISOString()
@@ -1383,6 +1385,22 @@ export default function InvoicesPage() {
                     type="number" 
                     value={editingInvoice.otherAmount || 0} 
                     onChange={e => setEditingInvoice({...editingInvoice, otherAmount: Number(e.target.value)})} 
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label>Previous Due (₨)</Label>
+                  <Input 
+                    type="number" 
+                    value={editingInvoice.previousPendingOutstandingDue || 0} 
+                    onChange={e => setEditingInvoice({...editingInvoice, previousPendingOutstandingDue: Number(e.target.value)})} 
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label>Late Penalty (₨)</Label>
+                  <Input 
+                    type="number" 
+                    value={editingInvoice.latePenaltyAmount || 0} 
+                    onChange={e => setEditingInvoice({...editingInvoice, latePenaltyAmount: Number(e.target.value)})} 
                   />
                 </div>
               </div>
