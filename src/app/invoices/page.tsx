@@ -608,13 +608,6 @@ export default function InvoicesPage() {
     if (!editingInvoice) return
     setIsUpdating(true)
     try {
-      const settingsDoc = await getDoc(doc(db, 'settings', 'general'))
-      const settingsData = settingsDoc.exists() ? settingsDoc.data() : {}
-      const enableVat = settingsData.enableVat !== undefined ? settingsData.enableVat : true
-      const vatPercent = settingsData.vatPercent !== undefined ? settingsData.vatPercent : 16.79
-
-      const eVatAmount = enableVat ? Math.round(Number(editingInvoice.electricityAmount || 0) * (vatPercent / 100)) : 0;
-      
       const ref = doc(db, 'invoices', editingInvoice.id)
       await updateDoc(ref, {
         amount: Number(editingInvoice.amount),
@@ -622,7 +615,7 @@ export default function InvoicesPage() {
         electricityReading: Number(editingInvoice.electricityReading || 0),
         electricityConsumed: Number(editingInvoice.electricityConsumed || 0),
         electricityAmount: Number(editingInvoice.electricityAmount || 0),
-        electricityVatAmount: eVatAmount,
+        electricityVatAmount: Number(editingInvoice.electricityVatAmount || 0),
         generatorReading: Number(editingInvoice.generatorReading || 0),
         generatorAmount: Number(editingInvoice.generatorAmount || 0),
         utilityAmount: Number(editingInvoice.utilityAmount || 0),
@@ -1319,6 +1312,14 @@ export default function InvoicesPage() {
                     type="number" 
                     value={editingInvoice.electricityAmount || 0} 
                     onChange={e => setEditingInvoice({...editingInvoice, electricityAmount: Number(e.target.value)})} 
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label>Electricity VAT (₨)</Label>
+                  <Input 
+                    type="number" 
+                    value={editingInvoice.electricityVatAmount || 0} 
+                    onChange={e => setEditingInvoice({...editingInvoice, electricityVatAmount: Number(e.target.value)})} 
                   />
                 </div>
                 <div className="space-y-2">
